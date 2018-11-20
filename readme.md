@@ -34,7 +34,7 @@ cpu, sdram, vga, kb, sound, led, usb
 
 ## 文档
 
-1. 模块名
+1. 模一致
 2. 参数、input、output(含义、宽度)、高低有效
 3. 说明解释、功能简述
 4. 时序
