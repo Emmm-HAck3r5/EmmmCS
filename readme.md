@@ -2,11 +2,11 @@
 
 ## TODO
 
-# Instruction
+### Instruction
 
 RV32I
 Extensions:
-M F(待定) C B N
+M F(待定) C <del>B</del> N
 
 ### Manual
 
@@ -14,7 +14,7 @@ Chp.1
 Chp.2
 Chp.6
 Chp.8
-Chp.13
+<del>Chp.13</del>
 Chp.18
 Chp.19
 Chp.20
