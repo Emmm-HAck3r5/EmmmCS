@@ -4,6 +4,7 @@
 
 - [ ] Integer Computational Instructions
     - [ ] Integer Register-Immediate Instructions
+
         |Name|Type||
         |:-|:-|:-|
         |⭕`ADDI`  |I      |`ADDI X[rd] <- X[rs1] + imm(sign extended 12 bit)`|
@@ -17,6 +18,7 @@
         |⭕`SRAI` |I-spec |`SRAI X[rd] <- X[rs1] A->> imm[4:0]`|
         |⭕`LUI`  |U      |`LUI X[rd] <- {imm[31:12] << 12}`|
         |⭕`AUIPC`|U      |`AUIPC pc <- pc + {imm[31:12] << 12}; X[rd] <- pc`|
+
     - [ ] Integer Register-Register Operations
 - [ ] Control Transfer Instructions
     - [ ] Unconditional Jumps
