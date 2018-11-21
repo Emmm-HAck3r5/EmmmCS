@@ -1,0 +1,61 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: cpu_introduction.tex
+% Project: EmmmCS
+% File Created: 2018-11-21 09:20:55
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-11-21 16:11:01
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{综述}
+本项目CPU部分采用RISC-V ISA，依据riscv-spec-v 2.2构建。
+\section{指令集支持情况}
+\begin{tabular}{|c|c|c|}
+    \hline
+    指令集  &   版本    &   支持？\\\hline
+    RV32I   &   2.0 &   是\\\hline
+    RV32E   &   1.9 &   是\\\hline
+    RV64I   &   2.0 &   否\\\hline
+    RV128I  &   1.7 &   否\\\hline
+    Ext.M   &   2.0 &   是\\\hline
+    Ext.A   &   2.0 &   否\\\hline
+    Ext.F   &   2.0 &   是\\\hline
+    Ext.D   &   2.0 &   否\\\hline
+    Ext.Q   &   2.0 &   否\\\hline
+    Ext.L   &   0.0 &   否\\\hline
+    Ext.C   &   2.0 &   否\\\hline
+    Ext.B   &   0.0 &   否\\\hline
+    Ext.J   &   0.0 &   否\\\hline
+    Ext.T   &   0.0 &   否\\\hline
+    Ext.P   &   0.1 &   否\\\hline
+    Ext.V   &   0.2 &   否\\\hline
+    Ext.N   &   1.1 &   否\\\hline
+\end{tabular}
+\section{常量定义}
+常量均定义在$rtl/core/cpu\_define.v$内\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    名称    &   值  &   说明\\\hline
+    CPU\_XLEN   &   32  &   CPU字长\\\hline
+    \multicolumn{3}{|c|}{REG}\\\hline
+    CPU\_GREGIDX\_WIDTH &   5   &   通用寄存器访问下标位宽\\\hline
+    CPU\_GREG\_COUNT    &   32  &   通用寄存器数量\\\hline
+\end{tabular}

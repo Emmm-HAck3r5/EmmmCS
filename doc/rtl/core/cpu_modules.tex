@@ -1,0 +1,47 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: cpu_modules.tex
+% Project: EmmmCS
+% File Created: 2018-11-21 16:11:51
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-11-21 16:32:57
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{模块}
+各模块位于同名文件内。
+\section{cpu\_gregs}
+\subsection{基本信息}
+模块名：cpu\_gregs
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   1   &   clk &   时钟\\\hline
+    input   &   1   &   rd\_wen  &   目标寄存器写使能\\\hline
+    input   &   CPU\_GREGIDX\_WIDTH &   rs1\_idx    &   rs1下标\\\hline
+    input   &   CPU\_GREGIDX\_WIDTH &   rs2\_idx    &   rs2下标\\\hline
+    input   &   CPU\_GREGIDX\_WIDTH &   rd\_idx    &   rd下标\\\hline
+    output   &   CPU\_XLEN &   rs1\_dat    &   rs1数据\\\hline
+    output   &   CPU\_XLEN &   rs2\_dat    &   rs2数据\\\hline
+    input   &   CPU\_XLEN &   rd\_dat    &   rd数据\\\hline
+\end{tabular}
+\subsection{说明}
+本模块定义CPU通用寄存器组，在时钟上升沿完成数据写入和读取，遵循先读后写顺序。
