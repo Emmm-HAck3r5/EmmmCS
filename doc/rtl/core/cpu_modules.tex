@@ -45,3 +45,45 @@
 \end{tabular}
 \subsection{说明}
 本模块定义CPU通用寄存器组，在时钟上升沿完成数据写入和读取，遵循先读后写顺序。
+
+\section{cpu\_bus\_ctrl}
+\subsection{基本信息}
+模块名：cpu\_bus\_ctrl
+所需周期：1 到 5 个周期
+\subsection{内部接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型        &   位宽    &   名称    &   说明\\\hline
+    input       &   1      &    clk     &   时钟信号\\\hline
+    input       &   26     &    address &   地址端\\\hline
+    input       &   32      &   wdata   &   写入数据\\\hline
+    input       &   2       &   WLEN    &   SDRAM读写控制\\\hline
+    inout       &   1       &   READY   &   双向预备信号\\\hline
+    output reg  &   32      &   rdata   &   读取数据\\\hline
+\end{tabular}
+\subsection{SDRAM接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型        &   位宽    &   名称    &   说明\\\hline
+    output reg  &   13     &    ADDR   &    DRAM\_ADDR[12..0]\\\hline
+    output reg  &   2       &   BA      &   DRAM\_BA[1..0]\\\hline
+    output reg  &   16      &   DQ      &   DRAM\_DQ[15..0]\\\hline
+    output reg  &   1       &   CKE     &   DRAM\_CKE\\\hline 
+    output reg  &   1       &   CS\_N     &   DRAM\_CS\_N\\\hline 
+    output reg  &   1       &   RAS\_N     &   DRAM\_RAS\_N\\\hline 
+    output reg  &   1       &   CAS\_N     &   DRAM\_CAS\_N\\\hline 
+    output reg  &   2       &   DMASK     &  \{DRAM\_UDQM, DRAM\_LDQM\}\\\hline 
+\end{tabular}
+\subsection{WLEN控制信号真值表}
+\begin{tabular}{|c|c|c|}
+    \hline
+    WLEN[1]  &  WLEN[0] &       功能\\\hline
+    0       &   0       &       32位读取操作\\\hline
+    0       &   1       &       8位写入操作\\\hline
+    1       &   0       &       16位写入操作\\\hline
+    1       &   1       &       32位写入操作\\\hline
+\end{tabular}
+\subsection{说明}
+SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
+\indent将双端口READY置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
+\indent读取操作固定返回输入地址后4个字节长的数据。执行写入操作时，超出写入长度的数据将被忽略。当地址输入端address最高位为高电位时，表示对片内寄存器进行读写操作，而非SDRAM，所需时间皆为 1 个时钟周期。
