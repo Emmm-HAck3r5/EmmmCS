@@ -32,6 +32,8 @@
 //instruction length
 `define CPU_INSTR_LENGTH 32
 //decoder info
+`define FUNCT_WIDTH 10
+`define OPCODE_WIDTH 7
 `define CPU_INSTR_INFO_WIDTH 5
 `define CPU_INSTR_OPR_INFO_WIDTH 8
 `define CPU_INSTR_DECODE_INFO_WIDTH 13

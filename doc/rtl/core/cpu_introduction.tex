@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@
 \section{常量定义}
 常量均定义在$rtl/core/cpu\_define.v$内\\
 \begin{center}
-\begin{tabular}{|c|p{3cm}|p{6cm}|}
+\begin{tabular}{|l|p{3cm}|p{6cm}|}
     \hline
     名称    &   值  &   说明\\\hline
     CPU\_XLEN   &   32  &   CPU字长\\\hline
@@ -66,10 +66,10 @@
     \makecell[{}{p{3cm}}]{CPU\_INSTR\_ \\ DECODE\_INFO\_WIDTH} & 13 & 指令解码信息位宽\\\hline
     \multicolumn{2}{|c|}{CPU\_INSTR\_OPR\_INFO\_WIDTH}&\\\hline
     CPU\_INSTR\_OPR\_INVALID & b0 & 无效操作数\\\hline
-    CPU\_INSTR\_OPR\_IMM & b1 & 操作数：立即数\\\hline
-    CPU\_INSTR\_OPR\_RS1 & b10 & 操作数：RS1\\\hline
-    CPU\_INSTR\_OPR\_RS2 & b100 & 操作数：RS2\\\hline
-    CPU\_INSTR\_OPR\_RD & b1000 & 操作数：RD\\\hline
+    CPU\_INSTR\_OPR\_IMM & b00001 & 操作数：立即数\\\hline
+    CPU\_INSTR\_OPR\_RS1 & b00010 & 操作数：RS1\\\hline
+    CPU\_INSTR\_OPR\_RS2 & b00100 & 操作数：RS2\\\hline
+    CPU\_INSTR\_OPR\_RD & b01000 & 操作数：RD\\\hline
     CPU\_INSTR\_OPR\_RS3 & b10000 & 操作数：R\\\hline
     CPU\_INSTR\_GRP\_INVALID & 0 & 无效指令组\\\hline
     \multicolumn{3}{|c|}{RV32I}\\\hline
