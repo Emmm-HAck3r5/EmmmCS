@@ -21,7 +21,7 @@
 % File Created: 2018-11-21 16:11:51
 % Author: Chen Haodong (easyai@outlook.com)
 % --------------------------
-% Last Modified: 2018-11-21 16:32:57
+% Last Modified: 2018-11-25 11:50:31
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
@@ -87,3 +87,34 @@
 SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
 \indent将双端口READY置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
 \indent读取操作固定返回输入地址后4个字节长的数据。执行写入操作时，超出写入长度的数据将被忽略。当地址输入端address最高位为高电位时，表示对片内寄存器进行读写操作，而非SDRAM，所需时间皆为 1 个时钟周期。
+
+\section{cpu\_instr\_decoder}
+\subsection{基本信息}
+模块名：cpu\_instr\_decoder
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   CPU\_INSTR\_LENGTH   &   instr &   输入指令\\\hline
+    output   &   CPU\_GREGIDX\_WIDTH &   rs1\_idx    &   rs1下标\\\hline
+    output   &   CPU\_GREGIDX\_WIDTH &   rs2\_idx    &   rs2下标\\\hline
+    output   &   CPU\_GREGIDX\_WIDTH &   rs3\_idx    &   rs3下标\\\hline
+    output   &   CPU\_GREGIDX\_WIDTH &   rd\_idx    &   rd下标\\\hline
+    output   &   CPU\_XLEN &   imm    &   立即数\\\hline
+    output   &   FUNCT\_WIDTH &   funct    &   funct\\\hline
+    output   &   OPCODE\_WIDTH &   opcode    &   opcode\\\hline
+    output   &   CPU\_INSTR\_DECODE\_INFO\_WIDTH &   dec\_instr\_info    &   指令解码信息\\\hline
+    output   &   1 &   instr\_valid    &   指令是否有效\\\hline
+    output   &   1 &   fp\_rm    &   浮点数rm\\\hline
+    output   &   1 &   fp\_width    &   浮点数width\\\hline
+    output   &   1 &   fp\_fmt    &   浮点数fmt\\\hline
+\end{tabular}
+\subsection{常量}
+\begin{tabular}{|c|p{3cm}|p{6cm}|}
+    \hline
+    名称    &   值  &   说明\\\hline
+    FUNCT\_WIDTH & 10 & funct位宽\\\hline
+    OPCODE\_WIDTH & 7 & opcode位宽\\\hline
+\end{tabular}
+\subsection{说明}
+本模块定义CPU指令解码器，对输入指令给出相应解码内容。应注意指令解码信息(dec\_instr\_info)中，低CPU\_INSTR\_OPR\_INFO\_WIDTH位为操作数信息，高CPU\_INSTR\_INFO\_WIDTH位为指令组信息。具体信息编码见1.2节。
