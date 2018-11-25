@@ -27,6 +27,8 @@
 
 \chapter{模块}
 各模块位于同名文件内。
+
+% cpu_gregs moudule
 \section{cpu\_gregs}
 \subsection{基本信息}
 模块名：cpu\_gregs
@@ -46,10 +48,52 @@
 \subsection{说明}
 本模块定义CPU通用寄存器组，在时钟上升沿完成数据写入和读取，遵循先读后写顺序。
 
+% cpu_gregs moudule
+\section{cpu\_alu}
+\subsection{基本信息}
+模块名：cpu\_alu\\
+\indent所需时间：(未定)
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型       &   位宽    &   名称    &   说明\\\hline
+    input      &   32      &   src\_A   &   A 输入端\\\hline
+    input      &   32      &   src\_B   &   B 输入端\\\hline
+    input      &   4       &    select  &   功能控制端\\\hline
+    output reg &   64      &    dest    &   输出端\\\hline
+    output reg &   4       &    flags   &   \{CF, OF, ZF, SF\}\\\hline
+    output reg &   1       &    READY   &   双向控制信号\\\hline
+\end{tabular}
+\subsection{select控制端真值表}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    select      &   指令   &      操作\\\hline
+    0000        &   ADD     &    ${dest := src\_A + src\_B}$\\\hline
+    0001        &   SUB     &    ${dest := src\_A - src\_B}$\\\hline
+    0010        &   AND     &    ${dest := src\_A\ \&\ src\_B}$\\\hline
+    0011        &   OR     &     ${dest := src\_A\ |\ src\_B}$\\\hline
+    0100        &   XOR     &    ${dest := src\_A \oplus src\_B}$\\\hline
+    0101        &   SLL     &    ${dest := src\_A \ll src\_B}$\\\hline
+    0110        &   SRL     &    ${dest := src\_A \gg src\_B}$\\\hline
+    0111        &   SRA     &    ${dest := src\_A \gg src\_B}$\\\hline
+    1000        &   MUL     &    ${dest := src\_A\ *\ src\_B}$\\\hline
+    1001        &   MULU    &    ${dest := src\_A\ *\ src\_B}$\\\hline
+    1010        &   MULSU   &    ${dest := src\_A\ *\ src\_B}$\\\hline
+    1011        &   DIV     &    ${dest := src\_A\ /\ src\_B}$\\\hline
+    1100        &   DIVU     &   ${dest := src\_A\ /\ src\_B}$\\\hline
+    1101        &   REM     &    ${dest := src\_A\ \%\ src\_B}$\\\hline
+    1110        &   REMU     &   ${dest := src\_A\ \%\ src\_B}$\\\hline
+    1111        &   NOP     &    ${dest := 0}$\\\hline
+\end{tabular}
+\subsection{说明}
+将双端口READY置零后，ALU开始进行运算。当READY恢复高电平时，表示运算已完成。\\
+\indent指令带\ U\ 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令\ MULSU\ 为 ${sign * unsigned}$ 操作。dest 高32位仅在乘法操作(MUL, MULU, MULSU)时有效，其他操作结果都放在低32位，高32位置零。指令标志位按 i386 手册上定义设置。
+
+% cpu_bus_ctrl moudule
 \section{cpu\_bus\_ctrl}
 \subsection{基本信息}
-模块名：cpu\_bus\_ctrl
-所需周期：1 到 5 个周期
+模块名：cpu\_bus\_ctrl\\
+\indent所需周期：1 到 5 个周期
 \subsection{内部接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
@@ -58,7 +102,7 @@
     input       &   26     &    address &   地址端\\\hline
     input       &   32      &   wdata   &   写入数据\\\hline
     input       &   2       &   WLEN    &   SDRAM读写控制\\\hline
-    inout       &   1       &   READY   &   双向预备信号\\\hline
+    inout       &   1       &   READY   &   双向控制信号\\\hline
     output reg  &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
 \subsection{SDRAM接口}
