@@ -62,7 +62,7 @@
     input      &   4       &    select  &   功能控制端\\\hline
     output reg &   64      &    dest    &   输出端\\\hline
     output reg &   4       &    flags   &   \{CF, OF, ZF, SF\}\\\hline
-    output reg &   1       &    READY   &   双向控制信号\\\hline
+    inout reg  &   1       &    READY   &   双向控制信号\\\hline
 \end{tabular}
 \subsection{select控制端真值表}
 \begin{tabular}{|c|c|c|}
@@ -99,7 +99,7 @@
     \hline
     类型        &   位宽    &   名称    &   说明\\\hline
     input       &   1      &    clk     &   时钟信号\\\hline
-    input       &   26     &    address &   地址端\\\hline
+    input       &   32     &    address &   地址端\\\hline
     input       &   32      &   wdata   &   写入数据\\\hline
     input       &   2       &   WLEN    &   SDRAM读写控制\\\hline
     inout       &   1       &   READY   &   双向控制信号\\\hline
