@@ -1,31 +1,84 @@
 `include "cpu_define.v"
-`define STATUS_LEN 3
-`define STATUS_FETCH_INSTR `STATUS_LEN'd0
-`define STATUS_DECODE_INSTR `STATUS_LEN'd1
-`define STATUS_DECODE_DONE `STATUS_LEN'd2
-`define STATUS_GREG_WRITE_END `STATUS_LEN'd3
-`define STATUS_ALU `STATUS_LEN'd4
-`define STATUS_MEMIO `STATUS_LEN'd5
-`define STATUS_GREG_WRITE `STATUS_LEN'd6
-`define STATUS_BRANCH `STATUS_LEN'd7
+
+//status
+`define STATUS_LEN 4
+`define STATUS_INIT           `STATUS_LEN'h0
+`define STATUS_FETCHING_INSTR `STATUS_LEN'h1
+`define STATUS_DECODING_INSTR `STATUS_LEN'h2
+`define STATUS_SET_FLAG       `STATUS_LEN'h3
+`define STATUS_MEM_READ       `STATUS_LEN'h5
+`define STATUS_MEM_READING    `STATUS_LEN'h6
+`define STATUS_ALU            `STATUS_LEN'h7
+`define STATUS_ALUING         `STATUS_LEN'h8
+`define STATUS_REG_WRITE      `STATUS_LEN'h9
+`define STATUS_REG_WRITE_POST `STATUS_LEN'h4
+`define STATUS_MEM_WRITE      `STATUS_LEN'h10
+`define STATUS_MEM_WRITING    `STATUS_LEN'h11
+`define STATUS_BRANCH         `STATUS_LEN'h12
+
+//bus
+`define BUS_RUN      1'b0
+`define BUS_STOP     1'b1
+`define BUS_READ_32  2'b00
+`define BUS_WRITE_8  2'b01
+`define BUS_WRITE_16 2'b10
+`define BUS_WRITE_32 2'b11
+
+//alu
+`define ALU_RUN      1'b0
+`define ALU_STOP     1'b1
+`define ALU_WIDTH    4
+`define ALU_ADD    `ALU_WIDTH'b0000
+`define ALU_SUB    `ALU_WIDTH'b0001
+`define ALU_AND    `ALU_WIDTH'b0010
+`define ALU_OR     `ALU_WIDTH'b0011
+`define ALU_XOR    `ALU_WIDTH'b0100
+`define ALU_SLL    `ALU_WIDTH'b0101
+`define ALU_SRL    `ALU_WIDTH'b0110
+`define ALU_SRA    `ALU_WIDTH'b0111
+`define ALU_MUL    `ALU_WIDTH'b1000
+`define ALU_MULU   `ALU_WIDTH'b1001
+`define ALU_MULSU  `ALU_WIDTH'b1010
+`define ALU_DIV    `ALU_WIDTH'b1011
+`define ALU_DIVU   `ALU_WIDTH'b1100
+`define ALU_REM    `ALU_WIDTH'b1101
+`define ALU_REMU   `ALU_WIDTH'b1110
+`define ALU_NOP    `ALU_WIDTH'b1111
+
+//bcc
+`define INSTR_BCC_EQ  3'b000
+`define INSTR_BCC_NE  3'b001
+`define INSTR_BCC_LT  3'b100
+`define INSTR_BCC_GE  3'b101
+`define INSTR_BCC_LTU 3'b110
+`define INSTR_BCC_GEU 3'b111
+
+// load / store
+`define INSTR_LB  3'b000
+`define INSTR_LH  3'b001
+`define INSTR_LW  3'b010
+`define INSTR_LBU 3'b100
+`define INSTR_LHU 3'b101
+`define INSTR_SB  3'b000
+`define INSTR_SH  3'b001
+`define INSTR_SW  3'b010
+
+// alu_instr
+
 
 module cpu_instr_exec(
     input clk,
     input clr
 );
 
-// regs
-reg [31:0] pc;
-
 // gregs
-reg gregs_wen;
+reg  gregs_wen;
 wire [`CPU_GREGIDX_WIDTH-1:0] gregs_rs1_idx;
 wire [`CPU_GREGIDX_WIDTH-1:0] gregs_rs2_idx;
 wire [`CPU_GREGIDX_WIDTH-1:0] gregs_rd_idx;
-reg [`CPU_XLEN-1:0] gregs_rs1_dat;
-reg [`CPU_XLEN-1:0] gregs_rs2_dat;
-reg [`CPU_XLEN-1:0] gregs_rd_dat;
-
+reg  [`CPU_XLEN-1:0] gregs_rs1_dat;
+reg  [`CPU_XLEN-1:0] gregs_rs2_dat;
+reg  [`CPU_XLEN-1:0] gregs_rd_dat;
 cpu_gregs gregs(
     .clk(clk),
     .rd_wen(gregs_wen),
@@ -44,7 +97,6 @@ reg [3:0] alu_select;
 reg [63:0] alu_dest;
 reg [3:0] alu_flags;
 reg alu_ready;
-
 cpu_alu alu(
     .src_A(alu_src_A),
     .src_B(alu_src_B),
@@ -60,7 +112,6 @@ reg [31:0] bus_rdata;
 reg [1:0] bus_wlen;
 reg [31:0] bus_wdata;
 reg bus_ready;
-
 cpu_bus_ctrl bus_ctrl(
     .clk(clk),
     .address(bus_address),
@@ -84,7 +135,6 @@ reg decoder_instr_valid;
 reg decoder_fp_rm;
 reg decoder_fp_width;
 reg decoder_fp_fmt;
-
 cpu_instr_decoder decoder(
     .instr(decoder_instr)
     .rs1_idx(decoder_rs1_idx)
@@ -106,97 +156,248 @@ assign gregs_rs2_idx = decoder_rs2_idx;
 assign gregs_rd_idx  = decoder_rd_idx;
 
 // main logic
-reg [`STATUS_LEN-1 : 0] status;
+reg [31:0] pc;
 reg [31:0] pc_nxt;
+reg flag_alu;
+reg flag_reg_write;
+reg flag_mem_read;
+reg flag_mem_write;
+reg flag_branch;
+
+reg [`STATUS_LEN-1 : 0] status;
 always @(posedge clk) begin
     if (clr) begin
-        pc = 0;
-        status = 0;
-        gregs_wen = 0;
-        alu_ready = 1;
-        bus_ready = 1;
+        pc     <= 0;
+        status <= `STATUS_INIT;
+        gregs_wen <= 0;
+        alu_ready <= `ALU_STOP;
+        bus_ready <= `BUS_STOP;
     end else begin
         case(status)
-            `STATUS_FETCH_INSTR: begin
-                bus_address <= pc;
-                bus_wlen <= 2'b11;
-                bus_ready <= 1'b0;
-                status <= `STATUS_DECODE_INSTR;
+            `STATUS_INIT: begin
+                status <= `STATUS_FETCH_INSTR;
+                flag_alu   <= 0;
+                flag_reg_write  <= 0;
+                flag_mem_read   <= 0;
+                flag_mem_write  <= 0;
+                flag_branch     <= 0;
             end
-            `STATUS_DECODE_INSTR: begin
-                if (bus_ready) begin
-                    pc <= pc + 4;
+            `STATUS_FETCHING_INSTR: begin
+                bus_address <= pc;
+                bus_wlen    <= `BUS_READ_32;
+                bus_ready   <= `BUS_RUN;
+                status <= `STATUS_DECODING_INSTR;
+            end
+            `STATUS_DECODING_INSTR: begin
+                if (bus_ready == `BUS_STOP) begin
                     decoder_instr <= bus_rdata;
-                    status <= `STATUS_DECODE_DONE;
+                    status <= `STATUS_SET_FLAG;
                 end else begin
-                    pc <= pc;
                     status <= `STATUS_DECODE_INSTR;
                 end
             end
-            `STATUS_DECODE_DONE: begin
+            `STATUS_SET_FLAG: begin
                 if (decoder_instr_valid) begin
                     case (decoder_dec_instr_info[`CPU_INSTR_INFO_WIDTH+`CPU_INSTR_OPR_INFO_WIDTH-1 : `CPU_INSTR_OPR_INFO_WIDTH])
                         `CPU_INSTR_GRP_LUI: begin
-                            gregs_rd_dat <= decoder_imm;
-                            gregs_wren = 1;
-                            status <= STATUS_GREG_WRITE_END;
+                            flag_reg_write <= 1;
+                            gregs_rd_dat   <= decoder_imm;
+                            status <= `STATUS_REG_WRITE;
                         end
                         `CPU_INSTR_GRP_AUIPC: begin
-                            gregs_rd_dat <= decoder_imm;
-                            gregs_wren = 1;
-                            status <= STATUS_GREG_WRITE_END;
+                            flag_reg_write <= 1;
+                            flag_branch    <= 1;
+                            gregs_rd_dat   <= decoder_imm + pc;
+                            pc_nxt         <= decoder_imm + pc;
+                            status <= `STATUS_REG_WRITE;
+                        end
+                        `CPU_INSTR_GRP_JAL:    begin
+                            flag_reg_write <= 1;
+                            flag_branch    <= 1;
+                            gregs_rd_dat   <= pc + 4;
+                            pc_nxt         <= decoder_imm + pc;
+                            status <= `STATUS_REG_WRITE;
+                        end
+                        `CPU_INSTR_GRP_JALR:   begin
+                            flag_reg_write <= 1;
+                            flag_branch    <= 1;
+                            gregs_rd_dat   <= pc + 4;
+                            pc_nxt         <= (decoder_imm + rs1_dat) & {31'd1, 0};
+                            status <= `STATUS_REG_WRITE;
+                        end
+                        `CPU_INSTR_GRP_BCC:    begin
+                            pc_nxt <= (decoder_imm + rs1_dat) & {31'd1, 0};
+                            case (decoder_funct[2:0])
+                                `INSTR_BCC_EQ:  flag_branch <= (rs1_dat == rs2_dat);
+                                `INSTR_BCC_NE:  flag_branch <= (rs1_dat != rs2_dat);
+                                `INSTR_BCC_LT:  flag_branch <= (rs1_dat[31] >  rs2_dat[31]) ||
+                                                        ((rs1_dat[31] == rs2_dat[31]) &&
+                                                         (rs1_dat     <  rs2_dat);
+                                `INSTR_BCC_GE:  flag_branch <= (rs1_dat[31] <= rs2_dat[31]) &&
+                                                        ((rs1_dat[31] != rs2_dat[31]) ||
+                                                         (rs1_dat     >= rs2_dat);
+                                `INSTR_BCC_LTU: flag_branch <= (rs1_dat <  rs2_dat);
+                                `INSTR_BCC_GEU: flag_branch <= (rs1_dat >= rs2_dat);
+                                default:  flag_branch <= 0;
+                            endcase
+                            status <= `STATUS_BRANCH;
+                        end
+                        `CPU_INSTR_GRP_LOAD:   begin
+                            flag_mem_read  <= 1;
+                            flag_reg_write <= 1;
+                            bus_address    <= rs1_dat + decoder_imm;
+                            bus_wlen       <= `BUS_READ_32;
+                            status <= `STATUS_MEM_READ;
+                        end
+                        `CPU_INSTR_GRP_STORE:  begin
+                            flag_mem_write <= 1;
+                            bus_address    <= rs1_dat + decoder_imm;
+                            case (decoder_funct[2:0])
+                                `INSTR_SB: bus_wlen <= `BUS_WRITE_8;
+                                `INSTR_SH: bus_wlen <= `BUS_WRITE_16;
+                                `INSTR_SW: bus_wlen <= `BUS_WRITE_32;
+                            endcase
+                            status <= `STATUS_MEM_WRITE;
+                        end
+                        `CPU_INSTR_GRP_ALUI:   begin
+                            flag_alu   <= (decoder_funct[2:0] == 3'b010 || decoder_funct[2:0] == 3'b011) ? 0 : 1;
+                            flag_reg_write <= 1;
+                            alu_src_A  <= rs1_dat;
+                            alu_src_B  <= (decoder_funct[2:0] == 3'b001 || decoder_funct[2:0] == 3'b101) ? {27'd0, decoder_imm[4:0]} : decoder_imm;
+                            case (decoder_funct[2:0])
+                                3'b000: alu_select <= `ALU_ADD;
+                                3'b010: gregs_rd_dat <= (rs1_dat[31] >  decoder_imm[31]) ||
+                                                       ((rs1_dat[31] == decoder_imm[31]) &&
+                                                        (rs1_dat     <  decoder_imm);
+                                3'b011: gregs_rd_dat <= (rs1_dat < decoder_imm);
+                                3'b100: alu_select <= `ALU_XOR;
+                                3'b110: alu_select <= `ALU_OR;
+                                3'b111: alu_select <= `ALU_AND;
+                                3'b001: alu_select <= `ALU_SLL;
+                                3'b101: alu_select <= decoder_imm[10] == 0 ? `ALU_SRL : `ALU_SRA;
+                            endcase
+                            status <= `STATUS_ALU;
+                        end
+                        `CPU_INSTR_GRP_ALU:    begin
+                            flag_alu <= (decoder_funct[2:0] == 3'b010 || decoder_funct[2:0] == 3'b011) ? 0 : 1;
+                            flag_reg_write <= 1;
+                            alu_src_A <= rs1_dat;
+                            alu_src_B <= (decoder_funct[2:0] == 3'b001 || decoder_funct[2:0] == 3'b101) ? {27'd0, rs2_dat[4:0]} : rs2_dat;
+                            case (decoder_funct[2:0])
+                                3'b000: alu_select <= (decoder_funct[8] == 0) ? `ALU_ADD : `ALU_SUB;
+                                3'b010: gregs_rd_dat <= (rs1_dat[31] >  rs2_dat[31]) ||
+                                                       ((rs1_dat[31] == rs2_dat[31]) &&
+                                                        (rs1_dat     <  rs2_dat);
+                                3'b011: gregs_rd_dat <= (rs1_dat < rs2_dat);
+                                3'b100: alu_select <= `ALU_XOR;
+                                3'b110: alu_select <= `ALU_OR;
+                                3'b111: alu_select <= `ALU_AND;
+                                3'b001: alu_select <= `ALU_SLL;
+                                3'b101: alu_select <= (decoder_funct[8] == 0) ? `ALU_SRL : `ALU_SRA;
+                            endcase
+                            status <= `STATUS_ALU;
+                        end
+                        `CPU_INSTR_GRP_FENCE:  begin
                             //TODO
                         end
-                        `CPU_INSTR_GRP_JAL    begin
+                        `CPU_INSTR_GRP_E_CSR:  begin
                             //TODO
                         end
-                        `CPU_INSTR_GRP_JALR   begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_BCC    begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_LOAD   begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_STORE  begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_ALUI   begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_ALU    begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_FENCE  begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_E_CSR  begin
-                            //TODO
-                        end
-                        `CPU_INSTR_GRP_MULDIV begin
+                        `CPU_INSTR_GRP_MULDIV: begin
                             //TODO()
                         end
                     endcase
                 end else begin
-                    status <= `STATUS_DECODE_DONE;
+                    status <= `STATUS_SET_FLAG;
                 end
             end
-            `STATUS_GREG_WRITE: begin
-                //TODO()
+
+            `STATUS_MEM_READ:   begin
+                if (flag_mem_read) begin
+                    bus_ready = BUS_RUN;
+                    status <= `STATUS_MEM_READING;
+                end else begin
+                    status <= `STATUS_ALU;
+                end
             end
-            `STATUS_ALU: begin
-                //TODO()
+            `STATUS_MEM_READING:    begin
+                if (flag_mem_read) begin
+                    if (bus_ready == BUS_STOP) begin
+                        case (decoder_funct[2:0])
+                            `INSTR_LB:  rd_dat <= (bus_rdata[7] == 0) ?
+                                            {24'0, bus_rdata[7:0]} :
+                                            {24'1, bus_rdata[7:0]};
+                            `INSTR_LH:  rd_dat <= (bus_rdata[15] == 0) ?
+                                            {16'0, bus_rdata[15:0]} :
+                                            {16'1, bus_rdata[15:0]};;
+                            `INSTR_LW:  rd_dat <= bus_rdata;
+                            `INSTR_LBU: rd_dat <= {24'0, bus_rdata[7:0]};
+                            `INSTR_LHU: rd_dat <= {16'0, bus_rdata[15:0]};
+                        endcase
+                        status <= `STATUS_REG_WRITE;
+                    end else begin
+                        status <= `STATUS_MEM_READING;
+                    end
+                end else begin
+                    status <= `STATUS_ALU;
+                end
             end
-            `STATUS_MEMIO: begin
-                //TODO()
+            `STATUS_ALU:    begin
+                if (flag_alu == 1) begin
+                    alu_ready <= ALU_RUN;
+                    status <= `STATUS_ALUING;
+                end else begin
+                    status <= `STATUS_REG_WRITE;
+                end
             end
-            `STATUS_GREG_WRITE_END: begin
-                gregs_wren <= 0;
-                status <= STATUS_FETCH_INSTR;
+            `STATUS_ALUING: begin
+                if (flag_alu == 1) begin
+                    if (alu_ready == `ALU_STOP) begin
+                        rd_dat <= alu_dest[31:0];
+                        status <= `STATUS_REG_WRITE;
+                    end else begin
+                        status <= `STATUS_ALUING;
+                    end
+                end else begin
+                    status <= `STATUS_REG_WRITE;
+                end
+            end
+            `STATUS_REG_WRITE:  begin
+                if (flag_reg_write) begin
+                    gregs_wen <= 1;
+                end
+                status <= `STATUS_REG_WRITE_POST;
+            end
+            `STATUS_REG_WRITE_POST:   begin
+                gregs_wen <= 0;
+                status <= `STATUS_BRANCH;
+            end
+            `STATUS_MEM_WRITE:  begin
+                if (flag_mem_write) begin
+                    bus_ready = BUS_RUN;
+                    status <= `STATUS_MEM_WRITING;
+                end else begin
+                    status <= `STATUS_BRANCH;
+                end
+            end
+            `STATUS_MEM_WRITING:    begin
+                if (flag_mem_write) begin
+                    if (bus_ready == BUS_STOP) begin
+                        status <= `STATUS_BRANCH;
+                    end else begin
+                        status <= `STATUS_MEM_WRITING;
+                    end
+                end else begin
+                    status <= `STATUS_BRANCH;
+                end
             end
             `STATUS_BRANCH: begin
-                //TODO()
+                if (flag_branch) begin
+                    pc <= pc_nxt;
+                end else begin
+                    pc <= pc + 4;
+                end
+                status <= `STATUS_INIT;
             end
             default: begin
                 status = `STATUS_INIT;
