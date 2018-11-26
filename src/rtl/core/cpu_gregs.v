@@ -18,7 +18,7 @@
   File Created: 2018-11-20 23:19:54
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-11-21 16:30:19
+  Last Modified: 2018-11-26 22:56:03
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -27,6 +27,7 @@
 module cpu_gregs(
     input clk,
     input rd_wen,
+    input reset_n,
 
     input [`CPU_GREGIDX_WIDTH-1:0] rs1_idx,
     input [`CPU_GREGIDX_WIDTH-1:0] rs2_idx,
@@ -40,12 +41,16 @@ module cpu_gregs(
 
     always @(posedge clk)
     begin
-        rx[0] = `CPU_XLEN'b0;
-        rs1_dat = rx[rs1_idx];
-        rs2_dat = rx[rs2_idx];
-        if(rd_wen && rd_idx!=`CPU_GREGIDX_WIDTH'b0)
+        if(!reset_n)
+            rx[0] = `CPU_XLEN'b0;
+        else
         begin
-            rx[rd_idx] = rd_dat;
+            rs1_dat = rx[rs1_idx];
+            rs2_dat = rx[rs2_idx];
+            if(rd_wen && rd_idx!=`CPU_GREGIDX_WIDTH'b0)
+            begin
+                rx[rd_idx] = rd_dat;
+            end
         end
     end
 endmodule
