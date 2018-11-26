@@ -16,6 +16,9 @@
 *.toc
 *.gz
 
+#quartus file
+quartus_project/output_files/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
