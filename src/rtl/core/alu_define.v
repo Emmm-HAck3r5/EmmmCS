@@ -1,0 +1,20 @@
+//alu
+`define ALU_RUN      1'b0
+`define ALU_STOP     1'b1
+`define ALU_WIDTH    4
+`define ALU_ADD    `ALU_WIDTH'b0000
+`define ALU_SUB    `ALU_WIDTH'b0001
+`define ALU_AND    `ALU_WIDTH'b0010
+`define ALU_OR     `ALU_WIDTH'b0011
+`define ALU_XOR    `ALU_WIDTH'b0100
+`define ALU_SLL    `ALU_WIDTH'b0101
+`define ALU_SRL    `ALU_WIDTH'b0110
+`define ALU_SRA    `ALU_WIDTH'b0111
+`define ALU_MUL    `ALU_WIDTH'b1000
+`define ALU_MULU   `ALU_WIDTH'b1001
+`define ALU_MULSU  `ALU_WIDTH'b1010
+`define ALU_DIV    `ALU_WIDTH'b1011
+`define ALU_DIVU   `ALU_WIDTH'b1100
+`define ALU_REM    `ALU_WIDTH'b1101
+`define ALU_REMU   `ALU_WIDTH'b1110
+`define ALU_NOP    `ALU_WIDTH'b1111

@@ -1,6 +1,8 @@
 `include "cpu_define.v"
+`include "bus_define.v"
+`include "alu_define.v"
 
-//status
+// cpu status
 `define STATUS_LEN 4
 `define STATUS_INIT           `STATUS_LEN'h0
 `define STATUS_FETCHING_INSTR `STATUS_LEN'h1
@@ -16,61 +18,15 @@
 `define STATUS_MEM_WRITING    `STATUS_LEN'h11
 `define STATUS_BRANCH         `STATUS_LEN'h12
 
-//bus
-`define BUS_RUN      1'b0
-`define BUS_STOP     1'b1
-`define BUS_READ_32  2'b00
-`define BUS_WRITE_8  2'b01
-`define BUS_WRITE_16 2'b10
-`define BUS_WRITE_32 2'b11
-
-//alu
-`define ALU_RUN      1'b0
-`define ALU_STOP     1'b1
-`define ALU_WIDTH    4
-`define ALU_ADD    `ALU_WIDTH'b0000
-`define ALU_SUB    `ALU_WIDTH'b0001
-`define ALU_AND    `ALU_WIDTH'b0010
-`define ALU_OR     `ALU_WIDTH'b0011
-`define ALU_XOR    `ALU_WIDTH'b0100
-`define ALU_SLL    `ALU_WIDTH'b0101
-`define ALU_SRL    `ALU_WIDTH'b0110
-`define ALU_SRA    `ALU_WIDTH'b0111
-`define ALU_MUL    `ALU_WIDTH'b1000
-`define ALU_MULU   `ALU_WIDTH'b1001
-`define ALU_MULSU  `ALU_WIDTH'b1010
-`define ALU_DIV    `ALU_WIDTH'b1011
-`define ALU_DIVU   `ALU_WIDTH'b1100
-`define ALU_REM    `ALU_WIDTH'b1101
-`define ALU_REMU   `ALU_WIDTH'b1110
-`define ALU_NOP    `ALU_WIDTH'b1111
-
-//bcc
-`define INSTR_BCC_EQ  3'b000
-`define INSTR_BCC_NE  3'b001
-`define INSTR_BCC_LT  3'b100
-`define INSTR_BCC_GE  3'b101
-`define INSTR_BCC_LTU 3'b110
-`define INSTR_BCC_GEU 3'b111
-
-// load / store
-`define INSTR_LB  3'b000
-`define INSTR_LH  3'b001
-`define INSTR_LW  3'b010
-`define INSTR_LBU 3'b100
-`define INSTR_LHU 3'b101
-`define INSTR_SB  3'b000
-`define INSTR_SH  3'b001
-`define INSTR_SW  3'b010
-
-// alu_instr
-
-
-module cpu_instr_exec(
-    input clk,
+module cpu(
+	input clk,
     input clr,
     output reg cpu_clk
 );
+
+//=======================================================
+//  REG/WIRE declarations
+//=======================================================
 
 // gregs
 reg  gregs_wen;
@@ -80,16 +36,6 @@ wire [`CPU_GREGIDX_WIDTH-1:0] gregs_rd_idx;
 wire [`CPU_XLEN-1:0] gregs_rs1_dat;
 wire [`CPU_XLEN-1:0] gregs_rs2_dat;
 reg  [`CPU_XLEN-1:0] gregs_rd_dat;
-cpu_gregs gregs(
-    .clk(clk),
-    .rd_wen(gregs_wen),
-    .rs1_idx(gregs_rs1_idx),
-    .rs2_idx(gregs_rs2_idx),
-    .rd_idx(gregs_rd_idx),
-    .rs1_dat(gregs_rs1_dat),
-    .rs2_dat(gregs_rs2_dat),
-    .rd_dat(gregs_rd_dat)
-);
 
 // alu
 reg  [`CPU_XLEN-1:0] alu_src_A;
@@ -101,14 +47,6 @@ reg  alu_ready;
 reg  alu_ready_yn;
 wire alu_ready_wire;
 assign alu_ready_wire = alu_ready_yn ? alu_ready : alu_ready_wire;
-cpu_alu alu(
-    .src_A(alu_src_A),
-    .src_B(alu_src_B),
-    .select(alu_select),
-    .dest(alu_dest),
-    .flags(alu_flags),
-    .READY(alu_ready_wire)//Dangerous InOut Port
-);
 
 // bus
 reg  [25:0] bus_address;
@@ -119,14 +57,6 @@ reg  bus_ready;
 reg  bus_ready_yn;
 wire bus_ready_wire;
 assign bus_ready_wire = bus_ready_yn ? bus_ready : bus_ready_wire;
-cpu_bus_ctrl bus_ctrl(
-    .clk(clk),
-    .address(bus_address),
-    .wdata(bus_wdata),
-    .WLEN(bus_wlen),
-    .rdata(bus_rdata),
-    .READY(bus_ready_wire)
-);
 
 // decoder
 reg  [`CPU_INSTR_LENGTH-1 : 0] decoder_instr;
@@ -142,6 +72,60 @@ wire decoder_instr_valid;
 wire decoder_fp_rm;
 wire decoder_fp_width;
 wire decoder_fp_fmt;
+// gRegs idx always be the decoding result
+assign gregs_rs1_idx = decoder_rs1_idx;
+assign gregs_rs2_idx = decoder_rs2_idx;
+assign gregs_rd_idx  = decoder_rd_idx;
+
+// PC
+reg [31:0] pc;
+reg [31:0] pc_nxt;
+// flags
+reg flag_alu;
+reg flag_reg_write;
+reg flag_mem_read;
+reg flag_mem_write;
+reg flag_branch;
+// status
+reg [`STATUS_LEN-1 : 0] status;
+
+//=======================================================
+//  Structural coding
+//=======================================================
+
+// gregs
+cpu_gregs gregs(
+    .clk(clk),
+    .rd_wen(gregs_wen),
+    .rs1_idx(gregs_rs1_idx),
+    .rs2_idx(gregs_rs2_idx),
+    .rd_idx(gregs_rd_idx),
+    .rs1_dat(gregs_rs1_dat),
+    .rs2_dat(gregs_rs2_dat),
+    .rd_dat(gregs_rd_dat)
+);
+
+// alu
+cpu_alu alu(
+    .src_A(alu_src_A),
+    .src_B(alu_src_B),
+    .select(alu_select),
+    .dest(alu_dest),
+    .flags(alu_flags),
+    .READY(alu_ready_wire)//Dangerous InOut Port
+);
+
+// bus
+cpu_bus_ctrl bus_ctrl(
+    .clk(clk),
+    .address(bus_address),
+    .wdata(bus_wdata),
+    .WLEN(bus_wlen),
+    .rdata(bus_rdata),
+    .READY(bus_ready_wire)
+);
+
+// decoder
 cpu_instr_decoder decoder(
     .instr(decoder_instr),
     .rs1_idx(decoder_rs1_idx),
@@ -158,20 +142,7 @@ cpu_instr_decoder decoder(
     .fp_fmt(decoder_fp_fmt)
 );
 
-assign gregs_rs1_idx = decoder_rs1_idx;
-assign gregs_rs2_idx = decoder_rs2_idx;
-assign gregs_rd_idx  = decoder_rd_idx;
-
 // main logic
-reg [31:0] pc;
-reg [31:0] pc_nxt;
-reg flag_alu;
-reg flag_reg_write;
-reg flag_mem_read;
-reg flag_mem_write;
-reg flag_branch;
-
-reg [`STATUS_LEN-1 : 0] status;
 always @(posedge clk) begin
     if (clr) begin
         pc     <= 0;
@@ -240,16 +211,16 @@ always @(posedge clk) begin
                         `CPU_INSTR_GRP_BCC:    begin
                             pc_nxt <= (decoder_imm + gregs_rs1_dat) & {{31{1'b1}}, 1'b0};
                             case (decoder_funct[2:0])
-                                `INSTR_BCC_EQ:  flag_branch <= (gregs_rs1_dat == gregs_rs2_dat);
-                                `INSTR_BCC_NE:  flag_branch <= (gregs_rs1_dat != gregs_rs2_dat);
-                                `INSTR_BCC_LT:  flag_branch <= (gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
+                                3'b000:  flag_branch <= (gregs_rs1_dat == gregs_rs2_dat);
+                                3'b001:  flag_branch <= (gregs_rs1_dat != gregs_rs2_dat);
+                                3'b100:  flag_branch <= (gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
                                                         ((gregs_rs1_dat[31] == gregs_rs2_dat[31]) &&
                                                          (gregs_rs1_dat     <  gregs_rs2_dat));
-                                `INSTR_BCC_GE:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
+                                3'b101:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
                                                         ((gregs_rs1_dat[31] != gregs_rs2_dat[31]) ||
                                                          (gregs_rs1_dat     >= gregs_rs2_dat));
-                                `INSTR_BCC_LTU: flag_branch <= (gregs_rs1_dat <  gregs_rs2_dat);
-                                `INSTR_BCC_GEU: flag_branch <= (gregs_rs1_dat >= gregs_rs2_dat);
+                                3'b110: flag_branch <= (gregs_rs1_dat <  gregs_rs2_dat);
+                                3'b111: flag_branch <= (gregs_rs1_dat >= gregs_rs2_dat);
                                 default:  flag_branch <= 0;
                             endcase
                             status <= `STATUS_BRANCH;
@@ -265,9 +236,9 @@ always @(posedge clk) begin
                             flag_mem_write <= 1;
                             bus_address    <= gregs_rs1_dat + decoder_imm;
                             case (decoder_funct[2:0])
-                                `INSTR_SB: bus_wlen <= `BUS_WRITE_8;
-                                `INSTR_SH: bus_wlen <= `BUS_WRITE_16;
-                                `INSTR_SW: bus_wlen <= `BUS_WRITE_32;
+                                3'b000: bus_wlen <= `BUS_WRITE_8;
+                                3'b001: bus_wlen <= `BUS_WRITE_16;
+                                3'b010: bus_wlen <= `BUS_WRITE_32;
                             endcase
                             status <= `STATUS_MEM_WRITE;
                         end
@@ -337,15 +308,15 @@ always @(posedge clk) begin
                 if (flag_mem_read) begin
                     if (bus_ready_wire == `BUS_STOP) begin
                         case (decoder_funct[2:0])
-                            `INSTR_LB:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
+                            3'b000:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
                                             {{24{1'b0}}, bus_rdata[7:0]} :
                                             {{24{1'b1}}, bus_rdata[7:0]};
-                            `INSTR_LH:  gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                            3'b001:  gregs_rd_dat <= (bus_rdata[15] == 0) ?
                                             {{16{1'b0}}, bus_rdata[15:0]} :
                                             {{16{1'b1}}, bus_rdata[15:0]};
-                            `INSTR_LW:  gregs_rd_dat <= bus_rdata;
-                            `INSTR_LBU: gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
-                            `INSTR_LHU: gregs_rd_dat <= {{16{1'b0}}, bus_rdata[15:0]};
+                            3'b010:  gregs_rd_dat <= bus_rdata;
+                            3'b100: gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+                            3'b101: gregs_rd_dat <= {{16{1'b0}}, bus_rdata[15:0]};
                         endcase
                         status <= `STATUS_REG_WRITE;
                     end else begin
@@ -420,5 +391,6 @@ always @(posedge clk) begin
         endcase
     end
 end
+
 
 endmodule
