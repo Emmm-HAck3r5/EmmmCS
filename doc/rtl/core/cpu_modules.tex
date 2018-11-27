@@ -164,9 +164,11 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
 \subsection{说明}
 本模块定义CPU指令解码器，对输入指令给出相应解码内容。应注意指令解码信息(dec\_instr\_info)中，低CPU\_INSTR\_OPR\_INFO\_WIDTH位为操作数信息，高CPU\_INSTR\_INFO\_WIDTH位为指令组信息。具体信息编码见1.2节。
 
-\section{cpu\_instr\_exec}
+\section{cpu}
 \subsection{基本信息}
-模块名：cpu\_instr\_exec
+模块名：cpu
+
+功能：CPU 顶层模块
 \subsection{接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
@@ -175,7 +177,7 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
     input   &  1  &   clr     &   清零信号（高电平有效）\\\hline
     output  &  1  &   cpu\_clk &   CPU时钟\\\hline
 \end{tabular}
-\subsection{常量}
-    无
+\subsection{时序}
+    $$T(\textit{cpu\_clk})=10T(\textit{clk})+\text{max}(T(\textit{cpu\_bus})+T(\textit{cpu\_alu}))$$
 \subsection{说明}
-本模块定义CPU指令执行器，clk 与 clr 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
+本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
