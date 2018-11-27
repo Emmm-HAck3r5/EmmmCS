@@ -3,7 +3,8 @@ module SDRAM_ctrl(
 	input	  [25:0]		address,
 	input	  [31:0]		wdata,
 	input	  [1:0]		WLEN,
-	inout reg			READY,
+	input					EN_N,
+	output reg			READY,
 	output reg [31:0]	rdata,
 	
 	// debug
@@ -86,11 +87,14 @@ always @ (negedge clk) begin
 			state <= `ST_IDLE;
 		end
 		4'd1: begin // `ST_IDLE
-			if (READY) command <= `CMD_NOP;
-			else begin
+			if (EN_N) begin 
+				command <= `CMD_NOP;
+				state <= `ST_IDLE;
+			end else begin
 				command <= `CMD_ACT;
 				ADDR <= row_addr;
 				BA <= blank;
+				READY <= 0;
 				case (WLEN)
 					2'b00: state <= `ST_R32_CMD;	// read 32 bits
 					2'b01: state <= `ST_W8_CMD;		// write 8 bits

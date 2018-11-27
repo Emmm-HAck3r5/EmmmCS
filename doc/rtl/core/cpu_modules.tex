@@ -89,15 +89,15 @@
     1111        &   NOP     &    ${dest := 0}$\\\hline
 \end{tabular}
 \subsection{说明}
-RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST 控制。进行乘除取余运算前，必须依序给出 RST 的上升沿和下降沿，重置 ALU 后，ALU 才会开始进行运算，直到预备信号 READY 为高电位，表示运算完成。
-\indent乘法操作(MUL, MULU, MULSU)需要 5 个时钟周期。除法和取余操作需要 32 个时钟周期。其余指令可视为组合电路，可以一个周期内完成操作
-\indent标志位仅在加减法时有效，并且按 i386 手册上定义设置。
+RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST 控制。进行乘除取余运算前，必须依序给出 RST 的上升沿和下降沿，重置 ALU 后，ALU 才会开始进行运算，直到预备信号 READY 为高电位，表示运算完成。\\
+\indent乘法操作(MUL, MULU, MULSU)需要 5 个时钟周期。除法和取余操作需要 32 个时钟周期。其余指令可视为组合电路，可以一个周期内完成操作\\
+\indent标志位仅在加减法时有效，并且按 i386 手册上定义设置。\\
 \indent指令带 U 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令 MULSU 为 ${sign * unsigned}$ 操作。
 
 % cpu_bus_ctrl moudule
-\section{cpu\_bus\_ctrl}
+\section{cpu\_bus}
 \subsection{基本信息}
-模块名：cpu\_bus\_ctrl\\
+模块名：cpu\_bus\\
 \indent所需周期：1 到 5 个周期
 \subsection{内部接口}
 \begin{tabular}{|c|c|c|c|}
@@ -107,8 +107,9 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     input       &   32     &    address &   地址端\\\hline
     input       &   32      &   wdata   &   写入数据\\\hline
     input       &   2       &   WLEN    &   SDRAM读写控制\\\hline
-    inout       &   1       &   READY   &   双向控制信号\\\hline
-    output reg  &   32      &   rdata   &   读取数据\\\hline
+    input       &   1       &   EN\_N   &   使能信号(低有效)\\\hline
+    output      &   1       &   READY   &   预备信号\\\hline
+    output      &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
 \subsection{SDRAM接口}
 \begin{tabular}{|c|c|c|c|}
@@ -121,6 +122,7 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     output reg  &   1       &   CS\_N     &   DRAM\_CS\_N\\\hline
     output reg  &   1       &   RAS\_N     &   DRAM\_RAS\_N\\\hline
     output reg  &   1       &   CAS\_N     &   DRAM\_CAS\_N\\\hline
+    output reg  &   1       &   WE\_N     &   DRAM\_WE\_N\\\hline
     output reg  &   2       &   DMASK     &  \{DRAM\_UDQM, DRAM\_LDQM\}\\\hline
 \end{tabular}
 \subsection{WLEN控制信号真值表}
@@ -134,8 +136,8 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
 \end{tabular}
 \subsection{说明}
 SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
-\indent将双端口READY置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
-\indent读取操作固定返回输入地址后4个字节长的数据。执行写入操作时，超出写入长度的数据将被忽略。当地址输入端address最高位为高电位时，表示对片内寄存器进行读写操作，而非SDRAM，所需时间皆为 1 个时钟周期。
+\indent将复位端 RST 置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
+\indent地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。
 
 \section{cpu\_instr\_decoder}
 \subsection{基本信息}
