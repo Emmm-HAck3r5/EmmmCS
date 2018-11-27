@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@
 % File Created: 2018-11-21 09:20:55
 % Author: Chen Haodong (easyai@outlook.com)
 % --------------------------
-% Last Modified: 2018-11-21 16:11:01
+% Last Modified: 2018-11-25 11:40:24
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
@@ -51,11 +51,49 @@
 \end{tabular}
 \section{常量定义}
 常量均定义在$rtl/core/cpu\_define.v$内\\
-\begin{tabular}{|c|c|c|}
+\begin{center}
+\begin{tabular}{|l|p{3cm}|p{6cm}|}
     \hline
     名称    &   值  &   说明\\\hline
     CPU\_XLEN   &   32  &   CPU字长\\\hline
     \multicolumn{3}{|c|}{REG}\\\hline
     CPU\_GREGIDX\_WIDTH &   5   &   通用寄存器访问下标位宽\\\hline
     CPU\_GREG\_COUNT    &   32  &   通用寄存器数量\\\hline
+    \multicolumn{3}{|c|}{INSTR Decoder}\\\hline
+    CPU\_INSTR\_LENGTH & 32 & 指令长度\\\hline
+    CPU\_INSTR\_INFO\_WIDTH & 5 & 指令信息位宽\\\hline
+    CPU\_INSTR\_OPR\_INFO\_WIDTH & 8 & 指令操作数信息位宽\\\hline
+    \makecell[{}{p{3cm}}]{CPU\_INSTR\_ \\ DECODE\_INFO\_WIDTH} & 13 & 指令解码信息位宽\\\hline
+    \multicolumn{2}{|c|}{CPU\_INSTR\_OPR\_INFO\_WIDTH}&\\\hline
+    CPU\_INSTR\_OPR\_INVALID & b0 & 无效操作数\\\hline
+    CPU\_INSTR\_OPR\_IMM & b00001 & 操作数：立即数\\\hline
+    CPU\_INSTR\_OPR\_RS1 & b00010 & 操作数：RS1\\\hline
+    CPU\_INSTR\_OPR\_RS2 & b00100 & 操作数：RS2\\\hline
+    CPU\_INSTR\_OPR\_RD & b01000 & 操作数：RD\\\hline
+    CPU\_INSTR\_OPR\_RS3 & b10000 & 操作数：R\\\hline
+    CPU\_INSTR\_GRP\_INVALID & 0 & 无效指令组\\\hline
+    \multicolumn{3}{|c|}{RV32I}\\\hline
+    \multicolumn{2}{|c|}{CPU\_INSTR\_INFO\_WIDTH}&\\\hline
+    CPU\_INSTR\_GRP\_LUI & 1 & 指令组：LUI\\\hline
+    CPU\_INSTR\_GRP\_AUIPC & 2 & 指令组：AUIPC\\\hline
+    CPU\_INSTR\_GRP\_JAL & 3 & 指令组：JAL\\\hline
+    CPU\_INSTR\_GRP\_JALR & 4 & 指令组：JALR\\\hline
+    CPU\_INSTR\_GRP\_BCC & 5 & 指令组：BCC(BEQ...)\\\hline
+    CPU\_INSTR\_GRP\_LOAD & 6 & 指令组：LOAD\\\hline
+    CPU\_INSTR\_GRP\_STORE & 7 & 指令组：STORE\\\hline
+    CPU\_INSTR\_GRP\_ALUI & 8 & 指令组：ALUI\\\hline
+    CPU\_INSTR\_GRP\_ALU & 9 & 指令组：ALU\\\hline
+    CPU\_INSTR\_GRP\_FENCE & 10 & 指令组：FENCE\\\hline
+    CPU\_INSTR\_GRP\_E\_CSR & 11 & 指令组：ECALL,EBREAK,CSR\\\hline
+    \multicolumn{3}{|c|}{[M]}\\\hline
+    CPU\_INSTR\_GRP\_MULDIV & 12 & 指令组：MULDIV\\\hline
+    \multicolumn{3}{|c|}{[F]}\\\hline
+    CPU\_INSTR\_GRP\_F\_FLW & 13 & 指令组：FLW\\\hline
+    CPU\_INSTR\_GRP\_F\_FSW & 14 & 指令组：FSW\\\hline
+    CPU\_INSTR\_GRP\_F\_FMADD & 15 & 指令组：FMADD\\\hline
+    CPU\_INSTR\_GRP\_F\_FMSUB & 16 & 指令组：FMSUB\\\hline
+    CPU\_INSTR\_GRP\_F\_FNMSUB & 17 & 指令组：FNMSUB\\\hline
+    CPU\_INSTR\_GRP\_F\_FNMADD & 18 & 指令组：FNMADD\\\hline
+    CPU\_INSTR\_GRP\_F\_FOPR & 19 & 指令组：FOPR\\\hline
 \end{tabular}
+\end{center}
