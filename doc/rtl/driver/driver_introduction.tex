@@ -1,0 +1,37 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: driver_introduction.tex
+% Project: EmmmCS
+% File Created: 2018-11-27 21:48:51
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-11-27 22:03:49
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{硬件驱动综述}
+本章描述软件与硬件间操作接口。按照RISC-V要求，所有地址按四字节对齐。
+\section{内存}
+软件可见内存为64MB，即整个DE10 SDRAM的大小。要求本部分存储于SDRAM。内存地址为0H-3FF FFFFH。
+\section{LED}
+LED使用2字节大小的reg进行保存，取低10位作为LED控制位。OS可见的内存地址映射为400 0000H-400 0001H。
+\section{VGA}
+VGA内部需要存储相应字模，本部分为只读内容。VGA将暴露自身的显存缓冲区和控制寄存器给OS。VGA工作模式应该能支持它每行显示不少于80个字符，整屏幕显示不少于30行。VGA显存缓冲区要求其存储至少为30X80X16bit，其中16bit部分，高8bit为ASCII码，低8bit为预设颜色，预设颜色中，高4位为背景色，低四位为前景色。OS可见的内存地址映射为：显存缓冲区：400 0004H-400 9603H。预留16字节作为VGA控制寄存器区域，内存地址映射为400 9604H-400 9614H。
+\section{键盘}
+\section{WM8731}
