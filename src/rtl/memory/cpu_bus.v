@@ -4,7 +4,7 @@ module cpu_bus(
 	input	[31:0]			wdata,
 	input	[1:0]				WLEN,
 	input						EN_N,
-	output 					READY,
+	output reg				READY,
 	output reg [31:0]		rdata,
 	
 	output [12:0] 			ADDR,
@@ -18,6 +18,7 @@ module cpu_bus(
 reg [15:0] LED_memory;
 
 wire [31:0] sdram_rdata;
+wire	sdram_ready;
 
 SDRAM_ctrl sdram(
 	.clk(clk),
@@ -25,7 +26,7 @@ SDRAM_ctrl sdram(
 	.wdata(wdata),
 	.WLEN(WLEN),
 	.EN_N(EN_N),
-	.READY(READY),
+	.READY(sdram_ready),
 	.rdata(sdram_rdata),
 	
 	.ADDR(ADDR),
@@ -79,6 +80,7 @@ end
 always @ (posedge clk) begin
 	if (address < `LED_START) begin
 		rdata <= sdram_rdata;
+		READY <= sdram_ready;
 	end else if ( address >= `LED_START && address < `VGA_START) begin
 		if (WLEN == 2'b00)
 			rdata <= { 16'd0, LED_memory};
