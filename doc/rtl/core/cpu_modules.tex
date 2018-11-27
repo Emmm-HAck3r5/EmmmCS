@@ -53,17 +53,19 @@
 \section{cpu\_alu}
 \subsection{基本信息}
 模块名：cpu\_alu\\
-\indent所需时间：(未定)
+\indent所需时间：1 到 32 个周期
 \subsection{接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
-    类型       &   位宽    &   名称    &   说明\\\hline
-    input      &   32      &   src\_A   &   A 输入端\\\hline
-    input      &   32      &   src\_B   &   B 输入端\\\hline
-    input      &   4       &    select  &   功能控制端\\\hline
-    output reg &   64      &    dest    &   输出端\\\hline
-    output reg &   4       &    flags   &   \{CF, OF, ZF, SF\}\\\hline
-    inout reg  &   1       &    READY   &   双向控制信号\\\hline
+    类型       &   位宽    &   名称       &   说明\\\hline
+    input      &    1      &    clk      &   时钟信号\\\hline 
+    input      &   32      &   src\_A    &   A 输入端\\\hline
+    input      &   32      &   src\_B    &   B 输入端\\\hline
+    input      &   4       &    select   &   功能控制端\\\hline
+    input       &   1       &    RST     &   复位端\\\hline
+    output       &   1       &    READY  &   预备信号\\\hline
+    output      &   32      &    dest    &   输出端\\\hline
+    output      &   4       &    flags   &   \{CF, OF, ZF, SF\}\\\hline
 \end{tabular}
 \subsection{select控制端真值表}
 \begin{tabular}{|c|c|c|}
@@ -87,8 +89,10 @@
     1111        &   NOP     &    ${dest := 0}$\\\hline
 \end{tabular}
 \subsection{说明}
-将双端口READY置零后，ALU开始进行运算。当READY恢复高电平时，表示运算已完成。\\
-\indent指令带\ U\ 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令\ MULSU\ 为 ${sign * unsigned}$ 操作。dest 高32位仅在乘法操作(MUL, MULU, MULSU)时有效，其他操作结果都放在低32位，高32位置零。指令标志位按 i386 手册上定义设置。
+RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST 控制。进行乘除取余运算前，必须依序给出 RST 的上升沿和下降沿，重置 ALU 后，ALU 才会开始进行运算，直到预备信号 READY 为高电位，表示运算完成。
+\indent乘法操作(MUL, MULU, MULSU)需要 5 个时钟周期。除法和取余操作需要 32 个时钟周期。其余指令可视为组合电路，可以一个周期内完成操作
+\indent标志位仅在加减法时有效，并且按 i386 手册上定义设置。
+\indent指令带 U 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令 MULSU 为 ${sign * unsigned}$ 操作。
 
 % cpu_bus_ctrl moudule
 \section{cpu\_bus\_ctrl}

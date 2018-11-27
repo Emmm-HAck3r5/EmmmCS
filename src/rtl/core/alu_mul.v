@@ -19,7 +19,7 @@ integer i;
 
 reg [3:0] count;
 
-always @ (posedge clk) begin
+always @ ( posedge clk or posedge rst) begin
 	if (rst) begin
 		READY <= 0;
 		count <= 0;
@@ -33,7 +33,7 @@ always @ (posedge clk) begin
 			array4[i] <= 0;
 		for(i = 0; i < 2 ; i = i + 1)
 			array2[i] <= 0;
-	end else begin
+	end else if ( !READY ) begin
 		for(i = 0; i < 32 ; i = i + 1)
 			array32[i] <= src_B[i] ? (src_A << i) : 0;
 		for(i = 0; i < 16 ; i = i + 1)
