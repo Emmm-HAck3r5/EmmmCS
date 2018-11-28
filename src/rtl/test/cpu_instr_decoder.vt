@@ -1,0 +1,104 @@
+// Copyright (C) 2018  Intel Corporation. All rights reserved.
+// Your use of Intel Corporation's design tools, logic functions 
+// and other software and tools, and its AMPP partner logic 
+// functions, and any output files from any of the foregoing 
+// (including device programming or simulation files), and any 
+// associated documentation or information are expressly subject 
+// to the terms and conditions of the Intel Program License 
+// Subscription Agreement, the Intel Quartus Prime License Agreement,
+// the Intel FPGA IP License Agreement, or other applicable license
+// agreement, including, without limitation, that your use is for
+// the sole purpose of programming logic devices manufactured by
+// Intel and sold by Intel or its authorized distributors.  Please
+// refer to the applicable agreement for further details.
+
+// *****************************************************************************
+// This file contains a Verilog test bench template that is freely editable to  
+// suit user's needs .Comments are provided in each section to help the user    
+// fill out necessary details.                                                  
+// *****************************************************************************
+// Generated on "11/28/2018 20:01:59"
+                                                                                
+// Verilog Test Bench template for design : cpu_instr_decoder
+// 
+// Simulation tool : ModelSim-Altera (Verilog)
+// 
+
+`timescale 1 ps/ 1 ps
+module cpu_instr_decoder_vlg_tst();
+// constants                                           
+// general purpose registers
+reg eachvec;
+// test vector input registers
+reg [31:0] instr;
+// wires                                               
+wire [12:0]  dec_instr_info;
+wire [1:0]  fp_fmt;
+wire [2:0]  fp_rm;
+wire [2:0]  fp_width;
+wire [9:0]  funct;
+wire [31:0]  imm;
+wire instr_valid;
+wire [6:0]  opcode;
+wire [4:0]  rd_idx;
+wire [4:0]  rs1_idx;
+wire [4:0]  rs2_idx;
+wire [4:0]  rs3_idx;
+
+// assign statements (if any)                          
+cpu_instr_decoder i1 (
+// port map - connection between master ports and signals/registers   
+	.dec_instr_info(dec_instr_info),
+	.fp_fmt(fp_fmt),
+	.fp_rm(fp_rm),
+	.fp_width(fp_width),
+	.funct(funct),
+	.imm(imm),
+	.instr(instr),
+	.instr_valid(instr_valid),
+	.opcode(opcode),
+	.rd_idx(rd_idx),
+	.rs1_idx(rs1_idx),
+	.rs2_idx(rs2_idx),
+	.rs3_idx(rs3_idx)
+);
+initial                                                
+begin                                                  
+// code that executes only once                        
+// insert code here --> begin                          
+	//R Type Test
+	//instr = 32'b0000000 00001 00010 000 00011 0110011;#20;
+	instr = 32'b00000000000100010000000110110011;#20;
+	//I Type Test
+	//instr = 32'b100000000000 00001 000 00011 0000011;#20;
+	instr = 32'b10000000000000001000000110000011;#20;
+	//S Type Test
+	//instr = 32'b1000000 00001 00011 000 00000 0100011;#20;
+	instr = 32'b10000000000100011000000000100011;#20;
+	//B Type Test
+	//instr = 32'b1000000 00001 00010 000 00001 1100011;#20;
+	instr = 32'b10000000000100010000000011100011;#20;
+	//U Type Test
+	//instr = 32'b10000000000000000000 00001 0110111;#20;
+	instr = 32'b10000000000000000000000010110111;#20;
+	//J Type Test
+	//instr = 32'b10000000000100000000 00001 1101111;#20;
+	instr = 32'b10000000000100000000000011101111;#20;
+	//R4 Type Test
+	//instr = 32'b00100 00 00001 00010 000 00011 1000011;#20;
+	instr = 32'b00100000000100010000000111000011;#20;
+// --> end                                             
+$display("Running testbench");                       
+end                                                    
+always                                                 
+// optional sensitivity list                           
+// @(event1 or event2 or .... eventn)                  
+begin                                                  
+// code executes for every event on sensitivity list   
+// insert code here --> begin                          
+                                                       
+@eachvec;                                              
+// --> end                                             
+end                                                    
+endmodule
+
