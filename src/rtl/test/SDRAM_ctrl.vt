@@ -1,0 +1,91 @@
+// Copyright (C) 2018  Intel Corporation. All rights reserved.
+// Your use of Intel Corporation's design tools, logic functions 
+// and other software and tools, and its AMPP partner logic 
+// functions, and any output files from any of the foregoing 
+// (including device programming or simulation files), and any 
+// associated documentation or information are expressly subject 
+// to the terms and conditions of the Intel Program License 
+// Subscription Agreement, the Intel Quartus Prime License Agreement,
+// the Intel FPGA IP License Agreement, or other applicable license
+// agreement, including, without limitation, that your use is for
+// the sole purpose of programming logic devices manufactured by
+// Intel and sold by Intel or its authorized distributors.  Please
+// refer to the applicable agreement for further details.
+
+// *****************************************************************************
+// This file contains a Verilog test bench template that is freely editable to  
+// suit user's needs .Comments are provided in each section to help the user    
+// fill out necessary details.                                                  
+// *****************************************************************************
+// Generated on "11/28/2018 15:27:54"
+                                                                                
+// Verilog Test Bench template for design : SDRAM_ctrl
+// 
+// Simulation tool : ModelSim-Altera (Verilog)
+// 
+
+`timescale 1 ps/ 1 ps
+module SDRAM_ctrl_vlg_tst();
+// test vector input registers
+reg [15:0] treg_DQ;
+reg EN_N;
+reg [1:0] WLEN;
+reg [25:0] address;
+reg clk;
+reg [31:0] wdata;
+// wires                                               
+wire [12:0]  ADDR;
+wire [1:0]  BA;
+wire CAS_N;
+wire CKE;
+wire CLK;
+wire CS_N;
+wire [1:0]  DMASK;
+wire [15:0]  DQ;
+wire RAS_N;
+wire READY;
+wire WE_N;
+wire [31:0]  rdata;
+
+// assign statements (if any)                          
+assign DQ = treg_DQ;
+SDRAM_ctrl i1 (
+// port map - connection between master ports and signals/registers   
+	.ADDR(ADDR),
+	.BA(BA),
+	.CAS_N(CAS_N),
+	.CKE(CKE),
+	.CLK(CLK),
+	.CS_N(CS_N),
+	.DMASK(DMASK),
+	.DQ(DQ),
+	.EN_N(EN_N),
+	.RAS_N(RAS_N),
+	.READY(READY),
+	.WE_N(WE_N),
+	.WLEN(WLEN),
+	.address(address),
+	.clk(clk),
+	.rdata(rdata),
+	.wdata(wdata)
+);
+initial                                                
+begin
+	treg_DQ = 16'hzzzz;
+	wdata = 32'h4e4e4e4e;
+	clk = 0; address = 26'h1ffffde; WLEN = 2'b11;
+	EN_N = 0; #10;	EN_N = 1; #10;	EN_N = 0; #100;
+$stop;
+$display("Running testbench");                       
+end                                                    
+always                                                 
+// optional sensitivity list                           
+// @(event1 or event2 or .... eventn)                  
+begin                                                  
+// code executes for every event on sensitivity list   
+// insert code here --> begin                          
+	#1 clk = ~clk;
+// --> end                                             
+end                                                    
+endmodule
+

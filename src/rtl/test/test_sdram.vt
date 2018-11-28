@@ -1,0 +1,94 @@
+// Copyright (C) 2018  Intel Corporation. All rights reserved.
+// Your use of Intel Corporation's design tools, logic functions 
+// and other software and tools, and its AMPP partner logic 
+// functions, and any output files from any of the foregoing 
+// (including device programming or simulation files), and any 
+// associated documentation or information are expressly subject 
+// to the terms and conditions of the Intel Program License 
+// Subscription Agreement, the Intel Quartus Prime License Agreement,
+// the Intel FPGA IP License Agreement, or other applicable license
+// agreement, including, without limitation, that your use is for
+// the sole purpose of programming logic devices manufactured by
+// Intel and sold by Intel or its authorized distributors.  Please
+// refer to the applicable agreement for further details.
+
+// *****************************************************************************
+// This file contains a Verilog test bench template that is freely editable to  
+// suit user's needs .Comments are provided in each section to help the user    
+// fill out necessary details.                                                  
+// *****************************************************************************
+// Generated on "11/28/2018 15:27:20"
+                                                                                
+// Verilog Test Bench template for design : test_sdram
+// 
+// Simulation tool : ModelSim-Altera (Verilog)
+// 
+
+`timescale 1 ps/ 1 ps
+module test_sdram_vlg_tst();
+// constants                                           
+// general purpose registers
+reg eachvec;
+// test vector input registers
+reg [15:0] treg_DQ;
+reg EN_N;
+reg [1:0] WLEN;
+reg [1:0] address;
+reg clk;
+reg [7:0] wdata;
+// wires                                               
+wire [12:0]  ADDR;
+wire [1:0]  BA;
+wire CAS_N;
+wire CKE;
+wire CLK;
+wire CS_N;
+wire [1:0]  DMASK;
+wire [15:0]  DQ;
+wire [9:0]  LEDs;
+wire RAS_N;
+wire WE_N;
+wire [41:0]  digi;
+
+// assign statements (if any)                          
+assign DQ = treg_DQ;
+test_sdram i1 (
+// port map - connection between master ports and signals/registers   
+	.ADDR(ADDR),
+	.BA(BA),
+	.CAS_N(CAS_N),
+	.CKE(CKE),
+	.CLK(CLK),
+	.CS_N(CS_N),
+	.DMASK(DMASK),
+	.DQ(DQ),
+	.EN_N(EN_N),
+	.LEDs(LEDs),
+	.RAS_N(RAS_N),
+	.WE_N(WE_N),
+	.WLEN(WLEN),
+	.address(address),
+	.clk(clk),
+	.digi(digi),
+	.wdata(wdata)
+);
+initial                                                
+begin                                                  
+// code that executes only once                        
+// insert code here --> begin                          
+                                                       
+// --> end                                             
+$display("Running testbench");                       
+end                                                    
+always                                                 
+// optional sensitivity list                           
+// @(event1 or event2 or .... eventn)                  
+begin                                                  
+// code executes for every event on sensitivity list   
+// insert code here --> begin                          
+                                                       
+@eachvec;                                              
+// --> end                                             
+end                                                    
+endmodule
+
