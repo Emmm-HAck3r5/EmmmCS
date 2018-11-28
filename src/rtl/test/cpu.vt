@@ -1,0 +1,86 @@
+// Copyright (C) 2017  Intel Corporation. All rights reserved.
+// Your use of Intel Corporation's design tools, logic functions
+// and other software and tools, and its AMPP partner logic
+// functions, and any output files from any of the foregoing
+// (including device programming or simulation files), and any
+// associated documentation or information are expressly subject
+// to the terms and conditions of the Intel Program License
+// Subscription Agreement, the Intel Quartus Prime License Agreement,
+// the Intel FPGA IP License Agreement, or other applicable license
+// agreement, including, without limitation, that your use is for
+// the sole purpose of programming logic devices manufactured by
+// Intel and sold by Intel or its authorized distributors.  Please
+// refer to the applicable agreement for further details.
+
+// *****************************************************************************
+// This file contains a Verilog test bench template that is freely editable to
+// suit user's needs .Comments are provided in each section to help the user
+// fill out necessary details.
+// *****************************************************************************
+// Generated on "11/29/2018 00:23:16"
+
+// Verilog Test Bench template for design : cpu
+//
+// Simulation tool : ModelSim-Altera (Verilog)
+//
+
+`timescale 1 ps/ 1 ps
+module cpu_vlg_tst();
+// constants
+// general purpose registers
+reg eachvec;
+// test vector input registers
+reg [15:0] treg_DQ;
+reg clk;
+reg clr_n;
+// wires
+wire [12:0]  ADDR;
+wire [1:0]  BA;
+wire CAS_N;
+wire CKE;
+wire CLK;
+wire CS_N;
+wire [1:0]  DMASK;
+wire [15:0]  DQ;
+wire RAS_N;
+wire WE_N;
+wire cpu_clk;
+
+// assign statements (if any)
+assign DQ = treg_DQ;
+cpu i1 (
+// port map - connection between master ports and signals/registers
+	.ADDR(ADDR),
+	.BA(BA),
+	.CAS_N(CAS_N),
+	.CKE(CKE),
+	.CLK(CLK),
+	.CS_N(CS_N),
+	.DMASK(DMASK),
+	.DQ(DQ),
+	.RAS_N(RAS_N),
+	.WE_N(WE_N),
+	.clk(clk),
+	.clr_n(clr_n),
+	.cpu_clk(cpu_clk)
+);
+initial
+begin
+// code that executes only once
+// insert code here --> begin
+clk = 0;
+clr_n = 0; #7;
+clr_n = 1; #7;
+// --> end
+$display("Running testbench");
+end
+always
+#5 clk = ~clk;
+begin
+// code executes for every event on sensitivity list
+// insert code here --> begin
+
+@eachvec;
+// --> end
+end
+endmodule
