@@ -13,7 +13,7 @@ module SDRAM_ctrl(
 	
 	output reg [12:0] 	ADDR,
 	output reg [1:0] 		BA,
-	inout  reg [15:0]		DQ,
+	inout  	  [15:0]		DQ,
 	output 					CKE, CLK,
 	output 					CS_N, RAS_N, CAS_N, WE_N,
 	output reg [1:0]		DMASK
@@ -33,14 +33,15 @@ module SDRAM_ctrl(
 // M8~M7: 	Standard operation (Operating Mode)
 // M6~M4:	CAS Latency = 2 
 // M3:		Sequential (Burst Type)
-// M2~M0:	Burst length = 4
-`define INIT_REGISTER 15'b000000000100010
+// M2~M0:	Burst length = 2
+`define INIT_REGISTER 15'b000000000100001
 
 reg [4:0] 	command;
 
 wire [12:0]	row_addr;
 wire [1:0]	blank;
-wire [9:0]	col_addr;
+wire [9:0]	col16_addr;
+wire [8:0]	col32_addr;
 wire 			btye_addr;
 
 assign CLK = clk;
@@ -52,7 +53,10 @@ assign WE_N = command[1];
 
 assign row_addr = address[25:13];
 assign blank = address[12:11];
-assign col_addr = address[10:1];
+
+assign col16_addr = address[10:1];
+assign col32_addr = address[10:2];
+
 assign btye_addr = address[0];
 
 // FINITE STATE MACHINE
@@ -72,11 +76,44 @@ assign btye_addr = address[0];
 `define ST_W32_DATA3 	4'd12
 `define ST_TRUNC 			4'd15
 
+`define DQST_WD1	2'b00
+`define DQST_WDL	2'b01
+`define DQST_WDU	2'b10
+`define DQST_WD2	2'b11
+
 reg [3:0] state;
+reg [1:0] DQ_state;
+reg DQWRITE_EN_N;
+
+assign DQ = DQWRITE_EN_N ? 16'hzzz :
+				(DQ_state == `DQST_WD1) ? wdata[15:0] :
+				(DQ_state == `DQST_WDU) ? {8'd0, wdata[7:0]} :
+				(DQ_state == `DQST_WDL) ? {wdata[15:8], 8'd0} :
+				wdata[31:16];	// DQ_state == `DQST_WD2
 
 initial begin
 	state <= `ST_INIT;
 	command <= `CMD_NOP;
+	DQ_state <= 0; DQWRITE_EN_N <= 1;
+end
+
+always @ (negedge clk) begin
+	case (state)
+		`ST_W8_CMD : begin
+			DQWRITE_EN_N <= 0;
+			if (btye_addr) DQ_state <= `DQST_WDU;
+			else DQ_state <= `DQST_WDL;
+		end
+		`ST_W16_CMD, `ST_W16_DATA2, `ST_W32_CMD : begin
+			DQ_state <= `DQST_WD1; DQWRITE_EN_N <= 0;
+		end
+		`ST_W32_DATA2 : begin
+			DQ_state <= `DQST_WD2; DQWRITE_EN_N <= 0;
+		end
+		default : begin
+			DQ_state <= `DQST_WD1; DQWRITE_EN_N <= 1;
+		end
+	endcase
 end
 
 always @ (negedge clk) begin
@@ -97,7 +134,7 @@ always @ (negedge clk) begin
 				READY <= 0;
 				case (WLEN)
 					2'b00: state <= `ST_R32_CMD;	// read 32 bits
-					2'b01: state <= `ST_W8_CMD;		// write 8 bits
+					2'b01: state <= `ST_W8_CMD;   // write 8 bits
 					2'b10: state <= `ST_W16_CMD;	// write 16 bits
 					2'b11: state <= `ST_W32_CMD;	// write 32 bits
 					default: state <= `ST_IDLE;
@@ -107,7 +144,7 @@ always @ (negedge clk) begin
 		4'd2: begin	// `ST_R32_CMD
 			command <= `CMD_READ_AP;
 			ADDR[10] <= command[0];
-			ADDR[9:0] <= col_addr;
+			ADDR[9:0] <= { col32_addr, 1'b0 };
 			BA <= blank;
 			DMASK <= 2'b00;
 			state <= `ST_R32_WAIT;
@@ -117,98 +154,52 @@ always @ (negedge clk) begin
 			state <= `ST_R32_DATA1;
 		end
 		4'd4: begin // `ST_R32_DATA1
-			if (btye_addr) begin
-				command <= `CMD_NOP;
-				rdata[7:0] <= DQ[15:8];
-			end else begin
-				command <= `CMD_BST;
-				rdata[15:0] <= DQ[15:0];
-			end
+			command <= `CMD_BST;
+			rdata[15:0] <= DQ;
 			state <= `ST_R32_DATA2;
 		end
 		4'd5: begin	// `ST_R32_DATA2
-			if (btye_addr) begin
-				command <= `CMD_BST;
-				rdata[23:8] <= DQ[15:0];
-				state <= `ST_R32_DATA3;
-			end else begin
-				command <= `CMD_NOP;
-				rdata[31:16] <= DQ[15:0];
-				READY <= 1'b1;
-				state <= `ST_IDLE;
-			end
-		end
-		4'd6: begin	// `ST_R32_DATA3
 			command <= `CMD_NOP;
-			rdata[31:24] <= DQ[7:0];
-			READY <= 1'b1;
+			rdata[31:16] <= DQ;
+			READY <= 1;
 			state <= `ST_IDLE;
 		end
+
 		4'd7: begin	// `ST_W8_CMD
 			command <= `CMD_WRITE_AP;
 			ADDR[10] <= command[0];
-			ADDR[9:0] <= col_addr;
+			ADDR[9:0] <= col16_addr;
 			BA <= blank;
-			DQ <= wdata[15:0];
 			
-			if (btye_addr)
+			if (btye_addr) begin
 				DMASK <= 2'b01;
-			else DMASK <= 2'b10;
-			
+			end else begin
+				DMASK <= 2'b10;
+			end
 			state <= `ST_TRUNC;
 		end
 		4'd8: begin	// `ST_W16_CMD
 			command <= `CMD_WRITE_AP;
 			ADDR[10] <= command[0];
-			ADDR[9:0] <= col_addr;
+			ADDR[9:0] <= col16_addr;
 			BA <= blank;
 			
-			if (btye_addr) begin
-				DQ <= { wdata[7:0], 8'd0 };
-				DMASK <= 2'b01;
-				state <= `ST_W16_DATA2;
-			end else begin
-				DQ <= wdata[15:0];
-				DMASK <= 2'b00;
-				state <= `ST_TRUNC;
-			end
-		end
-		4'd9: begin // `ST_W16_DATA2
-			command <= `CMD_NOP;
-			DQ <= { 8'd0, wdata[15:8]};
-			DMASK <= 2'b10;
+			DMASK <= 2'b00;
 			state <= `ST_TRUNC;
 		end
 		4'd10: begin	// `ST_W32_CMD
 			command <= `CMD_WRITE_AP;
 			ADDR[10] <= command[0];
-			ADDR[9:0] <= col_addr;
+			ADDR[9:0] <= {col32_addr, 1'b0};
 			BA <= blank;
-			DQ <= wdata[15:0];
 			
-			if (btye_addr) begin
-				DQ <= { wdata[7:0], 8'd0 };
-				DMASK <= 2'b01;
-			end else begin
-				DQ <= wdata[15:0];
-				DMASK <= 2'b00;
-			end
+			DMASK <= 2'b00;
 			state <= `ST_W32_DATA2;
 		end
 		4'd11: begin // `ST_W32_DATA2
 			command <= `CMD_NOP;
-			if (btye_addr) begin
-				DQ <= wdata[23:8];
-				state <= `ST_W32_DATA3;
-			end else begin
-				DQ <= wdata[31:16];
-				state <= `ST_TRUNC;
-			end
-		end
-		4'd12: begin // `ST_W32_DATA3
-			command <= `CMD_NOP;
-			DQ <= wdata[31:24];
 			state <= `ST_TRUNC;
+
 		end
 		4'd15: begin // `ST_TRUNC
 			command <= `CMD_BST;
