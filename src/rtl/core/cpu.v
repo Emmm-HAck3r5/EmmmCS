@@ -1,5 +1,5 @@
 `include "cpu_define.v"
-`include "bus_define.v"
+`include "../memory/bus_define.v"
 `include "alu_define.v"
 
 // cpu status
@@ -11,6 +11,7 @@
 `define STATUS_MEM_READ       `STATUS_LEN'h5
 `define STATUS_MEM_READING    `STATUS_LEN'h6
 `define STATUS_ALU            `STATUS_LEN'h7
+`define STATUS_ALU_2          `STATUS_LEN'h13
 `define STATUS_ALUING         `STATUS_LEN'h8
 `define STATUS_REG_WRITE      `STATUS_LEN'h9
 `define STATUS_REG_WRITE_POST `STATUS_LEN'h4
@@ -20,8 +21,15 @@
 
 module cpu(
 	input clk,
-    input clr,
-    output reg cpu_clk
+    input clr_n,
+    output reg cpu_clk,
+    //SDRAM ports
+    output [12:0] ADDR,
+	output [1:0]  BA,
+	inout  [15:0] DQ,
+	output        CKE, CLK,
+	output        CS_N, RAS_N, CAS_N, WE_N,
+	output [1:0]  DMASK
 );
 
 //=======================================================
@@ -43,20 +51,16 @@ reg  [`CPU_XLEN-1:0] alu_src_B;
 reg  [3:0] alu_select;
 wire [63:0] alu_dest;
 wire [3:0] alu_flags;
-reg  alu_ready;
-reg  alu_ready_yn;
-wire alu_ready_wire;
-assign alu_ready_wire = alu_ready_yn ? alu_ready : alu_ready_wire;
+reg  alu_rst;
+wire alu_ready;
 
 // bus
 reg  [25:0] bus_address;
 wire [31:0] bus_rdata;
 reg  [1:0]  bus_wlen;
 reg  [31:0] bus_wdata;
-reg  bus_ready;
-reg  bus_ready_yn;
-wire bus_ready_wire;
-assign bus_ready_wire = bus_ready_yn ? bus_ready : bus_ready_wire;
+reg  bus_en_n;
+wire bus_ready;
 
 // decoder
 reg  [`CPU_INSTR_LENGTH-1 : 0] decoder_instr;
@@ -107,22 +111,36 @@ cpu_gregs gregs(
 
 // alu
 cpu_alu alu(
+    .clk(clk),
     .src_A(alu_src_A),
     .src_B(alu_src_B),
     .select(alu_select),
     .dest(alu_dest),
     .flags(alu_flags),
-    .READY(alu_ready_wire)//Dangerous InOut Port
+    .RST(alu_rst),
+    .READY(alu_ready)
 );
 
 // bus
-cpu_bus_ctrl bus_ctrl(
+cpu_bus bus(
     .clk(clk),
     .address(bus_address),
     .wdata(bus_wdata),
     .WLEN(bus_wlen),
     .rdata(bus_rdata),
-    .READY(bus_ready_wire)
+    .EN_N(bus_en_n),
+    .READY(bus_ready),
+
+    .ADDR(ADDR),
+    .BA(BA),
+    .DQ(DQ),
+    .CKE(CKE),
+    .CLK(CLK),
+    .CS_N(CS_N),
+    .RAS_N(RAS_N),
+    .CAS_N(CAS_N),
+    .WE_N(WE_N),
+    .DMASK(DMASK)
 );
 
 // decoder
@@ -144,14 +162,11 @@ cpu_instr_decoder decoder(
 
 // main logic
 always @(posedge clk) begin
-    if (clr) begin
+    if (!clr_n) begin
         pc     <= 0;
         status <= `STATUS_INIT;
         gregs_wen <= 0;
-        alu_ready <= `ALU_STOP;
-        bus_ready <= `BUS_STOP;
-        alu_ready_yn <= 1;
-        bus_ready_yn <= 1;
+        alu_rst <= 0;
         cpu_clk <= 0;
     end else begin
         case(status)
@@ -168,7 +183,7 @@ always @(posedge clk) begin
                 cpu_clk <= 1;
                 bus_address <= pc;
                 bus_wlen    <= `BUS_READ_32;
-                bus_ready   <= `BUS_RUN;
+                bus_en_n      <= `BUS_RUN;
                 status <= `STATUS_DECODING_INSTR;
             end
             `STATUS_DECODING_INSTR: begin
@@ -297,16 +312,15 @@ always @(posedge clk) begin
 
             `STATUS_MEM_READ:   begin
                 if (flag_mem_read) begin
-                    bus_ready = `BUS_RUN;
+                    bus_en_n = `BUS_RUN;
                     status = `STATUS_MEM_READING;
-                    bus_ready_yn = 0;
                 end else begin
                     status <= `STATUS_ALU;
                 end
             end
             `STATUS_MEM_READING:    begin
                 if (flag_mem_read) begin
-                    if (bus_ready_wire == `BUS_STOP) begin
+                    if (bus_ready == `BUS_STOP) begin
                         case (decoder_funct[2:0])
                             3'b000:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
                                             {{24{1'b0}}, bus_rdata[7:0]} :
@@ -328,16 +342,23 @@ always @(posedge clk) begin
             end
             `STATUS_ALU:    begin
                 if (flag_alu == 1) begin
-                    alu_ready = `ALU_RUN;
+                    alu_rst = 1;
+                    status = `STATUS_ALU_2;
+                end else begin
+                    status <= `STATUS_REG_WRITE;
+                end
+            end
+            `STATUS_ALU_2:  begin
+                if (flag_alu == 1) begin
+                    alu_rst = 0;
                     status = `STATUS_ALUING;
-                    alu_ready_yn = 0;
                 end else begin
                     status <= `STATUS_REG_WRITE;
                 end
             end
             `STATUS_ALUING: begin
                 if (flag_alu == 1) begin
-                    if (alu_ready_wire == `ALU_STOP) begin
+                    if (alu_ready == 1) begin
                         gregs_rd_dat <= alu_dest[31:0];
                         status <= `STATUS_REG_WRITE;
                     end else begin
@@ -359,16 +380,15 @@ always @(posedge clk) begin
             end
             `STATUS_MEM_WRITE:  begin
                 if (flag_mem_write) begin
-                    bus_ready = `BUS_RUN;
+                    bus_en_n = `BUS_RUN;
                     status = `STATUS_MEM_WRITING;
-                    bus_ready_yn = 0;
                 end else begin
                     status <= `STATUS_BRANCH;
                 end
             end
             `STATUS_MEM_WRITING:    begin
                 if (flag_mem_write) begin
-                    if (bus_ready_wire == `BUS_STOP) begin
+                    if (bus_ready == `BUS_STOP) begin
                         status <= `STATUS_BRANCH;
                     end else begin
                         status <= `STATUS_MEM_WRITING;

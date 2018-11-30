@@ -53,12 +53,37 @@
 \section{cpu\_alu}
 \subsection{基本信息}
 模块名：cpu\_alu\\
-所需时间：1 到 32 个周期
+\indent所需时间：1 到 32 个周期
+\subsection{宏定义}
+\begin{tabular}{|l|r|l|}
+    \hline
+    \multicolumn{3}{|c|}{alu\_define.v}\\\hline
+    名称    &   值  &   说明\\\hline
+    ALU\_RUN     &      1'b0   &  ALU 工作状态码\\ \hline
+    ALU\_STOP    &      1'b1   &  ALU 停止状态码\\ \hline
+    ALU\_WIDTH   &      4      &  ALU 功能选择端位宽\\ \hline
+    ALU\_ADD     &   `ALU\_WIDTH'b0000 &  名称表示功能，如加\\ \hline
+    ALU\_SUB     &   `ALU\_WIDTH'b0001 &  减\\ \hline
+    ALU\_AND     &   `ALU\_WIDTH'b0010 &  逻辑与\\ \hline
+    ALU\_OR      &   `ALU\_WIDTH'b0011 &  ...\\ \hline
+    ALU\_XOR     &   `ALU\_WIDTH'b0100 &  \\ \hline
+    ALU\_SLL     &   `ALU\_WIDTH'b0101 &  \\ \hline
+    ALU\_SRL     &   `ALU\_WIDTH'b0110 &  \\ \hline
+    ALU\_SRA     &   `ALU\_WIDTH'b0111 &  \\ \hline
+    ALU\_MUL     &   `ALU\_WIDTH'b1000 &  \\ \hline
+    ALU\_MULU    &   `ALU\_WIDTH'b1001 &  \\ \hline
+    ALU\_MULSU   &   `ALU\_WIDTH'b1010 &  \\ \hline
+    ALU\_DIV     &   `ALU\_WIDTH'b1011 &  \\ \hline
+    ALU\_DIVU    &   `ALU\_WIDTH'b1100 &  \\ \hline
+    ALU\_REM     &   `ALU\_WIDTH'b1101 &  \\ \hline
+    ALU\_REMU    &   `ALU\_WIDTH'b1110 &  \\ \hline
+    ALU\_NOP     &   `ALU\_WIDTH'b1111 &  \\ \hline
+\end{tabular}
 \subsection{接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
     类型       &   位宽    &   名称       &   说明\\\hline
-    input      &    1      &    clk      &   时钟信号\\\hline 
+    input      &    1      &    clk      &   时钟信号\\\hline
     input      &   32      &   src\_A    &   A 输入端\\\hline
     input      &   32      &   src\_B    &   B 输入端\\\hline
     input      &   4       &    select   &   功能控制端\\\hline
@@ -98,7 +123,19 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
 \section{cpu\_bus}
 \subsection{基本信息}
 模块名：cpu\_bus\\
-所需周期：1 到 5 个周期
+\indent所需周期：1 到 5 个周期
+\subsection{宏定义}
+\begin{tabular}{|l|r|l|}
+    \hline
+    \multicolumn{3}{|c|}{bus\_define.v}\\\hline
+    名称    &   值  &   说明\\\hline
+    BUS\_RUN     &      1'b0   &  BUS 工作状态码\\ \hline
+    BUS\_STOP    &      1'b1   &  BUS 停止状态码\\ \hline
+    `define BUS\_READ\_32  & 2'b00 & 读出32位数据 \\ \hline
+    `define BUS\_WRITE\_8  & 2'b01 & 写入8位数据 \\ \hline
+    `define BUS\_WRITE\_16 & 2'b10 & 写入16位数据 \\ \hline
+    `define BUS\_WRITE\_32 & 2'b11 & 写入32位数据 \\ \hline
+\end{tabular}
 \subsection{内部接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
@@ -112,6 +149,7 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     output      &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
 \subsection{SDRAM接口}
+\label{SDRAM-ports}
 \begin{tabular}{|c|c|c|c|}
     \hline
     类型        &   位宽    &   名称    &   说明\\\hline
@@ -180,10 +218,15 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
     \hline
     类型    & 位宽 &   名称    &   说明\\\hline
     input   &  1  &   clk     &   硬件时钟信号\\\hline
-    input   &  1  &   clr     &   清零信号（高电平有效）\\\hline
+    input   &  1  &   clr\_n   &   清零信号（低电平有效）\\\hline
     output  &  1  &   cpu\_clk &   CPU时钟\\\hline
+    \multicolumn{4}{|c|}{剩余接口与 SDRAM 接口完全相同， 见 \ref{SDRAM-ports}}\\\hline
+    ADDR & & & \\ \hline
+    BA & & & \\ \hline
+    DQ & & & \\ \hline
+    ... & & & \\ \hline
 \end{tabular}
 \subsection{时序}
     $$T(\textit{cpu\_clk})=10T(\textit{clk})+\text{max}(T(\textit{cpu\_bus})+T(\textit{cpu\_alu}))$$
 \subsection{说明}
-本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
+本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr\_n 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
