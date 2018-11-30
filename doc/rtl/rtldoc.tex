@@ -28,6 +28,7 @@
 \documentclass[10pt,fancyhdr,UTF8]{ctexbook}
     \ctexset{section/format = {\Large\bfseries}}
     \input{packages}
+        %\setmainfont{Consolas}
     \title{EmmmCS Document}
     \author{
         EasyAI Chen(easyai@outlook.com)\\
@@ -38,10 +39,12 @@
 \maketitle
 \tableofcontents
 \mainmatter
+\include{preface}
 \part{硬件}
 \include{common_modules}
 \include{core/cpu_introduction}
 \include{core/cpu_modules}
 \include{driver/driver_introduction}
+\include{driver/drivers}
 \end{sloppypar}
 \end{document}

@@ -1,0 +1,83 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: drivers.tex
+% Project: EmmmCS
+% File Created: 2018-11-30 20:24:53
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-11-30 21:42:01
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{硬件驱动}
+本章提供各硬件驱动的说明。
+\section{led\_ctrl}
+\subsection{基本信息}
+模块名：led\_ctrl
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   LED\_REG\_WIDTH   &   led\_reg &   led控制寄存器\\\hline
+    \multicolumn{4}{|c|}{硬件控制信号}\\\hline
+    output   &   1   &   led\_0  &   led0\\\hline
+    output   &   1   &   led\_1  &   led1\\\hline
+    output   &   1   &   led\_2  &   led2\\\hline
+    output   &   1   &   led\_3  &   led3\\\hline
+    output   &   1   &   led\_4  &   led4\\\hline
+    output   &   1   &   led\_5  &   led5\\\hline
+    output   &   1   &   led\_6  &   led6\\\hline
+    output   &   1   &   led\_7  &   led7\\\hline
+    output   &   1   &   led\_8  &   led8\\\hline
+    output   &   1   &   led\_9  &   led9\\\hline
+\end{tabular}
+\subsection{说明}
+本模块提供对led的硬件驱动，OS可通过LED控制寄存器的内存映射直接控制led，注意控制寄存器中只有低10位有定义，高位保留。
+\subsection{控制寄存器}
+\begin{tikzpicture}[scale=1,line width=0.8pt] 
+\coordinate (A16) at (0,0);
+\coordinate (A10) at (3,0);
+\coordinate (A9) at (3.5,0);
+\coordinate (A8) at (4,0);
+\coordinate (A7) at (4.5,0);
+\coordinate (A6) at (5,0);
+\coordinate (A5) at (5.5,0);
+\coordinate (A4) at (6,0);
+\coordinate (A3) at (6.5,0);
+\coordinate (A2) at (7,0);
+\coordinate (A1) at (7.5,0);
+\coordinate (A0) at (8,0);
+\coordinate (C) at (8,2);
+\coordinate (D) at (0,2);
+\draw(A16)--(A0)--(C)--(D)--cycle;
+%the separator
+\foreach \i/\texti  in {0,1,2,3,4,5,6,7,8,9,10} {
+\draw (A\texti) to ($(A\texti)+(0,2)$);
+}
+%led
+\foreach \i/\texti in {0,1,2,3,4,5,6,7,8,9} {
+    \node[rotate=90] (LED\texti) at ($(A\texti) + (-0.25,0.8)$) {LED\texti};
+}
+%addr
+\foreach \i/\texti in {0,1,2,3,4,5,6,7,8,9,10,16} {
+    \node (ADDR\texti) at ($(A\texti) + (0,2.2)$) {\texti};
+}
+%reserved
+\coordinate[label=below:RESERVED] (RESERVED) at ($(A16)!0.5!(A10) + (0,1.2)$);
+\end{tikzpicture}
