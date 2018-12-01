@@ -22,4 +22,11 @@
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
+//led
 `define LED_REG_WIDTH 16
+
+//display
+`define DP_X_ADDR_WIDTH 8
+`define DP_Y_ADDR_WIDTH 5
+`define DP_REG_WIDTH 128
+`define DP_COLOR_WIDTH 4
