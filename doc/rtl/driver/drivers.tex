@@ -21,13 +21,13 @@
 % File Created: 2018-11-30 20:24:53
 % Author: Chen Haodong (easyai@outlook.com)
 % --------------------------
-% Last Modified: 2018-11-30 21:42:01
+% Last Modified: 2018-12-01 20:43:27
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
 \chapter{硬件驱动}
 本章提供各硬件驱动的说明。
-\section{led\_ctrl}
+\section{led驱动}
 \subsection{基本信息}
 模块名：led\_ctrl
 \subsection{接口}
@@ -81,3 +81,75 @@
 %reserved
 \coordinate[label=below:RESERVED] (RESERVED) at ($(A16)!0.5!(A10) + (0,1.2)$);
 \end{tikzpicture}
+\section{显示驱动}
+\subsection{VGA驱动}
+\subsubsection{基本信息}
+模块名：vga\_ctrl（内部模块）
+\subsubsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   1   &   pclk &   25MHz时钟\\\hline
+    input   &   1   &   reset  &   置位\\\hline
+    input   &   24   &   vga\_data  &   vga数据\\\hline
+    output   &   10   &   h\_addr  &   水平方向扫描像素点坐标\\\hline
+    output   &   10   &   v\_addr  &   垂直方向扫描像素点坐标\\\hline
+    output   &   1   &   hsync  &   行同步信号\\\hline
+    output   &   1   &   vsync  &   列同步信号\\\hline
+    output   &   1   &   valid  &   消隐信号\\\hline
+    output   &   8   &   vga\_r  &   R颜色信号\\\hline
+    output   &   8   &   vga\_g  &   G颜色信号\\\hline
+    output   &   8   &   vga\_b  &   B颜色信号\\\hline
+\end{tabular}
+\subsubsection{说明}
+本模块提供底层VGA控制。
+\subsection{显示驱动}
+\subsubsection{基本信息}
+模块名：display\_ctrl
+\subsubsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   1   &   clk &   50MHz时钟\\\hline
+    input   &   1   &   reset\_n  &   复位\\\hline
+    input   &   16   &   in\_data  &   输入数据\\\hline
+    input   &   DP\_REG\_WIDTH   &   ctrl\_reg  &   控制寄存器\\\hline
+    output   &   DP\_X\_ADDR\_WIDTH   &   x\_addr  &   水平坐标\\\hline
+    output   &   DP\_Y\_ADDR\_WIDTH   &   y\_addr  &   垂直坐标\\\hline
+    \multicolumn{4}{|c|}{硬件控制信号}\\\hline
+    input   &   1   &   vga\_rst  &   VGA复位信号\\\hline
+    output   &   1   &   vga\_vs  &   VGA列同步信号\\\hline
+    output   &   1   &   vga\_hs  &   VGA行同步信号\\\hline
+    output   &   1   &   vga\_syncn  &   VGA同步信号\\\hline
+    output   &   1   &   vga\_blankn  &   VGA消隐信号\\\hline
+    output   &   1   &   vga\_clk  &   VGA时钟信号\\\hline
+    output   &   8   &   vga\_r  &   VGA R颜色信号\\\hline
+    output   &   8   &   vga\_g  &   VGA G颜色信号\\\hline
+    output   &   8   &   vga\_b  &   VGA B颜色信号\\\hline
+\end{tabular}
+\subsubsection{说明}
+本模块提供显示控制驱动。输入数据in\_data中，低8位为ASCII码，高8位为颜色数据，其中，高4位为前景色，低4位为背景色。
+\subsubsection{控制寄存器}
+\begin{tikzpicture}[scale=1,line width=0.8pt] 
+\coordinate (A8) at (0,0);
+\coordinate (YADDRA) at (6.5,0);
+\coordinate (XADDRA) at (7,0);
+\coordinate (A0) at (8,0);
+\coordinate (C) at (8,3);
+\coordinate (D) at (0,3);
+\draw(A8)--(A0)--(C)--(D)--cycle;
+%the separator
+\draw (XADDRA) to ($(XADDRA)+(0,3)$);
+\draw (YADDRA) to ($(YADDRA)+(0,3)$);
+%label
+\node[rotate=90] (CURXADDR) at ($(A0) + (-0.5,1.3)$) {CUR\_XADDR};
+\node[rotate=90] (CURYADDR) at ($(XADDRA) + (-0.25,1.3)$) {CUR\_YADDR};
+%addr
+\node (A0ADDR) at ($(A0) + (0,3.2)$) {0};
+\node (XADDR) at ($(XADDRA) + (0,3.2)$) {8};
+\node (YADDR) at ($(YADDRA) + (0,3.2)$) {13};
+\node (A8ADDR) at ($(A8) + (0,3.2)$) {128};
+%reserved
+\coordinate[label=below:RESERVED] (RESERVED) at ($(A8)!0.5!(YADDRA) + (0,1.6)$);
+\end{tikzpicture}\\
+其中，CUR\_XADDR和CUR\_YADDR代表当前光标位置。
