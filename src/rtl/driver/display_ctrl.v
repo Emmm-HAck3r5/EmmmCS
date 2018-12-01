@@ -18,7 +18,7 @@
   File Created: 2018-12-01 15:06:22
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-01 15:06:22
+  Last Modified: 2018-12-01 20:49:13
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -26,7 +26,7 @@ module display_ctrl(
     input clk,
     input reset_n,
 
-    input [7:0] in_ascii,
+    input [15:0] in_data,
     input [`DP_REG_WIDTH-1:0] ctrl_reg,
     //to upper
     output [`DP_X_ADDR_WIDTH-1:0] x_addr,
@@ -48,8 +48,11 @@ module display_ctrl(
     wire [`DP_COLOR_WIDTH-1:0] bg_color;
     wire [`DP_COLOR_WIDTH-1:0] fg_color;
     //font
+    wire [7:0] in_ascii;
     wire [7:0] font_line_bitmap;
+    wire [7:0] real_font_line_bitmap;//used to process the cursor
     wire [2:0] font_x_addr; //0 - 7 
+    wire [3:0] font_y_addr; //0 - 15
     wire [10:0] font_line_addr; // for font rom
     //vga
     wire [9:0] h_addr;//x
@@ -61,8 +64,9 @@ module display_ctrl(
     //DP_COLOR_WIDTH = 4
     assign cur_x_addr = ctrl_reg[7:0];
     assign cur_y_addr = ctrl_reg[12:8];
-    assign bg_color = ctrl_reg[19:16];
-    assign fg_color = ctrl_reg[23:20];
+    assign in_ascii = in_data[7:0];
+    assign bg_color = in_data[11:8];
+    assign fg_color = in_data[15:12];
 
     assign vga_syncn = 1'b0;
 
@@ -97,9 +101,10 @@ module display_ctrl(
     assign x_addr = (h_addr - 1) >> 3;
     assign y_addr = (v_addr - 1) >> 4;
     assign font_x_addr = (h_addr - 1) & 10'h7;
+    assign font_y_addr = (v_addr - 1 )& 10'hf;
 
-    assign font_line_addr = ({3'b0,in_ascii}<<4) + ((v_addr - 1)&10'hf);
-
+    assign font_line_addr = ({3'b0,in_ascii}<<4) + font_y_addr;
+    assign real_font_line_bitmap = x_addr == cur_x_addr && y_addr == cur_y_addr && font_y_addr == 4'hf ? 8'hff : font_line_bitmap;
     //todo the color and cursor
-    assign vga_data = {24{font_line_bitmap[font_x_addr]}};
+    assign vga_data = {24{real_font_line_bitmap[font_x_addr]}};
 endmodule
