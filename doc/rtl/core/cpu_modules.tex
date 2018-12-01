@@ -54,11 +54,36 @@
 \subsection{基本信息}
 模块名：cpu\_alu\\
 \indent所需时间：1 到 32 个周期
+\subsection{宏定义}
+\begin{tabular}{|l|r|l|}
+    \hline
+    \multicolumn{3}{|c|}{alu\_define.v}\\\hline
+    名称    &   值  &   说明\\\hline
+    ALU\_RUN     &      1'b0   &  ALU 工作状态码\\ \hline
+    ALU\_STOP    &      1'b1   &  ALU 停止状态码\\ \hline
+    ALU\_WIDTH   &      4      &  ALU 功能选择端位宽\\ \hline
+    ALU\_ADD     &   `ALU\_WIDTH'b0000 &  名称表示功能，如加\\ \hline
+    ALU\_SUB     &   `ALU\_WIDTH'b0001 &  减\\ \hline
+    ALU\_AND     &   `ALU\_WIDTH'b0010 &  逻辑与\\ \hline
+    ALU\_OR      &   `ALU\_WIDTH'b0011 &  ...\\ \hline
+    ALU\_XOR     &   `ALU\_WIDTH'b0100 &  \\ \hline
+    ALU\_SLL     &   `ALU\_WIDTH'b0101 &  \\ \hline
+    ALU\_SRL     &   `ALU\_WIDTH'b0110 &  \\ \hline
+    ALU\_SRA     &   `ALU\_WIDTH'b0111 &  \\ \hline
+    ALU\_MUL     &   `ALU\_WIDTH'b1000 &  \\ \hline
+    ALU\_MULU    &   `ALU\_WIDTH'b1001 &  \\ \hline
+    ALU\_MULSU   &   `ALU\_WIDTH'b1010 &  \\ \hline
+    ALU\_DIV     &   `ALU\_WIDTH'b1011 &  \\ \hline
+    ALU\_DIVU    &   `ALU\_WIDTH'b1100 &  \\ \hline
+    ALU\_REM     &   `ALU\_WIDTH'b1101 &  \\ \hline
+    ALU\_REMU    &   `ALU\_WIDTH'b1110 &  \\ \hline
+    ALU\_NOP     &   `ALU\_WIDTH'b1111 &  \\ \hline
+\end{tabular}
 \subsection{接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
     类型       &   位宽    &   名称       &   说明\\\hline
-    input      &    1      &    clk      &   时钟信号\\\hline 
+    input      &    1      &    clk      &   时钟信号\\\hline
     input      &   32      &   src\_A    &   A 输入端\\\hline
     input      &   32      &   src\_B    &   B 输入端\\\hline
     input      &   4       &    select   &   功能控制端\\\hline
@@ -90,15 +115,27 @@
 \end{tabular}
 \subsection{说明}
 RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST 控制。进行乘除取余运算前，必须依序给出 RST 的上升沿和下降沿，重置 ALU 后，ALU 才会开始进行运算，直到预备信号 READY 为高电位，表示运算完成。\\
-\indent乘法操作(MUL, MULU, MULSU)需要 5 个时钟周期。除法和取余操作需要 32 个时钟周期。其余指令可视为组合电路，可以一个周期内完成操作\\
-\indent标志位仅在加减法时有效，并且按 i386 手册上定义设置。\\
-\indent指令带 U 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令 MULSU 为 ${sign * unsigned}$ 操作。
+乘法操作(MUL, MULU, MULSU)需要 5 个时钟周期。除法和取余操作需要 32 个时钟周期。其余指令可视为组合电路，可以一个周期内完成操作\\
+标志位仅在加减法时有效，并且按 i386 手册上定义设置。\\
+指令带 U 后缀表示操作为无符号整形操作。若无后缀，默认为有符号整形操作。注意，指令 MULSU 为 ${sign * unsigned}$ 操作。
 
 % cpu_bus_ctrl moudule
 \section{cpu\_bus}
 \subsection{基本信息}
 模块名：cpu\_bus\\
 \indent所需周期：1 到 5 个周期
+\subsection{宏定义}
+\begin{tabular}{|l|r|l|}
+    \hline
+    \multicolumn{3}{|c|}{bus\_define.v}\\\hline
+    名称    &   值  &   说明\\\hline
+    BUS\_RUN     &      1'b0   &  BUS 工作状态码\\ \hline
+    BUS\_STOP    &      1'b1   &  BUS 停止状态码\\ \hline
+    `define BUS\_READ\_32  & 2'b00 & 读出32位数据 \\ \hline
+    `define BUS\_WRITE\_8  & 2'b01 & 写入8位数据 \\ \hline
+    `define BUS\_WRITE\_16 & 2'b10 & 写入16位数据 \\ \hline
+    `define BUS\_WRITE\_32 & 2'b11 & 写入32位数据 \\ \hline
+\end{tabular}
 \subsection{内部接口}
 \begin{tabular}{|c|c|c|c|}
     \hline
@@ -112,6 +149,7 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     output      &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
 \subsection{SDRAM接口}
+\label{SDRAM-ports}
 \begin{tabular}{|c|c|c|c|}
     \hline
     类型        &   位宽    &   名称    &   说明\\\hline
@@ -136,8 +174,8 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
 \end{tabular}
 \subsection{说明}
 SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
-\indent将复位端 RST 置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
-\indent地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。
+将复位端 RST 置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
+地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。
 
 \section{cpu\_instr\_decoder}
 \subsection{基本信息}
@@ -180,10 +218,15 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
     \hline
     类型    & 位宽 &   名称    &   说明\\\hline
     input   &  1  &   clk     &   硬件时钟信号\\\hline
-    input   &  1  &   clr     &   清零信号（高电平有效）\\\hline
+    input   &  1  &   clr\_n   &   清零信号（低电平有效）\\\hline
     output  &  1  &   cpu\_clk &   CPU时钟\\\hline
+    \multicolumn{4}{|c|}{剩余接口与 SDRAM 接口完全相同， 见 \ref{SDRAM-ports}}\\\hline
+    ADDR & & & \\ \hline
+    BA & & & \\ \hline
+    DQ & & & \\ \hline
+    ... & & & \\ \hline
 \end{tabular}
 \subsection{时序}
     $$T(\textit{cpu\_clk})=10T(\textit{clk})+\text{max}(T(\textit{cpu\_bus})+T(\textit{cpu\_alu}))$$
 \subsection{说明}
-本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
+本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr\_n 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
