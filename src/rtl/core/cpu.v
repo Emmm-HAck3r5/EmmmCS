@@ -86,6 +86,7 @@ assign gregs_rd_idx  = greg_restore_flag ? greg_back_no : decoder_rd_idx;
 // PC
 reg [31:0] pc;
 reg [31:0] pc_nxt;
+reg [31:0] pc_back;
 // flags
 reg flag_alu;
 reg flag_reg_write;
@@ -98,7 +99,7 @@ reg [`STATUS_LEN-1 : 0] status;
 reg greg_back_flag; //1=backing 0=not backing
 reg greg_restore_flag; //1=restoring 0=not restoring
 reg [`CPU_GREGIDX_WIDTH : 0] greg_back_no;
-reg [`CPU_XLEN-1 : 0]           greg_backup [`CPU_GREGIDX_WIDTH : 0];
+reg [`CPU_XLEN-1 : 0]        greg_backup [`CPU_GREGIDX_WIDTH : 0];
 reg IFlag;
 
 //=======================================================
@@ -186,6 +187,7 @@ always @(posedge clk) begin
                 flag_branch     <= 0;
                 cpu_clk <= 0;
                 if (IF == 0 && 0) begin// TODO: Add signal from Keyboard
+                    pc_back = pc;
                     greg_back_flag = 1;
                     status = `STATUS_BACKUP;
                     greg_back_no = 0;
@@ -316,6 +318,7 @@ always @(posedge clk) begin
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
                             if (IFlag == 1 && 0) begin // Add trap return signal
+                                pc = pc_back;
                                 greg_restore_flag = 1;
                                 status = `STATUS_RESTORE;
                                 greg_back_no = 0;
