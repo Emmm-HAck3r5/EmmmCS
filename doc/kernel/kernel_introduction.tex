@@ -1,0 +1,56 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: kernel_introduction.tex
+% Project: EmmmCS
+% File Created: 2018-12-07 19:23:25
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-12-07 19:35:11
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+\chapter{Kernel 综述}
+\section{架构}
+本Kernel不提供进程、线程模型，文件系统，网络。\\
+本Kernel由以下部分组成：
+\begin{itemize}
+    \item KLIB - Kernel编程的基础库
+    \item driver - 提供对VGA、PS/2 KB、LED等设备控制
+    \item mm - 内存管理器，提供动态内存管理
+    \item sh - 提供交互式命令行
+    \item app - 内置应用
+\end{itemize}
+\section{常量、类型}
+\begin{tabular}{|c|c|c|}
+    \hline
+    名称 & 值 & 说明\\\hline
+    NULL & 0 & NULL值\\\hline
+    FALSE & 0 & 布尔False\\\hline
+    TRUE & 1 & 布尔True\\\hline
+\end{tabular}
+\begin{tabular}{|c|c|c|}
+    \hline
+    名称 & 对应类型 & 说明\\\hline
+    BOOL & unsigned char & 布尔类型\\\hline
+    u8 & unsigned char & 8位无符号数\\\hline
+    u16 & unsigned short & 16位无符号数\\\hline
+    u32 & unsigned int & 32位无符号数\\\hline
+    s8 & char & 8位有符号数\\\hline
+    s16 & short & 16位有符号数\\\hline
+    s32 & int & 32位有符号数\\\hline
+\end{tabular}
