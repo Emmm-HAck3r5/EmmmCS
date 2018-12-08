@@ -18,7 +18,18 @@
   File Created: 2018-12-04 22:44:12
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-04 22:49:31
+  Last Modified: 2018-12-08 12:04:01
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
+#include "mem.h"
+#include "../mm/mm.h"
+
+void *malloc(u32 size)
+{
+      return mm_alloc(size);
+}
+void free(void *p)
+{
+      mm_dealloc(p);
+}

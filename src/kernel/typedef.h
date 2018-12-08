@@ -18,9 +18,11 @@
   File Created: 2018-12-04 22:36:23
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-07 19:28:19
+  Last Modified: 2018-12-08 12:02:56
   Modified By: Chen Haodong (easyai@outlook.com)
  */
+#ifndef TYPEDEF_H
+#define TYPEDEF_H
 #define NULL 0
 #define FALSE 0
 #define TRUE 1
@@ -31,3 +33,4 @@ typedef unsigned int u32;
 typedef char s8;
 typedef short s16;
 typedef int s32;
+#endif

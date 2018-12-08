@@ -18,7 +18,7 @@
   File Created: 2018-12-07 19:45:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-07 22:43:49
+  Last Modified: 2018-12-08 12:01:11
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 /*
@@ -41,6 +41,8 @@ allocate for
 depth:14
 ATTENTION: ALLOCATED SIZE = ALIGNED(REQUIRED SIZE + HEADER SIZE)
 */
+#ifndef KERNEL_MM_H
+#define KERNEL_MM_H
 #include "../typedef.h"
 // 128KB heap
 #define HEAP_SIZE 131072
@@ -58,3 +60,4 @@ typedef struct
 void mm_init(void);
 void *mm_alloc(u32 sz);
 void mm_dealloc(void *p);
+#endif

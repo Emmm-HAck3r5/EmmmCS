@@ -18,13 +18,16 @@
   File Created: 2018-12-04 22:44:16
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-07 19:44:35
+  Last Modified: 2018-12-08 12:03:07
   Modified By: Chen Haodong (easyai@outlook.com)
  */
+#ifndef KLIB_MEM_H
+#define KLIB_MEM_H
 #include "../typedef.h"
 
 void* malloc(u32 size);
 void free(void *p);
-void memcpy(void *dst, const void *src, u32 size);
-void memset(void *dst, u32 val, u32 size);
-void memmove(void *dst, const void *src, u32 size);
+void* memcpy(void *dst, const void *src, u32 size);
+void* memset(void *dst, u32 val, u32 size);
+void* memmove(void *dst, const void *src, u32 size);
+#endif

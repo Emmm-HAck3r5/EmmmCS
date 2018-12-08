@@ -18,10 +18,11 @@
   File Created: 2018-12-07 22:31:49
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-07 23:35:09
+  Last Modified: 2018-12-08 12:01:57
   Modified By: Chen Haodong (easyai@outlook.com)
  */
-
+#ifndef KLIB_DLIST_H
+#define KLIB_DLIST_H
 /* ATTENTION! the head of dlist doesn't store data!*/
 #define DLIST_INIT(__list__, __m_next__, __m_prev__) \
     {                                                \
@@ -58,3 +59,4 @@
             if (__p_node__ == __list__)                                         \
                 __p_node__ = NULL;                                              \
         }
+#endif

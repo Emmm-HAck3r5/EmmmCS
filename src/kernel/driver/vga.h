@@ -18,9 +18,11 @@
   File Created: 2018-12-04 22:42:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-07 19:44:25
+  Last Modified: 2018-12-08 12:02:18
   Modified By: Chen Haodong (easyai@outlook.com)
  */
+#ifndef DRIVER_VGA_H
+#define DRIVER_VGA_H
 #include "../typedef.h"
 void vga_init();
 void vga_write(u8 color, u8 c, u32 x, u32 y);
@@ -28,4 +30,5 @@ static void scroll(void);
 void vga_putc(u8 color, u8 c);
 void vga_puts(u8 color, u8 *str);
 void vga_putn(u8 color, u32 n, u8 mode);
-void vga_clean(void)
+void vga_clean(void);
+#endif
