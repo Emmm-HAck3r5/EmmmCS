@@ -18,17 +18,39 @@
   File Created: 2018-12-04 22:42:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 12:02:18
+  Last Modified: 2018-12-08 16:13:25
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_VGA_H
 #define DRIVER_VGA_H
 #include "../typedef.h"
+//80x30
+#define VGA_CHAR_X_SIZE 80
+#define VGA_CHAR_Y_SIZE 30
+#define VGA_CHAR_BUF_SIZE 2400
+#define VGA_B_BLACK 0x00
+#define VGA_B_BLUE 0x10
+#define VGA_B_GREEN 0x20
+#define VGA_B_CYAN 0x30
+#define VGA_B_RED 0x40
+#define VGA_B_MAGENTA 0x50
+#define VGA_B_BROWN 0x60
+#define VGA_B_WHITE 0x70
+#define VGA_F_BLACK 0x00
+#define VGA_F_BLUE 0x01
+#define VGA_F_GREEN 0x02
+#define VGA_F_CYAN 0x03
+#define VGA_F_RED 0x04
+#define VGA_F_MAGENTA 0x05
+#define VGA_F_BROWN 0x06
+#define VGA_F_WHITE 0x07
+#define VGA_N_S_DEC 0x0
+#define VGA_N_U_DEC 0x1
+#define VGA_N_HEX 0x2
 void vga_init();
-void vga_write(u8 color, u8 c, u32 x, u32 y);
-static void scroll(void);
-void vga_putc(u8 color, u8 c);
-void vga_puts(u8 color, u8 *str);
+void vga_writec(u8 color, char c, u8 x, u8 y);
+void vga_putc(u8 color, char c);
+void vga_puts(u8 color, const char *str);
 void vga_putn(u8 color, u32 n, u8 mode);
 void vga_clean(void);
 #endif
