@@ -18,14 +18,14 @@
   File Created: 2018-12-04 22:49:50
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 12:02:38
+  Last Modified: 2018-12-08 16:23:48
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_LED_H
 #define DRIVER_LED_H
 #include "../typedef.h"
 
-void led_init();
+void led_init(void);
 void led_on(u8 id);
 void led_off(u8 id);
 void led_toggle(u8 id);

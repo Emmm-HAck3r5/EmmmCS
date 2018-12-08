@@ -1,0 +1,158 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: kernel_driver.tex
+% Project: EmmmCS
+% File Created: 2018-12-08 16:21:25
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-12-08 16:45:42
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{Kernel 驱动}
+\section{LED}
+LED使用2个字节的控制寄存器，内存映射在0x80000起始。
+\subsection{接口}
+
+\subsubsection{led\_init}
+\noindent函数原型：void led\_init(void);\\
+说明：led驱动初始化
+
+\subsubsection{led\_on}
+\noindent函数原型：void led\_on(u8 id);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & id & 取值0-9，对应led的id\\\hline
+\end{tabular}\\
+说明：开对应led，若id非法，无操作。
+
+\subsubsection{led\_off}
+\noindent函数原型：void led\_off(u8 id);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & id & 取值0-9，对应led的id\\\hline
+\end{tabular}\\
+说明：关对应led，若id非法，无操作。
+
+\subsubsection{led\_toggle}
+\noindent函数原型：void led\_toggle(u8 id);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & id & 取值0-9，对应led的id\\\hline
+\end{tabular}\\
+说明：反转对应led状态，若id非法，无操作。
+
+\section{VGA}
+屏幕坐标，以左上角为原点，横向为x轴，纵向为y轴。
+\subsection{常量、宏、类型}
+\noindent\begin{tabular}{|c|c|c|}
+    \hline
+    名称 & 值 & 说明\\\hline
+    VGA\_CHAR\_X\_SIZE & 80 & 列数\\\hline
+    VGA\_CHAR\_Y\_SIZE & 30 & 行数\\\hline
+    VGA\_CHAR\_BUF\_SIZE & 2400 & 总字符数\\\hline
+\end{tabular}\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    名称 & 值 & 说明\\\hline
+    \multicolumn{3}{|c|}{背景色}\\\hline
+    VGA\_B\_BLACK & 0x00 & 黑\\\hline
+    VGA\_B\_BLUE & 0x10 & 蓝\\\hline
+    VGA\_B\_GREEN & 0x20 & 绿\\\hline
+    VGA\_B\_CYAN & 0x30 & 青\\\hline
+    VGA\_B\_RED & 0x40 & 红\\\hline
+    VGA\_B\_MAGENTA & 0x50 & 洋红\\\hline
+    VGA\_B\_BROWN & 0x60 & 棕\\\hline
+    VGA\_B\_WHITE & 0x70 & 白\\\hline
+    \multicolumn{3}{|c|}{前景色}\\\hline
+    VGA\_F\_BLACK & 0x00 & 黑\\\hline
+    VGA\_F\_BLUE & 0x01 & 蓝\\\hline
+    VGA\_F\_GREEN & 0x02 & 绿\\\hline
+    VGA\_F\_CYAN & 0x03 & 青\\\hline
+    VGA\_F\_RED & 0x04 & 红\\\hline
+    VGA\_F\_MAGENTA & 0x05 & 洋红\\\hline
+    VGA\_F\_BROWN & 0x06 & 棕\\\hline
+    VGA\_F\_WHITE & 0x07 & 白\\\hline
+    \multicolumn{3}{|c|}{数字格式}\\\hline
+    VGA\_N\_S\_DEC & 0x0 & 有符号十进制\\\hline
+    VGA\_N\_U\_DEC & 0x1 & 无符号十进制\\\hline
+    VGA\_N\_HEX & 0x2 & 十六进制\\\hline
+\end{tabular}\\
+\subsection{接口}
+
+\subsubsection{vga\_init}
+\noindent函数原型：void vga\_init(void);\\
+说明：vga驱动初始化
+
+\subsubsection{vga\_writec}
+\noindent函数原型：void vga\_writec(u8 color, char c, u8 x, u8 y);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    char & c & 输出字符\\\hline
+    u8 & x & x坐标\\\hline
+    u8 & y & y坐标\\\hline
+\end{tabular}\\
+说明：在对应坐标处写入字符，若坐标非法则无操作。注意该函数不改变光标位置。
+
+\subsubsection{vga\_putc}
+\noindent函数原型：void vga\_putc(u8 color, char c);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    char & c & 输出字符\\\hline
+\end{tabular}\\
+说明：在光标处写入字符，该函数会自动滚屏。
+
+\subsubsection{vga\_puts}
+\noindent函数原型：void vga\_puts(u8 color, const char *str);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    const char* & str & 输出字符串\\\hline
+\end{tabular}\\
+说明：在光标处写入字符串，该函数会自动滚屏。
+
+\subsubsection{vga\_putn}
+\noindent函数原型：void vga\_putn(u8 color, u32 n, u8 mode);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    u32 & n & 输出数字\\\hline
+    u8 & mode & 数字格式\\\hline
+\end{tabular}\\
+说明：在光标处写入数字，该函数会自动滚屏。
+
+\subsubsection{vga\_clean}
+\noindent函数原型：void vga\_clean(void);\\
+说明：清屏
