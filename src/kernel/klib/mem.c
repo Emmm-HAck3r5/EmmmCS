@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:44:12
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 12:04:01
+  Last Modified: 2018-12-08 13:15:07
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -27,9 +27,37 @@
 
 void *malloc(u32 size)
 {
-      return mm_alloc(size);
+    return mm_alloc(size);
 }
 void free(void *p)
 {
-      mm_dealloc(p);
+    mm_dealloc(p);
+}
+void *memcpy(void *dst, const void *src, u32 size)
+{
+    u8 *tmp_dst = (u8 *)dst;
+    u8 *tmp_src = (u8 *)src;
+    while (size--)
+        *tmp_dst++ = *tmp_src++;
+    return dst;
+}
+void *memset(void *dst, u32 val, u32 size)
+{
+    u8 *tmp_dst = (u8 *)dst;
+    while(size--)
+        *tmp_dst++ = (u8)val;
+    return dst;
+}
+void *memmove(void *dst, const void *src, u32 size)
+{
+    if((u32)dst < (u32)src)
+        return memcpy(dst, src, size);
+    else
+    {
+        u8 *tmp_dst = (u8 *)dst + size;
+        u8 *tmp_src = (u8 *)src + size;
+        while (size--)
+            *--tmp_dst = *--tmp_src;
+        return dst;
+    }
 }
