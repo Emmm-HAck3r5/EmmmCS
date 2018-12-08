@@ -18,7 +18,7 @@
   File Created: 2018-12-07 19:45:10
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 11:09:19
+  Last Modified: 2018-12-08 11:50:08
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "mm.h"
@@ -49,10 +49,10 @@ static u32 align_up_pow2(u32 n)
 static u32 log2(u32 n)
 {
     u32 result = !!(n & 0xAAAAAAAA);
-    result |= !!((n & 0xFFFF0000) << 4);
-    result |= !!((n & 0xFF00FF00) << 3);
-    result |= !!((n & 0xF0F0F0F0) << 2);
-    result |= !!((n & 0xCCCCCCCC) << 1);
+    result |= (!!(n & 0xFFFF0000) << 4);
+    result |= (!!(n & 0xFF00FF00) << 3);
+    result |= (!!(n & 0xF0F0F0F0) << 2);
+    result |= (!!(n & 0xCCCCCCCC) << 1);
     return result;
 }
 static BOOL divide(u8 level)
@@ -113,7 +113,7 @@ static u32 dealloc_merge(u8 level,u32 addr)
         //DO NOT insert the node
         //just return the new addr needed merge
         if ((u32)addr > (u32)buddy)
-            addr = buddy;
+            addr = (u32)buddy;
         return addr;
     }
     else
@@ -166,7 +166,15 @@ void mm_dealloc(void *p)
         if(next_addr == NULL)
         {
             //insert the node
-            MM_LIST_ADD_TAIL(buddy_mm.tree[level], m_next, m_prev, (buddy_mm_info_t *)addr);
+            if (buddy_mm.tree[level] == NULL)
+            {
+                ((buddy_mm_info_t *)addr)->m_next = ((buddy_mm_info_t *)addr)->m_prev = ((buddy_mm_info_t *)addr);
+                buddy_mm.tree[level] = (buddy_mm_info_t *)addr;
+            }
+            else
+            {
+                MM_LIST_ADD_TAIL(buddy_mm.tree[level], m_next, m_prev, (buddy_mm_info_t *)addr);
+            }
             break;
         }
         else
