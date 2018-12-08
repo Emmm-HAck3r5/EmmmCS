@@ -1,0 +1,88 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: kernel_mm.tex
+% Project: EmmmCS
+% File Created: 2018-12-08 16:46:37
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-12-08 16:57:15
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{Kernel 内存管理}
+Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
+
+\section{常量、宏、类型}
+\noindent\begin{tabular}{|c|c|c|}
+    \hline
+    名称 & 值 & 说明\\\hline
+    HEAP\_SIZE & 131072 & 128KB\\\hline
+    TREE\_DEPTH & 14 & 分配粒度\\\hline
+\end{tabular}\\
+
+\subsubsection{buddy\_mm\_info\_t}
+\noindent成员：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    buddy\_mm\_info\_t* & m\_next & 链表，后驱\\\hline
+    buddy\_mm\_info\_t* & m\_prev & 链表，前驱\\\hline
+\end{tabular}\\
+说明：空闲块链表项。
+
+\subsubsection{buddy\_mm\_header\_t}
+\noindent类型：u32\\
+说明：指针Header，存储level
+
+\subsubsection{buddy\_mm\_t}
+\noindent成员：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u32 & used\_size & 已使用大小\\\hline
+    buddy\_mm\_info\_t*[TREE\_DEPTH] & tree & 空闲块集合\\\hline
+\end{tabular}\\
+说明：Buddy内存分配系统。
+
+\section{接口}
+
+\subsubsection{mm\_init}
+\noindent函数原型：void mm\_init(void);\\
+说明：内存管理初始化。
+
+\subsubsection{mm\_alloc}
+\noindent函数原型：void* mm\_alloc(u32 sz);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u32 & sz & 需分配大小\\\hline
+\end{tabular}\\
+返回值：内存块起始地址，若分配失败返回NULL\\
+说明：内存块分配。
+
+\subsubsection{mm\_dealloc}
+\noindent函数原型：void mm\_dealloc(void *p);\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    void* & p & 需回收内存块指针\\\hline
+\end{tabular}\\
+说明：回收相应内存块。

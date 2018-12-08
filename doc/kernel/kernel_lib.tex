@@ -1,0 +1,138 @@
+%
+% Copyright 2018 EmmmHackers
+% 
+% 
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+% 
+% 
+%       http://www.apache.org/licenses/LICENSE-2.0
+% 
+% 
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+% --------------------------
+% File: kernel_lib.tex
+% Project: EmmmCS
+% File Created: 2018-12-08 16:58:40
+% Author: Chen Haodong (easyai@outlook.com)
+% --------------------------
+% Last Modified: 2018-12-08 17:15:10
+% Modified By: Chen Haodong (easyai@outlook.com)
+%
+
+\chapter{Kernel Lib}
+若函数与C标准库中函数同名，则其行为也一致。该部分函数文档见C11标准文档。
+
+\section{DList}
+提供了侵入式双向链表。链表头结点不存放数据。
+
+\subsection{接口}
+
+\subsubsection{DLIST\_INIT}
+\noindent函数原型：DLIST\_INIT(list, m\_next, m\_prev)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表头结点\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+\end{tabular}\\
+说明：初始化链表
+
+\subsubsection{DLIST\_EMPTY}
+\noindent函数原型：DLIST\_EMPTY(list, m\_next, m\_prev)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表头结点\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+\end{tabular}\\
+说明：判断链表是否为空
+
+\subsubsection{DLIST\_INSERT}
+\noindent函数原型：DLIST\_INSERT(pos, m\_next, m\_prev, node)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & pos & 被插入结点的前驱\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+    ptr & node & 被插入结点\\\hline
+\end{tabular}\\
+说明：插入结点
+
+
+\subsubsection{DLIST\_DELETE}
+\noindent函数原型：DLIST\_DELETE(list, pos, m\_next, m\_prev)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表\\\hline
+    ptr & pos & 被删除结点\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+\end{tabular}\\
+说明：删除结点
+
+\subsubsection{DLIST\_ADD\_TAIL}
+\noindent函数原型：DLIST\_ADD\_TAIL(list, m\_next, m\_prev, node)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+    ptr & node & 被添加结点\\\hline
+\end{tabular}\\
+说明：添加结点至链表尾
+
+\subsubsection{DLIST\_ADD\_HEAD}
+\noindent函数原型：DLIST\_ADD\_HEAD(list, m\_next, m\_prev, node)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    member name & m\_prev & 前驱变量名\\\hline
+    ptr & node & 被添加结点\\\hline
+\end{tabular}\\
+说明：添加结点至链表头
+
+\subsubsection{DLIST\_FOREACH}
+\noindent函数原型：DLIST\_FOREACH(list, m\_next, ptr)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    ptr & ptr & 当前操作结点\\\hline
+\end{tabular}\\
+说明：链表遍历
+
+\subsubsection{DLIST\_FIND\_NODE}
+\noindent函数原型：DLIST\_FIND\_NODE(list, m\_next, p\_node, key, cmpfunc)\\
+参数：\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    ptr & list & 链表\\\hline
+    member name & m\_next & 后驱变量名\\\hline
+    ptr & p\_node & 返回值\\\hline
+    value & key & 关键字\\\hline
+    function & cmpfunc & 比较函数\\\hline
+\end{tabular}\\
+比较函数要求：二元函数，左操作数接受key值，右操作数接受一个指向链表结点的指针，若匹配返回非零值。\\
+说明：链表结点查找，若查找不到返回NULL。
