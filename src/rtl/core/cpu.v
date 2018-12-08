@@ -18,6 +18,8 @@
 `define STATUS_MEM_WRITE      `STATUS_LEN'h10
 `define STATUS_MEM_WRITING    `STATUS_LEN'h11
 `define STATUS_BRANCH         `STATUS_LEN'h12
+`define STATUS_BACKUP         `STATUS_LEN'h14
+`define STATUS_RESTORE        `STATUS_LEN'h15
 
 module cpu(
 	input clk,
@@ -77,13 +79,14 @@ wire decoder_fp_rm;
 wire decoder_fp_width;
 wire decoder_fp_fmt;
 // gRegs idx always be the decoding result
-assign gregs_rs1_idx = decoder_rs1_idx;
+assign gregs_rs1_idx = greg_back_flag ? greg_back_no[`CPU_GREGIDX_WIDTH-1:0] : decoder_rs1_idx;
 assign gregs_rs2_idx = decoder_rs2_idx;
-assign gregs_rd_idx  = decoder_rd_idx;
+assign gregs_rd_idx  = greg_restore_flag ? greg_back_no : decoder_rd_idx;
 
 // PC
 reg [31:0] pc;
 reg [31:0] pc_nxt;
+reg [31:0] pc_back;
 // flags
 reg flag_alu;
 reg flag_reg_write;
@@ -92,6 +95,12 @@ reg flag_mem_write;
 reg flag_branch;
 // status
 reg [`STATUS_LEN-1 : 0] status;
+
+reg greg_back_flag; //1=backing 0=not backing
+reg greg_restore_flag; //1=restoring 0=not restoring
+reg [`CPU_GREGIDX_WIDTH : 0] greg_back_no;
+reg [`CPU_XLEN-1 : 0]        greg_backup [`CPU_GREGIDX_WIDTH : 0];
+reg IFlag;
 
 //=======================================================
 //  Structural coding
@@ -171,13 +180,22 @@ always @(posedge clk) begin
     end else begin
         case(status)
             `STATUS_INIT: begin
-                status <= `STATUS_FETCHING_INSTR;
                 flag_alu   <= 0;
                 flag_reg_write  <= 0;
                 flag_mem_read   <= 0;
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
+                if (IF == 0 && 0) begin// TODO: Add signal from Keyboard
+                    pc_back = pc;
+                    greg_back_flag = 1;
+                    status = `STATUS_BACKUP;
+                    greg_back_no = 0;
+                    IF = 1;
+                end else begin
+                    greg_back_flag <= 0;
+                    status <= `STATUS_FETCHING_INSTR;
+                end
             end
             `STATUS_FETCHING_INSTR: begin
                 cpu_clk <= 1;
@@ -299,7 +317,12 @@ always @(posedge clk) begin
                             //TODO
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
-                            //TODO
+                            if (IFlag == 1 && 0) begin // Add trap return signal
+                                pc = pc_back;
+                                greg_restore_flag = 1;
+                                status = `STATUS_RESTORE;
+                                greg_back_no = 0;
+                            end
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
                             //TODO()
@@ -404,6 +427,34 @@ always @(posedge clk) begin
                     pc <= pc + 4;
                 end
                 status <= `STATUS_INIT;
+            end
+            `STATUS_BACKUP: begin
+                if (greg_back_flag) begin
+                    greg_backup[greg_back_no] = gregs_rs1_dat;
+                    if (greg_back_no <= 8'hff) begin
+                        greg_back_no = greg_back_no + 1;
+                        status = `STATUS_BACKUP;
+                    end else begin
+                        greg_back_flag = 0;
+                        status = `STATUS_INIT;
+                    end
+                end else begin
+                    status <= `STATUS_INIT;
+                end
+            end
+            `STATUS_RESTORE:begin
+                if (greg_restore_flag) begin
+                    if (greg_back_no <= 8'hff) begin
+                        greg_back_no = greg_back_no + 1;
+                        gregs_rd_dat = greg_backup[greg_back_no];
+                    end else begin
+                        greg_restore_flag = 0;
+                        status = `STATUS_INIT;
+                        IFlag = 0;
+                    end
+                end else begin
+                    status <= `STATUS_INIT;
+                end
             end
             default: begin
                 status = `STATUS_INIT;

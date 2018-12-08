@@ -16,7 +16,7 @@
 % See the License for the specific language governing permissions and
 % limitations under the License.
 % --------------------------
-% File: rtldoc.tex
+% File: doc.tex
 % Project: EmmmCS
 % File Created: 2018-11-20 23:41:50
 % Author: Chen Haodong (easyai@outlook.com)
@@ -32,7 +32,8 @@
     \title{EmmmCS Document}
     \author{
         EasyAI Chen(easyai@outlook.com)\\
-        Forewing Xie(jujianai@hotmail.com)
+        Forewing Xie(jujianai@hotmail.com)\\
+        Niffle Wu(1102365274@qq.com)
     }
 \begin{document}
 \begin{sloppypar}
@@ -41,10 +42,13 @@
 \mainmatter
 \include{preface}
 \part{硬件}
-\include{common_modules}
-\include{core/cpu_introduction}
-\include{core/cpu_modules}
-\include{driver/driver_introduction}
-\include{driver/drivers}
+\include{rtl/common_modules}
+\include{rtl/core/cpu_introduction}
+\include{rtl/core/cpu_modules}
+\include{rtl/core/cpu_interrupts}
+\include{rtl/driver/driver_introduction}
+\include{rtl/driver/drivers}
+\part{软件}
+\include{kernel/kernel_introduction}
 \end{sloppypar}
 \end{document}

@@ -1,0 +1,21 @@
+
+\chapter{CPU 中断、异常}
+
+\section{综述}
+本项目中 CPU 中断异常处理在 RISC-V 架构上有所简化，并且进行了修改，请软件开发者遵循本文档所约定的方法进行处理。
+
+\section{中断发生}
+
+当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到中断处理函数所指向的地址；同时将 \texttt{x1} 作为中断号、\texttt{xi} 寄存器作为第 $i-1$ 个参数传递给中断处理函数。
+
+\section{中断返回}
+
+由于本项目仅支持 M-level，故只支持通过 \texttt{MRET} 指令进行中断返回；执行本指令时，将会将 \texttt{pc}、\texttt{xi} 等通用寄存器恢复为进行中断前的状态。
+
+\section{中断表}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    中断号 & 含义 & 参数 1 & 参数 2\\\hline
+    0     & 无异常 & &\\\hline
+    1     & 键盘 & 键盘内存地址 &\\\hline
+\end{tabular}
