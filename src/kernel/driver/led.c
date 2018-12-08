@@ -18,8 +18,53 @@
   File Created: 2018-12-04 22:49:46
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-05 23:02:17
+  Last Modified: 2018-12-08 14:34:19
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "led.h"
 static u8 * const led_reg = (u8 *)0x80000;
+
+void led_init()
+{
+    *led_reg = 0;
+    *(led_reg + 1) = 0;
+}
+void led_on(u8 id)
+{
+    if(id > 9)
+        return;
+    if(id > 7)
+    {
+        *(led_reg + 1) |= 1 << (id - 8);
+    }
+    else
+    {
+        *(led_reg) |= 1 << id;
+    }
+}
+void led_off(u8 id)
+{
+    if (id > 9)
+        return;
+    if (id > 7)
+    {
+        *(led_reg + 1) &= ~(1 << (id - 8));
+    }
+    else
+    {
+        *(led_reg) &= ~(1 << id);
+    }
+}
+void led_toggle(u8 id)
+{
+    if (id > 9)
+        return;
+    if (id > 7)
+    {
+        *(led_reg + 1) ^= 1 << (id - 8);
+    }
+    else
+    {
+        *(led_reg) ^= 1 << id;
+    }
+}
