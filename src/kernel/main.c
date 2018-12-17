@@ -25,11 +25,14 @@
 #include "driver/led.h"
 #include "driver/vga.h"
 #include "mm/mm.h"
+#include "intr/intr.h"
+
 void init(void)
 {
     led_init();
     vga_init();
     mm_init();
+    intr_init();
 }
 int main(void)
 {
