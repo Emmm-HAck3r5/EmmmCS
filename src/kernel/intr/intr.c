@@ -8,12 +8,21 @@ void intr_init(){
     // TODO: insert an instr to set the idtr to intr()'s address
 }
 
+void intr_open(){
+    __asm__ ("ecall");
+}
+
+void intr_close(){
+    __asm__ ("ebreak");
+}
+
 void intr(){
     switch(intr_args[0]){
         case 0: return;
         case 1: kbd_update(intr_args + 1); break;
         default: break;
     }
-    // TODO: insert a mret instr here
+    intr_close();
+    __asm__ ("mret");
     return;
 }

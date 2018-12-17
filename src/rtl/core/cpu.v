@@ -116,7 +116,8 @@ reg greg_back_flag; //1=backing 0=not backing
 reg greg_restore_flag; //1=restoring 0=not restoring
 reg [`CPU_GREGIDX_WIDTH : 0] greg_back_no;
 reg [`CPU_XLEN-1 : 0]        greg_backup [`CPU_GREGIDX_WIDTH : 0];
-reg IFlag;
+reg is_intring;
+reg IF;
 reg [`CPU_XLEN-1 : 0] idtr;
 
 //=======================================================
@@ -206,6 +207,8 @@ always @(posedge clk) begin
         gregs_wen <= 0;
         alu_rst <= 0;
         cpu_clk <= 0;
+        is_intring <= 0;
+        IF = 0;
     end else begin
         case(status)
             `STATUS_INIT: begin
@@ -215,12 +218,12 @@ always @(posedge clk) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (IF == 0 && 0) begin// TODO: Add signal from Keyboard
+                if (is_intring == 0 && IF == 1 && 0) begin// TODO: Add signal from Keyboard
                     pc_back = pc;
                     greg_back_flag = 1;
                     status = `STATUS_BACKUP;
                     greg_back_no = 0;
-                    IF = 1;
+                    is_intring = 1;
                     flag_branch = 1;
                     pc_nxt = idtr;
                     flag_mem_write = 1;
@@ -352,19 +355,34 @@ always @(posedge clk) begin
                             //TODO
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
-                            if (IFlag == 1 && 0) begin // Add trap return signal
-                                pc = pc_back;
-                                greg_restore_flag = 1;
-                                status = `STATUS_RESTORE;
-                                greg_back_no = 0;
-                            end
+                            case(decoder_funct[2:0])
+                                3'b000:
+                                    case(decoder_imm)
+                                        12'h302: begin // MRET
+                                            pc = pc_back;
+                                            greg_restore_flag = 1;
+                                            status = `STATUS_RESTORE;
+                                            greg_back_no = 0;
+                                        end
+                                        12'h000: begin // ECALL, fake open_intr()
+                                            IF = 1;
+                                        end
+                                        12'h001: begin // EBREAK, fake close_intr()
+                                            IF = 0;
+                                        end
+                                        default:
+                                            status = `STATUS_BRANCH;
+                                    endcase
+                                default:
+                                    status = `STATUS_BRANCH;
+                            endcase
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
                             //TODO()
                         end
                     endcase
                 end else begin
-                    status <= `STATUS_SET_FLAG;
+                    status <= `STATUS_BRANCH;
                 end
             end
 
@@ -487,7 +505,7 @@ always @(posedge clk) begin
                         status = `STATUS_BRANCH;
                         pc_nxt = pc_back;
                         flag_branch = 1;
-                        IFlag = 0;
+                        is_intring = 0;
                     end
                 end else begin
                     status <= `STATUS_INIT;
