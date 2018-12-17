@@ -21,22 +21,38 @@
 `define STATUS_BACKUP         `STATUS_LEN'h14
 `define STATUS_RESTORE        `STATUS_LEN'h15
 
+`define INTR_ADDR `CPU_XLEN'h0x7fffc
+
 module cpu(
 	input clk,
     input clr_n,
     output reg cpu_clk,
-    //SDRAM ports
-    output [12:0] ADDR,
-	output [1:0]  BA,
-	inout  [15:0] DQ,
-	output        CKE, CLK,
-	output        CS_N, RAS_N, CAS_N, WE_N,
-	output [1:0]  DMASK
+
+    /////////////// LED ///////////////
+	output 			[9:0]		LEDR,
+	//////////// VGA //////////
+	output		          		VGA_BLANK_N,
+	output		    [7:0]		VGA_B,
+	output		          		VGA_CLK,
+	output		    [7:0]		VGA_G,
+	output		          		VGA_HS,
+	output		    [7:0]		VGA_R,
+	output		          		VGA_SYNC_N,
+	output		          		VGA_VS,
+    //////////// PS2 //////////
+	inout 		          		PS2_CLK,
+	inout 		          		PS2_DAT
 );
 
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
+
+//ps2
+reg  ps2_proc;
+wire ps2_ready;
+wire ps2_ovf;
+wire [7:0] ps2_kbcode;
 
 // gregs
 reg  gregs_wen;
@@ -101,21 +117,34 @@ reg greg_restore_flag; //1=restoring 0=not restoring
 reg [`CPU_GREGIDX_WIDTH : 0] greg_back_no;
 reg [`CPU_XLEN-1 : 0]        greg_backup [`CPU_GREGIDX_WIDTH : 0];
 reg IFlag;
+reg [`CPU_XLEN-1 : 0] idtr;
 
 //=======================================================
 //  Structural coding
 //=======================================================
 
+// ps2 kbd
+keyboard_ctlr kbd(
+    RST_N    (clr_n),
+    PROC     (ps2_proc),
+    READY    (ps2_ready),
+    OVERFLOW (ps2_ovf),
+    kbcode   (ps2_kbcode),
+    CLOCK_50 (clk),
+    PS2_CLK  (PS2_CLK),
+    PS2_DAT  (PS2_DAT)
+);
+
 // gregs
 cpu_gregs gregs(
-    .clk(clk),
-    .rd_wen(gregs_wen),
-    .rs1_idx(gregs_rs1_idx),
-    .rs2_idx(gregs_rs2_idx),
-    .rd_idx(gregs_rd_idx),
-    .rs1_dat(gregs_rs1_dat),
-    .rs2_dat(gregs_rs2_dat),
-    .rd_dat(gregs_rd_dat)
+    .clk     (clk),
+    .rd_wen  (gregs_wen),
+    .rs1_idx (gregs_rs1_idx),
+    .rs2_idx (gregs_rs2_idx),
+    .rd_idx  (gregs_rd_idx),
+    .rs1_dat (gregs_rs1_dat),
+    .rs2_dat (gregs_rs2_dat),
+    .rd_dat  (gregs_rd_dat)
 );
 
 // alu
@@ -133,23 +162,23 @@ cpu_alu alu(
 // bus
 cpu_bus bus(
     .clk(clk),
+    .reset_n(clr_n),
     .address(bus_address),
     .wdata(bus_wdata),
     .WLEN(bus_wlen),
-    .rdata(bus_rdata),
     .EN_N(bus_en_n),
     .READY(bus_ready),
+    .rdata(bus_rdata),
 
-    .ADDR(ADDR),
-    .BA(BA),
-    .DQ(DQ),
-    .CKE(CKE),
-    .CLK(CLK),
-    .CS_N(CS_N),
-    .RAS_N(RAS_N),
-    .CAS_N(CAS_N),
-    .WE_N(WE_N),
-    .DMASK(DMASK)
+    LEDR(LEDR),
+    VGA_BLANK_N(VGA_BLANK_N),
+    VGA_B(VGA_B),
+    VGA_CLK(VGA_CLK),
+    VGA_G(VGA_G),
+    VGA_HS(VGA_HS),
+    VGA_R(VGA_R),
+    VGA_SYNC_N(VGA_SYNC_N),
+    VGA_VS(VGA_VS)
 );
 
 // decoder
@@ -192,6 +221,12 @@ always @(posedge clk) begin
                     status = `STATUS_BACKUP;
                     greg_back_no = 0;
                     IF = 1;
+                    flag_branch = 1;
+                    pc_nxt = idtr;
+                    flag_mem_write = 1;
+                    bus_wlen    = `BUS_WRITE_32;
+                    bus_address = `INTR_ADDR;
+                    bus_wdata   = {8'h0, ps2_kbcode, 16'h0101}; //WARN: ascii/kbcode
                 end else begin
                     greg_back_flag <= 0;
                     status <= `STATUS_FETCHING_INSTR;
@@ -436,7 +471,7 @@ always @(posedge clk) begin
                         status = `STATUS_BACKUP;
                     end else begin
                         greg_back_flag = 0;
-                        status = `STATUS_INIT;
+                        status = `STATUS_MEM_WRITE;
                     end
                 end else begin
                     status <= `STATUS_INIT;
@@ -449,7 +484,9 @@ always @(posedge clk) begin
                         gregs_rd_dat = greg_backup[greg_back_no];
                     end else begin
                         greg_restore_flag = 0;
-                        status = `STATUS_INIT;
+                        status = `STATUS_BRANCH;
+                        pc_nxt = pc_back;
+                        flag_branch = 1;
                         IFlag = 0;
                     end
                 end else begin

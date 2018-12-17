@@ -6,7 +6,15 @@
 
 \section{中断发生}
 
-当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到中断处理函数所指向的地址；同时将 \texttt{x1} 作为中断号、\texttt{xi} 寄存器作为第 $i-1$ 个参数传递给中断处理函数。
+当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到中断处理函数所指向的地址；
+
+中断参数为一个 4 子节数，每子节含义如下：
+\begin{tabular}{|c|c|}
+    \hline
+    位数 & 含义 \\\hline
+    0     & 中断号 \\\hline
+    1-3     & 终端参数，由中断执行函数确定含义 \\\hline
+\end{tabular}
 
 \section{中断返回}
 
