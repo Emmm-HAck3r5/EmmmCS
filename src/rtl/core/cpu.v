@@ -356,23 +356,16 @@ always @(posedge clk) begin
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
                             case(decoder_funct[2:0])
-                                3'b000:
+                                3'b001:
                                     case(decoder_imm)
-                                        12'h302: begin // MRET
+                                        12'h040: idtr = gregs_rs1_dat;  // fake sidt
+                                        12'h041: IF = gregs_rs1_dat[0]; // fake [open,close]_intr()
+                                        12'h042: begin // fake MRET
                                             pc = pc_back;
                                             greg_restore_flag = 1;
                                             status = `STATUS_RESTORE;
                                             greg_back_no = 0;
                                         end
-                                        12'h000: begin // ECALL, fake open_intr()
-                                            IF = 1;
-                                        end
-                                        12'h001: begin // EBREAK, fake close_intr()
-                                            IF = 0;
-                                        end
-                                        default:
-                                            status = `STATUS_BRANCH;
-                                    endcase
                                 default:
                                     status = `STATUS_BRANCH;
                             endcase

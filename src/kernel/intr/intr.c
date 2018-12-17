@@ -5,15 +5,19 @@ static u8* intr_args = (u8*)INDR_ADDR;
 
 void intr_init(){
     *((u32*) intr_args) = 0;
+    void* intr_ptr = intr;
+    asm volatile("csrw uscratch, %0": "r"(intr_ptr));
     // TODO: insert an instr to set the idtr to intr()'s address
 }
 
 void intr_open(){
-    __asm__ ("ecall");
+    int code = 1;
+    asm volatile("csrw uepc, %0": "r"(code));
 }
 
 void intr_close(){
-    __asm__ ("ebreak");
+    int code = 0;
+    asm volatile("csrw uepc, %0": "r"(code));
 }
 
 void intr(){
@@ -23,6 +27,7 @@ void intr(){
         default: break;
     }
     intr_close();
-    __asm__ ("mret");
+    int code = 0;
+    asm volatile("csrw ucause, %0": "r"(code));
     return;
 }

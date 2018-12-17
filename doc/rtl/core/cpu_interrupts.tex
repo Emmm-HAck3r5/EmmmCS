@@ -4,6 +4,20 @@
 \section{综述}
 本项目中 CPU 中断异常处理在 RISC-V 架构上有所简化，并且进行了修改，请软件开发者遵循本文档所约定的方法进行处理。
 
+\section{中断控制}
+
+\subsubsection{初始化}
+通过写入 \texttt{0x40} 号 csr uscratch，设置中断入口。
+
+\subsubsection{打开中断}
+通过给 \texttt{0x41} 号 csr uepc 赋值为 1，打开中断。
+
+\subsubsection{关闭中断}
+通过给 \texttt{0x41} 号 csr uepc 赋值为 0，关闭中断。
+
+\subsubsection{中断返回}
+通过给 \texttt{0x42} 号 csr ucause 赋值，从中断中返回。
+
 \section{中断发生}
 
 当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到中断处理函数所指向的地址；
