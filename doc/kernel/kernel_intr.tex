@@ -28,11 +28,16 @@
 \chapter{Kernel Intr}
 中断处理函数。
 
+\section{intr\_init}
+简介：对中断模块进行初始化。
+\texttt{void intr\_init(void)}
+
+\subsection{函数功能}
+
+开机时被调用，初始化中断模块。
+
 \section{intr}
-中断处理主函数，用于分发中断。
-
-\subsection{函数原型}
-
+简介：中断处理主函数，用于分发中断。
 \texttt{void intr(void)}
 
 \subsection{函数功能}

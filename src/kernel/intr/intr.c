@@ -3,6 +3,11 @@
 
 static u8* intr_args = (u8*)INDR_ADDR;
 
+void intr_init(){
+    *((u32*) intr_args) = 0;
+    // TODO: insert an instr to set the idtr to intr()'s address
+}
+
 void intr(){
     switch(intr_args[0]){
         case 0: return;

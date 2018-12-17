@@ -5,6 +5,7 @@
 
 #define INDR_ADDR 0x7fffc
 
+void intr_init();
 void intr();
 
 #endif
