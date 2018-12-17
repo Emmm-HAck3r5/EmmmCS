@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -136,3 +136,55 @@
 \end{tabular}\\
 比较函数要求：二元函数，左操作数接受key值，右操作数接受一个指向链表结点的指针，若匹配返回非零值。\\
 说明：链表结点查找，若查找不到返回NULL。
+
+\section{stdio}
+
+\subsection{接口}
+
+\subsubsection{getchar}
+\noindent函数原型：\texttt{char getchar(void);} \\
+从键盘读取一个字符，返回其 ascii 码。
+
+\subsubsection{gets}
+\noindent函数原型：\texttt{char* gets(char* str);} \\
+从键盘读取一个字符串，写入 \texttt{str} 中，以 \begin{verbatim}'\0'\end{verbatim} 结尾。\\
+返回值为 \texttt{str}。
+
+\subsubsection{putchar}
+\noindent函数原型：\texttt{int putchar(char cha);} \\
+将 \texttt{cha} 输出到 vga 缓冲区。
+
+\subsubsection{puts}
+\noindent函数原型：\texttt{int puts(const char* str);} \\
+将字符串 \texttt{str} 输出到 vga 缓冲区。
+
+\subsubsection{putn}
+\noindent函数原型：\texttt{void putn(u32 n, u8 mode);} \\
+
+参数说明：
+
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u32 & n & 输出数字\\\hline
+    u8 & mode & 数字格式\\\hline
+\end{tabular}
+
+\subsubsection{putchar\_color}
+\noindent函数原型：\texttt{int putchar\_color(u8 color, char cha);} \\
+将 \texttt{cha} 输出到 vga 缓冲区，带有颜色 \texttt{color}。
+
+\subsubsection{puts\_color}
+\noindent函数原型：\texttt{int puts\_color(u8 color, const char * str);} \\
+将字符串 \texttt{str} 输出到 vga 缓冲区，带有颜色 \texttt{color}。
+
+
+\subsubsection{putn\_color}
+\noindent函数原型：\texttt{void putn\_color(u8 color, u32 n, u8 mode);} \\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    u32 & n & 输出数字\\\hline
+    u8 & mode & 数字格式\\\hline
+\end{tabular}\\
