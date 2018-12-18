@@ -40,3 +40,18 @@
 \subsection{说明}
 本模块定义复位模块，用于电路开机自启动、初始化。\\
 在FPGA完成开机初始化后复位信号有效，经过65536个时钟周期，复位信号无效。
+
+\section{clkgen\_module}
+\subsection{基本信息}
+模块名：clkgen\_module
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   1   &   clkin &   50MHz时钟\\\hline
+    input   &   1   &   rst  &   复位信号\\\hline
+    input   &   1   &   clken  &   使能信号\\\hline
+    output   &   1   &   clkout  &   输出时钟信号\\\hline
+\end{tabular}
+\subsection{说明}
+本模块可产生50MHz的可分时钟信号。\\

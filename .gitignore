@@ -10,7 +10,6 @@
 #vscode settings
 .vscode/
 #compiled-tex
-*.pdf
 *.aux
 *.log
 *.toc

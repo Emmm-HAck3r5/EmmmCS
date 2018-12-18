@@ -31,11 +31,11 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 \subsection{接口}
 
 \subsubsection{led\_init}
-\noindent函数原型：void led\_init(void);\\
+\noindent{函数原型：void led\_init(void);}\\
 说明：led驱动初始化
 
 \subsubsection{led\_on}
-\noindent函数原型：void led\_on(u8 id);\\
+\noindent{函数原型：void led\_on(u8 id);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -45,7 +45,7 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：开对应led，若id非法，无操作。
 
 \subsubsection{led\_off}
-\noindent函数原型：void led\_off(u8 id);\\
+\noindent{函数原型：void led\_off(u8 id);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -55,7 +55,7 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：关对应led，若id非法，无操作。
 
 \subsubsection{led\_toggle}
-\noindent函数原型：void led\_toggle(u8 id);\\
+\noindent{函数原型：void led\_toggle(u8 id);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -67,13 +67,13 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 \section{VGA}
 屏幕坐标，以左上角为原点，横向为x轴，纵向为y轴。
 \subsection{常量、宏、类型}
-\noindent\begin{tabular}{|c|c|c|}
+\noindent{\begin{tabular}{|c|c|c|}
     \hline
     名称 & 值 & 说明\\\hline
     VGA\_CHAR\_X\_SIZE & 80 & 列数\\\hline
     VGA\_CHAR\_Y\_SIZE & 30 & 行数\\\hline
     VGA\_CHAR\_BUF\_SIZE & 2400 & 总字符数\\\hline
-\end{tabular}\\
+\end{tabular}}\\
 \begin{tabular}{|c|c|c|}
     \hline
     名称 & 值 & 说明\\\hline
@@ -104,11 +104,11 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 \subsection{接口}
 
 \subsubsection{vga\_init}
-\noindent函数原型：void vga\_init(void);\\
+\noindent{函数原型：void vga\_init(void);}\\
 说明：vga驱动初始化
 
 \subsubsection{vga\_writec}
-\noindent函数原型：void vga\_writec(u8 color, char c, u8 x, u8 y);\\
+\noindent{函数原型：void vga\_writec(u8 color, char c, u8 x, u8 y);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -121,7 +121,7 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：在对应坐标处写入字符，若坐标非法则无操作。注意该函数不改变光标位置。
 
 \subsubsection{vga\_putc}
-\noindent函数原型：void vga\_putc(u8 color, char c);\\
+\noindent{函数原型：void vga\_putc(u8 color, char c);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -132,7 +132,7 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：在光标处写入字符，该函数会自动滚屏。
 
 \subsubsection{vga\_puts}
-\noindent函数原型：void vga\_puts(u8 color, const char *str);\\
+\noindent{函数原型：void vga\_puts(u8 color, const char *str);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -143,7 +143,7 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：在光标处写入字符串，该函数会自动滚屏。
 
 \subsubsection{vga\_putn}
-\noindent函数原型：void vga\_putn(u8 color, u32 n, u8 mode);\\
+\noindent{函数原型：void vga\_putn(u8 color, u32 n, u8 mode);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -155,16 +155,16 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 说明：在光标处写入数字，该函数会自动滚屏。
 
 \subsubsection{vga\_clean}
-\noindent函数原型：void vga\_clean(void);\\
+\noindent{函数原型：void vga\_clean(void);}\\
 说明：清屏
 
-\section{KBD}
+\section{键盘}
 KBD 维护一个环形字符缓冲区。
 
 \subsection{接口}
 
 \subsubsection{kbd\_update}
-\noindent函数原型：void kbd\_update(u8* args);\\
+\noindent{函数原型：void kbd\_update(u8* args);}\\
 
 使用一个两字节的内存空间维护键盘状态，cpu 在中断前应写好对应地址内容
 
@@ -178,5 +178,5 @@ KBD 维护一个环形字符缓冲区。
 说明：中断处理函数，在键盘按下时被调用；作用是把键盘操作写入缓冲区。
 
 \subsubsection{kbd\_getc}
-\noindent函数原型：u8 kbd\_getc();\\
+\noindent{函数原型：u8 kbd\_getc();}\\
 说明：从缓冲区读取一位字符 ascii 码并返回。

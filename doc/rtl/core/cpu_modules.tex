@@ -25,7 +25,7 @@
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
-\chapter{CPU模块}
+\chapter{CPU}
 各模块位于同名文件内。
 
 % cpu_gregs moudule
@@ -53,31 +53,31 @@
 \section{cpu\_alu}
 \subsection{基本信息}
 模块名：cpu\_alu\\
-\indent所需时间：1 到 32 个周期
+\indent{所需时间：1 到 32 个周期}
 \subsection{宏定义}
 \begin{tabular}{|l|r|l|}
     \hline
     \multicolumn{3}{|c|}{alu\_define.v}\\\hline
     名称    &   值  &   说明\\\hline
-    ALU\_RUN     &      1'b0   &  ALU 工作状态码\\ \hline
-    ALU\_STOP    &      1'b1   &  ALU 停止状态码\\ \hline
+    ALU\_RUN     &      0   &  ALU 工作状态码\\ \hline
+    ALU\_STOP    &      1   &  ALU 停止状态码\\ \hline
     ALU\_WIDTH   &      4      &  ALU 功能选择端位宽\\ \hline
-    ALU\_ADD     &   `ALU\_WIDTH'b0000 &  名称表示功能，如加\\ \hline
-    ALU\_SUB     &   `ALU\_WIDTH'b0001 &  减\\ \hline
-    ALU\_AND     &   `ALU\_WIDTH'b0010 &  逻辑与\\ \hline
-    ALU\_OR      &   `ALU\_WIDTH'b0011 &  ...\\ \hline
-    ALU\_XOR     &   `ALU\_WIDTH'b0100 &  \\ \hline
-    ALU\_SLL     &   `ALU\_WIDTH'b0101 &  \\ \hline
-    ALU\_SRL     &   `ALU\_WIDTH'b0110 &  \\ \hline
-    ALU\_SRA     &   `ALU\_WIDTH'b0111 &  \\ \hline
-    ALU\_MUL     &   `ALU\_WIDTH'b1000 &  \\ \hline
-    ALU\_MULU    &   `ALU\_WIDTH'b1001 &  \\ \hline
-    ALU\_MULSU   &   `ALU\_WIDTH'b1010 &  \\ \hline
-    ALU\_DIV     &   `ALU\_WIDTH'b1011 &  \\ \hline
-    ALU\_DIVU    &   `ALU\_WIDTH'b1100 &  \\ \hline
-    ALU\_REM     &   `ALU\_WIDTH'b1101 &  \\ \hline
-    ALU\_REMU    &   `ALU\_WIDTH'b1110 &  \\ \hline
-    ALU\_NOP     &   `ALU\_WIDTH'b1111 &  \\ \hline
+    ALU\_ADD     &   b'0000 &  加\\ \hline
+    ALU\_SUB     &   b'0001 &  减\\ \hline
+    ALU\_AND     &   b'0010 &  逻辑与\\ \hline
+    ALU\_OR      &   b'0011 &  逻辑或\\ \hline
+    ALU\_XOR     &   b'0100 &  逻辑异或\\ \hline
+    ALU\_SLL     &   b'0101 &  左移\\ \hline
+    ALU\_SRL     &   b'0110 &  逻辑右移\\ \hline
+    ALU\_SRA     &   b'0111 &  算术右移\\ \hline
+    ALU\_MUL     &   b'1000 &  乘\\ \hline
+    ALU\_MULU    &   b'1001 &  无符号乘\\ \hline
+    ALU\_MULSU   &   b'1010 &  左操作数有符号，右操作数无符号乘\\ \hline
+    ALU\_DIV     &   b'1011 &  除\\ \hline
+    ALU\_DIVU    &   b'1100 &  无符号除\\ \hline
+    ALU\_REM     &   b'1101 &  取模\\ \hline
+    ALU\_REMU    &   b'1110 &  无符号取模\\ \hline
+    ALU\_NOP     &   b'1111 &  无操作\\ \hline
 \end{tabular}
 \subsection{接口}
 \begin{tabular}{|c|c|c|c|}
@@ -123,7 +123,7 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
 \section{cpu\_bus}
 \subsection{基本信息}
 模块名：cpu\_bus\\
-\indent所需周期：1 到 5 个周期
+\indent{所需时钟周期：1 到 5 个周期}
 \subsection{宏定义}
 \begin{tabular}{|l|r|l|}
     \hline
@@ -131,10 +131,10 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     名称    &   值  &   说明\\\hline
     BUS\_RUN     &      1'b0   &  BUS 工作状态码\\ \hline
     BUS\_STOP    &      1'b1   &  BUS 停止状态码\\ \hline
-    `define BUS\_READ\_32  & 2'b00 & 读出32位数据 \\ \hline
-    `define BUS\_WRITE\_8  & 2'b01 & 写入8位数据 \\ \hline
-    `define BUS\_WRITE\_16 & 2'b10 & 写入16位数据 \\ \hline
-    `define BUS\_WRITE\_32 & 2'b11 & 写入32位数据 \\ \hline
+    BUS\_READ\_32  & 2'b00 & 读出32位数据 \\ \hline
+    BUS\_WRITE\_8  & 2'b01 & 写入8位数据 \\ \hline
+    BUS\_WRITE\_16 & 2'b10 & 写入16位数据 \\ \hline
+    BUS\_WRITE\_32 & 2'b11 & 写入32位数据 \\ \hline
 \end{tabular}
 \subsection{内部接口}
 \begin{tabular}{|c|c|c|c|}
@@ -148,21 +148,21 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     output      &   1       &   READY   &   预备信号\\\hline
     output      &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
-\subsection{SDRAM接口}
-\label{SDRAM-ports}
-\begin{tabular}{|c|c|c|c|}
-    \hline
-    类型        &   位宽    &   名称    &   说明\\\hline
-    output      &   13     &    ADDR   &    DRAM\_ADDR[12..0]\\\hline
-    output      &   2       &   BA      &   DRAM\_BA[1..0]\\\hline
-    output      &   16      &   DQ      &   DRAM\_DQ[15..0]\\\hline
-    output      &   1       &   CKE     &   DRAM\_CKE\\\hline
-    output      &   1       &   CS\_N     &   DRAM\_CS\_N\\\hline
-    output      &   1       &   RAS\_N     &   DRAM\_RAS\_N\\\hline
-    output      &   1       &   CAS\_N     &   DRAM\_CAS\_N\\\hline
-    output      &   1       &   WE\_N     &   DRAM\_WE\_N\\\hline
-    output      &   2       &   DMASK     &  \{DRAM\_UDQM, DRAM\_LDQM\}\\\hline
-\end{tabular}
+%\subsection{SDRAM接口}
+%\label{SDRAM-ports}
+%\begin{tabular}{|c|c|c|c|}
+%    \hline
+%    类型        &   位宽    &   名称    &   说明\\\hline
+%    output      &   13     &    ADDR   &    DRAM\_ADDR[12..0]\\\hline
+%    output      &   2       &   BA      &   DRAM\_BA[1..0]\\\hline
+%    output      &   16      &   DQ      &   DRAM\_DQ[15..0]\\\hline
+%    output      &   1       &   CKE     &   DRAM\_CKE\\\hline
+%    output      &   1       &   CS\_N     &   DRAM\_CS\_N\\\hline
+%    output      &   1       &   RAS\_N     &   DRAM\_RAS\_N\\\hline
+%    output      &   1       &   CAS\_N     &   DRAM\_CAS\_N\\\hline
+%    output      &   1       &   WE\_N     &   DRAM\_WE\_N\\\hline
+%    output      &   2       &   DMASK     &  \{DRAM\_UDQM, DRAM\_LDQM\}\\\hline
+%\end{tabular}
 \subsection{WLEN控制信号真值表}
 \begin{tabular}{|c|c|c|}
     \hline
@@ -175,7 +175,8 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
 \subsection{说明}
 SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
 将复位端 RST 置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
-地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。
+地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。\\
+\textbf{SDRAM IS DEPRECATED}
 
 \section{cpu\_instr\_decoder}
 \subsection{基本信息}
@@ -220,11 +221,6 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
     input   &  1  &   clk     &   硬件时钟信号\\\hline
     input   &  1  &   clr\_n   &   清零信号（低电平有效）\\\hline
     output  &  1  &   cpu\_clk &   CPU时钟\\\hline
-    \multicolumn{4}{|c|}{剩余接口与 SDRAM 接口完全相同， 见 \ref{SDRAM-ports}}\\\hline
-    ADDR & & & \\ \hline
-    BA & & & \\ \hline
-    DQ & & & \\ \hline
-    ... & & & \\ \hline
 \end{tabular}
 \subsection{时序}
     $$T(\textit{cpu\_clk})=10T(\textit{clk})+\text{max}(T(\textit{cpu\_bus})+T(\textit{cpu\_alu}))$$
