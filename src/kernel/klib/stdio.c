@@ -20,17 +20,17 @@ char* gets(char* str){
 }
 
 int putchar(char cha){
-    vga_putc(0, cha);
+    vga_putc(VGA_B_BLACK | VGA_F_WHITE, cha);
     return 0;
 }
 
-int puts   (const char* str){
-    vga_puts(0, str);
+int puts(const char* str){
+    vga_puts(VGA_B_BLACK | VGA_F_WHITE, str);
     return 0;
 }
 
-void putn  (u32 n, u8 mode){
-    vga_putn(0, n, mode);
+void putn(u32 n, u8 mode){
+    vga_putn(VGA_B_BLACK | VGA_F_WHITE, n, mode);
     return 0;
 }
 
@@ -39,7 +39,7 @@ int putchar_color(u8 color, char cha){
     return 0;
 }
 
-int puts_color   (u8 color, const char* str){
+int puts_color(u8 color, const char* str){
     vga_puts(color, str);
     return 0;
 }
