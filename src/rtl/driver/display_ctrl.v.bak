@@ -40,9 +40,9 @@ module display_ctrl(
     output vga_clk,
     output [7:0] vga_r,
     output [7:0] vga_g,
-    output [7:0] vga_b
+    output [7:0] vga_b,
     );
-    wire cur_clk;
+    wire cur_clock;
     wire [`DP_X_ADDR_WIDTH-1:0] cur_x_addr;
     wire [`DP_Y_ADDR_WIDTH-1:0] cur_y_addr;
     wire [`DP_COLOR_WIDTH-1:0] bg_color;
@@ -51,7 +51,7 @@ module display_ctrl(
     wire [7:0] in_ascii;
     wire [7:0] font_line_bitmap;
     wire [7:0] real_font_line_bitmap;//used to process the cursor
-    wire [2:0] font_x_addr; //0 - 7
+    wire [2:0] font_x_addr; //0 - 7 
     wire [3:0] font_y_addr; //0 - 15
     wire [10:0] font_line_addr; // for font rom
     //vga
@@ -72,7 +72,7 @@ module display_ctrl(
 
     //clock
     clkgen_module #(25000000) vgaclk(.clkin(clk),.rst(~reset_n),.clken(1'b1),.clkout(vga_clk));
-    clkgen_module #(2) cursorclk(.clkin(clk),.rst(~reset_n),.clken(1'b1),.clkout(cur_clk));
+    clkgen_module #(2) cursorclk(.clkin(clk),.rst(~reset_n),.clken(1'b1),clkout(cur_clk));
     //vga
     vga_ctrl vga(.pclk(vga_clk),
                 .reset(vga_rst),
