@@ -53,6 +53,7 @@ wire ps2_proc;
 wire ps2_ready;
 wire ps2_ovf;
 wire [7:0] ps2_kbcode;
+wire [7:0] scan2ascii_ascii;
 
 // gregs
 reg  gregs_wen;
@@ -123,6 +124,12 @@ reg [`CPU_XLEN-1 : 0] idtr;
 //=======================================================
 //  Structural coding
 //=======================================================
+// scan to ascii
+kbd_scan2ascii s2a(
+	.address(ps2_kbcode),
+	.clock(CLOCK_50),
+	.q(scan2ascii_ascii)
+);
 
 // ps2 kbd
 keyboard_ctrl kbd(
@@ -229,8 +236,8 @@ always @(posedge clk) begin
                     pc_nxt = idtr;
                     flag_mem_write <= 1;
                     bus_wlen    = `BUS_WRITE_32;
-                    bus_address = `INTR_ADDR;
-                    bus_wdata   = {8'h0, ps2_kbcode, 16'h0101};
+                    bus_address = idtr;
+                    bus_wdata   = {8'h0, ps2_kbcode, 16'h0101}; // temp: return scancode instead of ascii
                 end else begin
                     greg_back_flag <= 0;
                     status <= `STATUS_FETCHING_INSTR;

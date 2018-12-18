@@ -11,6 +11,7 @@ db/*
 *.sof
 *.fit.*
 *.sta.*
+greybox_tmp
 
 !db/emmmcs.db_info
 !db/emmmcs.sld_design_entry.sci
