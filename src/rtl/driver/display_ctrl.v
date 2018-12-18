@@ -65,8 +65,8 @@ module display_ctrl(
     assign cur_x_addr = ctrl_reg[7:0];
     assign cur_y_addr = ctrl_reg[12:8];
     assign in_ascii = in_data[7:0];
-    assign bg_color = in_data[11:8];
-    assign fg_color = in_data[15:12];
+    assign fg_color = in_data[11:8];
+    assign bg_color = in_data[15:12];
 
     assign vga_syncn = 1'b0;
 
@@ -87,6 +87,9 @@ module display_ctrl(
                 .vga_b(vga_b));
     //font
     vga_font_rom from(.address(font_line_addr),.clock(~clk),.q(font_line_bitmap));
+	 
+	 //color
+	 vga_color_decoder(.fb(real_font_line_bitmap[font_x_addr]),.fg_color(fg_color),.bg_color(bg_color),.rgb(vga_data));
 
     /*
     h_addr,v_addr start from 1
@@ -104,7 +107,5 @@ module display_ctrl(
     assign font_y_addr = (v_addr - 1 )& 10'hf;
 
     assign font_line_addr = ({3'b0,in_ascii}<<4) + font_y_addr;
-    assign real_font_line_bitmap = x_addr == cur_x_addr && y_addr == cur_y_addr && font_y_addr == 4'hf ? 8'hff : font_line_bitmap;
-    //todo the color and cursor
-    assign vga_data = {24{real_font_line_bitmap[font_x_addr]}};
+	 assign real_font_line_bitmap = x_addr == cur_x_addr && y_addr == cur_y_addr && font_y_addr == 4'hf && cur_clk? 8'hff : font_line_bitmap;
 endmodule

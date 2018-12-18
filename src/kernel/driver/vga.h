@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:42:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 16:13:25
+  Last Modified: 2018-12-18 16:20:39
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_VGA_H
@@ -44,6 +44,7 @@
 #define VGA_F_MAGENTA 0x05
 #define VGA_F_BROWN 0x06
 #define VGA_F_WHITE 0x07
+#define VGA_F_YELLOW 0x0e
 #define VGA_N_S_DEC 0x0
 #define VGA_N_U_DEC 0x1
 #define VGA_N_HEX 0x2
