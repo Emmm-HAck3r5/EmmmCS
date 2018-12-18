@@ -45,7 +45,7 @@ module vga_color_decoder(
     input fb,
     input [3:0] fg_color,
     input [3:0] bg_color,
-    output [23:0] rgb
+    output reg [23:0] rgb
 );
     wire [3:0] color_data;
     assign color_data = fb? fg_color:bg_color;
