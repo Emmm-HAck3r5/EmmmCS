@@ -376,6 +376,28 @@ always @(posedge clk) begin
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
                             //NOT SUPPORT
+                            flag_reg_write <= 1;
+                            alu_src_A <= gregs_rs1_dat;
+                            alu_src_B <= gregs_rs2_dat;
+                            case (decoder_funct[2:0])
+                                3'b000: // MUL
+                                    alu_select <= `ALU_MUL;
+                                3'b001: // MULH
+                                    alu_select <= `ALU_MULU;
+                                3'b010: // MULHSU
+                                    alu_select <= `ALU_MULSU;
+                                3'b011: // MULHU
+                                    alu_select <= `ALU_MULU;
+                                3'b100: // DIV
+                                    alu_select <= `ALU_DIV;
+                                3'b101: // DIVU
+                                    alu_select <= `ALU_DIVU;
+                                3'b110: // REM
+                                    alu_select <= `ALU_REM;
+                                3'b111: // REMU
+                                    alu_select <= `ALU_REMU;
+                            endcase
+                            status <= `STATUS_ALU;
                         end
                     endcase
                 end else begin
