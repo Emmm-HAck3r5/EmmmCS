@@ -27,17 +27,20 @@
 #include "mm/mm.h"
 #include "intr/intr.h"
 
-void init(void)
-{
-    led_init();
-    vga_init();
-    mm_init();
-    intr_init();
-}
+void init(void);
+
 int main(void)
 {
     init();
     while(1)
         ;
     return 0;
+}
+
+void init(void)
+{
+    led_init();
+    vga_init();
+    mm_init();
+    intr_init();
 }
