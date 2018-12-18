@@ -7,6 +7,10 @@ module cpu_bus(
 	input						EN_N,
 	output reg					READY,
 	output reg [31:0]			rdata,
+	// debugging
+	// output reg gobal_wen,
+	// output wire vga_en,
+	// output wire led_wen,
 	/////////////// LED ///////////////
 	output 			[9:0]		LEDR,
 	//////////// VGA //////////
@@ -35,7 +39,10 @@ module cpu_bus(
 `define	KB_START		(`VGA_START + `VGA_MAXSIZE)
 
 // ENABLE
-wire cache_en, led_en, vga_en;
+
+wire cache_en;
+wire led_en;
+// wire vga_en;
 assign cache_en = (address >= `CACHE_START) && (address < `LED_START);
 assign led_en = (address >= `LED_START) && (address < `VGA_START);
 assign vga_en =  (address >= `VGA_START) && (address < `KB_START);
@@ -65,7 +72,10 @@ always @ (posedge clk)
 
 // write-in data
 reg gobal_wen;
-wire cache_wen, led_wen, vga_wen;
+// wire cache_wen, led_wen, vga_wen;
+wire cache_wen;
+wire led_wen;
+wire vga_wen;
 reg [`WORD_SIZE - 1:0] wdata16;
 
 assign cache_wen = cache_en && gobal_wen;
@@ -99,6 +109,7 @@ end
 always @ (posedge clk) begin
 	case (bus_state)	// select read data
 	  `BUS_ST_IDLE: rdata[2*`WORD_SIZE-1:`WORD_SIZE] <= selected_rdata;
+	//   `BUS_ST_IDLE: rdata[`WORD_SIZE-1:0] <= selected_rdata;
 	  `BUS_ST_RD32_R2: rdata[`WORD_SIZE-1:0] <= selected_rdata;
 	  default: rdata <= rdata;
 	endcase
@@ -167,10 +178,12 @@ vga_memory vm(
 	);
 
 assign led_rdata = led_memory[0];
-  
+
 always @ (posedge clk) begin
-	led_memory[0] <= wdata[`WORD_SIZE - 1 : 0];
-	led_memory[1] <= wdata[2*`WORD_SIZE-1 : `WORD_SIZE];
+	if (led_wen) begin
+		led_memory[0] <= wdata[`WORD_SIZE - 1 : 0];
+		led_memory[1] <= wdata[2*`WORD_SIZE-1 : `WORD_SIZE];
+	end
 end
 
 // DEVICE OUTPUT
