@@ -26,7 +26,7 @@
 %
 
 \chapter{Kernel 内存管理}
-Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
+Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。本管理器提供16B,32B,64B,128B,256B,512B,1KB,2KB,4KB,8KB,16KB,32KB,64KB,128KB共14层分配大小。\textbf{注意实际分配大小为需求大小$+$4B指针Header后向上2的幂对齐}
 
 \section{常量、宏、类型}
 \noindent\begin{tabular}{|c|c|c|}
@@ -37,7 +37,7 @@ Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
 \end{tabular}\\
 
 \subsubsection{buddy\_mm\_info\_t}
-\noindent成员：\\
+\noindent{成员：}\\
 \begin{tabular}{|c|c|c|}
     \hline
     类型 & 名称 & 说明\\\hline
@@ -47,11 +47,11 @@ Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
 说明：空闲块链表项。
 
 \subsubsection{buddy\_mm\_header\_t}
-\noindent类型：u32\\
+\noindent{类型：u32}\\
 说明：指针Header，存储level
 
 \subsubsection{buddy\_mm\_t}
-\noindent成员：\\
+\noindent{成员：}\\
 \begin{tabular}{|c|c|c|}
     \hline
     类型 & 名称 & 说明\\\hline
@@ -63,11 +63,11 @@ Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
 \section{接口}
 
 \subsubsection{mm\_init}
-\noindent函数原型：void mm\_init(void);\\
+\noindent{函数原型：void mm\_init(void);}\\
 说明：内存管理初始化。
 
 \subsubsection{mm\_alloc}
-\noindent函数原型：void* mm\_alloc(u32 sz);\\
+\noindent{函数原型：void* mm\_alloc(u32 sz);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -78,7 +78,7 @@ Kernel 提供128KB的堆内存管理，采用Buddy Memory Management。
 说明：内存块分配。
 
 \subsubsection{mm\_dealloc}
-\noindent函数原型：void mm\_dealloc(void *p);\\
+\noindent{函数原型：void mm\_dealloc(void *p);}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
