@@ -31,7 +31,7 @@ int puts(const char* str){
 
 void putn(u32 n, u8 mode){
     vga_putn(VGA_B_BLACK | VGA_F_WHITE, n, mode);
-    return 0;
+    return;
 }
 
 int putchar_color(u8 color, char cha){
@@ -46,5 +46,5 @@ int puts_color(u8 color, const char* str){
 
 void putn_color(u8 color, u32 n, u8 mode){
     vga_putn(color, n, mode);
-    return 0;
+    return;
 }
