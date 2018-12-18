@@ -24,6 +24,7 @@
 
 #include "driver/led.h"
 #include "driver/vga.h"
+#include "driver/kbd.h"
 #include "mm/mm.h"
 #include "intr/intr.h"
 
@@ -41,6 +42,7 @@ void init(void)
 {
     led_init();
     vga_init();
+    kbd_init();
     mm_init();
     intr_init();
 }

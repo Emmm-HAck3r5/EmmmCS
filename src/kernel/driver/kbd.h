@@ -4,6 +4,7 @@
 
 #define KBD_BUF_SIZE 256
 
+void kbd_init();
 void kbd_update();
 u8   kbd_getc();
 
