@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -156,3 +156,26 @@ LED使用2个字节的控制寄存器，内存映射在0x80000起始。
 \subsubsection{vga\_clean}
 \noindent函数原型：void vga\_clean(void);\\
 说明：清屏
+
+\section{KBD}
+KBD 维护一个环形字符缓冲区。
+
+\subsection{接口}
+
+\subsubsection{kbd\_update}
+\noindent函数原型：void kbd\_update(u8* args);\\
+
+使用一个两字节的内存空间维护键盘状态，cpu 在中断前应写好对应地址内容
+
+\begin{tabular}{|c|c|}
+    \hline
+    参数 & 含义 \\\hline
+    \texttt{args[0]} & 是否有效 \\\hline
+    \texttt{args[1]} & 键盘扫描码 \\\hline
+\end{tabular}
+
+说明：中断处理函数，在键盘按下时被调用；作用是把键盘操作写入缓冲区。
+
+\subsubsection{kbd\_getc}
+\noindent函数原型：u8 kbd\_getc();\\
+说明：从缓冲区读取一位字符 ascii 码并返回。
