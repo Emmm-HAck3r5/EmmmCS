@@ -8,9 +8,13 @@ module cpu_bus(
 	output reg					READY,
 	output reg [31:0]			rdata,
 	// debugging
-	// output reg gobal_wen,
-	// output wire vga_en,
-	// output wire led_wen,
+	// output 			global_wen,
+	// output			cache_en,
+	// output			cache_wen,
+	// output reg [15:0] selected_rdata,
+	// output reg  [31:0] addr_offset,
+	// output reg [2:0]	bus_state,
+	// output wire [15:0] cache_rdata,
 	/////////////// LED ///////////////
 	output 			[9:0]		LEDR,
 	//////////// VGA //////////
@@ -39,10 +43,9 @@ module cpu_bus(
 `define	KB_START		(`VGA_START + `VGA_MAXSIZE)
 
 // ENABLE
-
 wire cache_en;
 wire led_en;
-// wire vga_en;
+wire vga_en;
 assign cache_en = (address >= `CACHE_START) && (address < `LED_START);
 assign led_en = (address >= `LED_START) && (address < `VGA_START);
 assign vga_en =  (address >= `VGA_START) && (address < `KB_START);
@@ -64,23 +67,23 @@ wire [`WORD_SIZE - 1:0] led_rdata;
 wire [`WORD_SIZE - 1:0] vga_rdata;
 reg [`WORD_SIZE - 1:0] selected_rdata;
 
-always @ (posedge clk)
+always @ (negedge clk)
 	if (cache_en) selected_rdata <= cache_rdata;
 	else if (led_en) selected_rdata <= led_rdata;
 	else if (vga_en) selected_rdata <= vga_rdata;
 	else selected_rdata <= selected_rdata;
 
 // write-in data
-reg gobal_wen;
-// wire cache_wen, led_wen, vga_wen;
+wire global_wen;
 wire cache_wen;
 wire led_wen;
 wire vga_wen;
 reg [`WORD_SIZE - 1:0] wdata16;
 
-assign cache_wen = cache_en && gobal_wen;
-assign led_wen = led_en && gobal_wen;
-assign vga_wen = vga_en && gobal_wen;
+assign global_wen = (WLEN != 2'h00);
+assign cache_wen = cache_en && global_wen;
+assign led_wen = led_en && global_wen;
+assign vga_wen = vga_en && global_wen;
 
 // ADDRESS MAPPING FSM
 `define BUS_ST_IDLE			0
@@ -92,46 +95,55 @@ assign vga_wen = vga_en && gobal_wen;
 `define	BUS_ST_WR32_W1		6
 `define	BUS_ST_WR32_W2		7
 
-`define WLEN_RD32	0
-`define WLEN_WR8	1
-`define WLEN_WR16	2
-`define WLEN_WR32	3
+`define WLEN_RD32	2'b00
+`define WLEN_WR8	2'b01
+`define WLEN_WR16	2'b10
+`define WLEN_WR32	2'b11
 
 reg [2:0] bus_state = `BUS_ST_IDLE;
 
+initial begin
+	bus_state = `BUS_ST_IDLE;
+end
+
+// address offset
 always @ (posedge clk) begin
-	case (bus_state)	// address offset
-	  `BUS_ST_RD32_R2, `BUS_ST_WR32_W2: addr_offset <= 32'd2;
+	case (bus_state)
+	  `BUS_ST_IDLE: 
+	  	if (!EN_N && WLEN == `WLEN_RD32)
+		  addr_offset <= 32'd2;
+		else addr_offset <= 32'd0;
+	  `BUS_ST_WR32_W1: addr_offset <= 32'd2;
 	  default: addr_offset <= 32'd0;
 	endcase
 end
 
+// select read data
 always @ (posedge clk) begin
-	case (bus_state)	// select read data
-	  `BUS_ST_IDLE: rdata[2*`WORD_SIZE-1:`WORD_SIZE] <= selected_rdata;
-	//   `BUS_ST_IDLE: rdata[`WORD_SIZE-1:0] <= selected_rdata;
-	  `BUS_ST_RD32_R2: rdata[`WORD_SIZE-1:0] <= selected_rdata;
+	case (bus_state)
+	  `BUS_ST_RD32_R1: rdata[`WORD_SIZE-1:0] <= selected_rdata;
+	  `BUS_ST_RD32_R2: rdata[2*`WORD_SIZE-1:`WORD_SIZE] <= selected_rdata;
 	  default: rdata <= rdata;
 	endcase
 end
 
+// write-in data
 always @ (posedge clk) begin
-	case (bus_state)	// write-in data
-	  `BUS_ST_WR8_W:begin
-		gobal_wen <= 1; wdata16 <= {selected_rdata[`WORD_SIZE-1:8], wdata[7:0]};
-	  end
-	  `BUS_ST_WR16_W, `BUS_ST_WR32_W1: begin
-		gobal_wen <= 1; wdata16 <= wdata[`WORD_SIZE-1:0];
-		end
-	  `BUS_ST_WR32_W2: begin
-		gobal_wen <= 1; wdata16 <= wdata[2*`WORD_SIZE-1:`WORD_SIZE];
-	  end
-	  default: gobal_wen <= 0;
+	case (bus_state)
+		`BUS_ST_IDLE : 
+			case(WLEN)
+				`WLEN_WR8: wdata16 <= {selected_rdata[`WORD_SIZE-1:8], wdata[7:0]};
+				`WLEN_WR16, `WLEN_WR32: wdata16 <= wdata[`WORD_SIZE-1:0];
+				default: ;
+			endcase
+		`BUS_ST_WR32_W1:  wdata16 <= wdata[2*`WORD_SIZE-1:`WORD_SIZE];
+		`BUS_ST_WR32_W2:  wdata16 <= wdata[`WORD_SIZE-1:0];
 	endcase
 end
 
+// state transformation
 always @ (posedge clk) begin
-	case (bus_state)	// state transformation
+	case (bus_state)	
 		`BUS_ST_IDLE : begin
 			READY <= 1;
 			if (EN_N) bus_state <= `BUS_ST_IDLE;
@@ -161,16 +173,16 @@ end
 reg [`WORD_SIZE - 1 : 0] led_memory [`LED_MAXSIZE - 1:0];
 
 cache c(
-	.address({cache_addr[11:1], 1'b0}),
+	.address(cache_addr[18:1]),
 	.clock(clk),
-	.data(wdata),
+	.data(wdata16),
 	.wren(cache_wen),
 	.q(cache_rdata)
 	);
 
 vga_memory vm(
 	.clock(clk),
-	.data(wdata),
+	.data(wdata16),
 	.rdaddress(vga_raddr),
 	.wraddress({vga_waddr[11:1], 1'b0}),
 	.wren(vga_wen),
@@ -181,11 +193,14 @@ assign led_rdata = led_memory[0];
 
 always @ (posedge clk) begin
 	if (led_wen) begin
-		led_memory[0] <= wdata[`WORD_SIZE - 1 : 0];
-		led_memory[1] <= wdata[2*`WORD_SIZE-1 : `WORD_SIZE];
+		if (WLEN == `WLEN_WR8)
+			led_memory[0][7:0] <= wdata[7:0];
+		else begin
+			led_memory[0] <= wdata[`WORD_SIZE - 1 : 0];
+			led_memory[1] <= wdata[2*`WORD_SIZE-1 : `WORD_SIZE];
+		end
 	end
 end
-
 // DEVICE OUTPUT
 assign LEDR = led_memory[0][9:0];
 
