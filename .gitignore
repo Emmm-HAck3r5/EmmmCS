@@ -10,7 +10,6 @@
 #vscode settings
 .vscode/
 #compiled-tex
-*.pdf
 *.aux
 *.log
 *.toc
@@ -18,6 +17,14 @@
 
 #quartus file
 quartus_project/output_files/
+/proj_temp/
+proj/*.done
+proj/*.rpt
+proj/*map*
+proj/incremental_db
+proj/db/*
+!proj/db/emmmcs.db_info
+!proj/db/emmmcs.sld_design_entry.sci
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

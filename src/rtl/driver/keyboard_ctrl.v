@@ -10,7 +10,7 @@ module keyboard_ctrl(
 	inout 		          		PS2_CLK,
 	inout 		          		PS2_DAT
 	);
-	
+
 reg [7:0] fifo [15:0];
 reg [3:0] rptr;
 reg [3:0] wptr;
@@ -52,4 +52,4 @@ always @ (negedge CLOCK_50) begin
 	end
 end
 
-endmodule 
+endmodule

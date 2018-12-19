@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@
 \subsection{接口}
 
 \subsubsection{DLIST\_INIT}
-\noindent函数原型：DLIST\_INIT(list, m\_next, m\_prev)\\
+\noindent{函数原型：DLIST\_INIT(list, m\_next, m\_prev)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -46,7 +46,7 @@
 说明：初始化链表
 
 \subsubsection{DLIST\_EMPTY}
-\noindent函数原型：DLIST\_EMPTY(list, m\_next, m\_prev)\\
+\noindent{函数原型：DLIST\_EMPTY(list, m\_next, m\_prev)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -58,7 +58,7 @@
 说明：判断链表是否为空
 
 \subsubsection{DLIST\_INSERT}
-\noindent函数原型：DLIST\_INSERT(pos, m\_next, m\_prev, node)\\
+\noindent{函数原型：DLIST\_INSERT(pos, m\_next, m\_prev, node)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -72,7 +72,7 @@
 
 
 \subsubsection{DLIST\_DELETE}
-\noindent函数原型：DLIST\_DELETE(list, pos, m\_next, m\_prev)\\
+\noindent{函数原型：DLIST\_DELETE(list, pos, m\_next, m\_prev)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -85,7 +85,7 @@
 说明：删除结点
 
 \subsubsection{DLIST\_ADD\_TAIL}
-\noindent函数原型：DLIST\_ADD\_TAIL(list, m\_next, m\_prev, node)\\
+\noindent{函数原型：DLIST\_ADD\_TAIL(list, m\_next, m\_prev, node)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -98,7 +98,7 @@
 说明：添加结点至链表尾
 
 \subsubsection{DLIST\_ADD\_HEAD}
-\noindent函数原型：DLIST\_ADD\_HEAD(list, m\_next, m\_prev, node)\\
+\noindent{函数原型：DLIST\_ADD\_HEAD(list, m\_next, m\_prev, node)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -111,7 +111,7 @@
 说明：添加结点至链表头
 
 \subsubsection{DLIST\_FOREACH}
-\noindent函数原型：DLIST\_FOREACH(list, m\_next, ptr)\\
+\noindent{函数原型：DLIST\_FOREACH(list, m\_next, ptr)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -123,7 +123,7 @@
 说明：链表遍历
 
 \subsubsection{DLIST\_FIND\_NODE}
-\noindent函数原型：DLIST\_FIND\_NODE(list, m\_next, p\_node, key, cmpfunc)\\
+\noindent{函数原型：DLIST\_FIND\_NODE(list, m\_next, p\_node, key, cmpfunc)}\\
 参数：\\
 \begin{tabular}{|c|c|c|}
     \hline
@@ -136,3 +136,55 @@
 \end{tabular}\\
 比较函数要求：二元函数，左操作数接受key值，右操作数接受一个指向链表结点的指针，若匹配返回非零值。\\
 说明：链表结点查找，若查找不到返回NULL。
+
+\section{stdio}
+
+\subsection{接口}
+
+\subsubsection{getchar}
+\noindent{函数原型：\texttt{char getchar(void);}} \\
+从键盘读取一个字符，返回其 ascii 码。
+
+\subsubsection{gets}
+\noindent{函数原型：\texttt{char* gets(char* str);}} \\
+从键盘读取一个字符串，写入 \texttt{str} 中，以 \begin{verbatim}'\0'\end{verbatim} 结尾。\\
+返回值为 \texttt{str}。
+
+\subsubsection{putchar}
+\noindent{函数原型：\texttt{int putchar(char cha);}} \\
+将 \texttt{cha} 输出到 vga 缓冲区。
+
+\subsubsection{puts}
+\noindent{函数原型：\texttt{int puts(const char* str);}} \\
+将字符串 \texttt{str} 输出到 vga 缓冲区。
+
+\subsubsection{putn}
+\noindent{函数原型：\texttt{void putn(u32 n, u8 mode);}} \\
+
+参数说明：
+
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u32 & n & 输出数字\\\hline
+    u8 & mode & 数字格式\\\hline
+\end{tabular}
+
+\subsubsection{putchar\_color}
+\noindent{函数原型：\texttt{int putchar\_color(u8 color, char cha);} }\\
+将 \texttt{cha} 输出到 vga 缓冲区，带有颜色 \texttt{color}。
+
+\subsubsection{puts\_color}
+\noindent{函数原型：\texttt{int puts\_color(u8 color, const char * str);}} \\
+将字符串 \texttt{str} 输出到 vga 缓冲区，带有颜色 \texttt{color}。
+
+
+\subsubsection{putn\_color}
+\noindent{函数原型：\texttt{void putn\_color(u8 color, u32 n, u8 mode);} }\\
+\begin{tabular}{|c|c|c|}
+    \hline
+    类型 & 名称 & 说明\\\hline
+    u8 & color & 颜色\\\hline
+    u32 & n & 输出数字\\\hline
+    u8 & mode & 数字格式\\\hline
+\end{tabular}\\

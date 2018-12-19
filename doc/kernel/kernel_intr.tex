@@ -29,16 +29,28 @@
 中断处理函数。
 
 \section{intr\_init}
-简介：对中断模块进行初始化。
 \texttt{void intr\_init(void)}
+
+简介：对中断模块进行初始化。
 
 \subsection{函数功能}
 
 开机时被调用，初始化中断模块。
 
+\section{intr\_open}
+\texttt{void intr\_open(void)}
+
+简介：打开中断。
+
+\section{intr\_close}
+\texttt{void intr\_close(void)}
+
+简介：关闭中断。
+
 \section{intr}
-简介：中断处理主函数，用于分发中断。
 \texttt{void intr(void)}
+
+简介：中断处理主函数，用于分发中断。
 
 \subsection{函数功能}
 

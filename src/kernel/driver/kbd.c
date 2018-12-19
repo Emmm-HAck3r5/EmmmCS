@@ -1,8 +1,9 @@
 #include "kbd.h"
+#include "../intr/intr.h"
+#include "../mm/mm.h"
 
-static u8 kbd_buf[KBD_BUF_SIZE];
-static u32 kbd_w_ptr = 0;
-static u32 kbd_r_ptr = 0;
+static u8* kbd_buf;
+static u32 kbd_ptr = 0, kbd_ptr_r = 0;;
 
 static const u8 scan_to_ascii[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x60, 0x00,
@@ -15,21 +16,28 @@ static const u8 scan_to_ascii[] = {
     0x30, 0x2E, 0x32, 0x35, 0x36, 0x38, 0x00, 0x00, 0x00, 0x2B, 0x33, 0x2C, 0x2A, 0x39, 0x00, 0x00
 };
 
+void kbd_init(){
+    kbd_buf = (u8*)mm_alloc(KBD_BUF_SIZE);
+}
+
 void kbd_update(u8* args){
     if (args[0] == 1){
-        kbd_buf[kbd_w_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
+        kbd_buf[kbd_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
         args[0] = 0;
-        kbd_w_ptr++;
+        kbd_ptr++;
     }
     return;
 }
 
 u8 kbd_getc(){
-    if (kbd_r_ptr == kbd_w_ptr){
-        return 0;
-    }else{
-        u8 ret = kbd_buf[kbd_r_ptr % KBD_BUF_SIZE];
-        kbd_r_ptr++;
-        return ret;
+    u8 ret = 0;
+    intr_open();
+    while(1){
+        if (kbd_ptr != kbd_ptr_r){
+            ret = kbd_buf[kbd_ptr_r % KBD_BUF_SIZE];
+            kbd_ptr_r++;
+            break;
+        }
     }
+    return ret;
 }

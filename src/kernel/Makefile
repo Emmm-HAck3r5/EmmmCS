@@ -1,15 +1,20 @@
-.PHONY: clean
+.PHONY: clean dump
 
 CC := riscv32-unknown-elf-gcc
 OD := riscv32-unknown-elf-objdump
-CFLAGS := -nostdinc -fno-stack-protector -fno-builtin -static -Ttext=0x00000 -march=rv32i -mabi=ilp32 -nostdlib
+LD := riscv32-unknown-elf-ld
+CFLAGS := -nostdinc -fno-stack-protector -fno-builtin -static -Ttext=0x00000 -march=rv32im -mabi=ilp32 -nostdlib
 
-CFILES := $(shell find -name "*.c")
+CFILES := main.c
+CFILES += $(shell find ! -name "main.c" -name "*.c")
 OBJS := $(CFILES:.c=.o)
 PRO := kernel
 
 kernel: $(OBJS)
-	$(CC) -o $(PRO) $(OBJS)
+	$(CC) $(CFLAGS) -o $(PRO) $(OBJS)
+
+dump: kernel
+	$(OD) -D kernel > kernel.dump
 
 $(OBJS): typedef.h
 

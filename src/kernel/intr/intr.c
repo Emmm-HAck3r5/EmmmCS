@@ -1,11 +1,26 @@
 #include "intr.h"
 #include "../driver/kbd.h"
+#include "../riscv_asm.h"
 
 static u8* intr_args = (u8*)INDR_ADDR;
 
 void intr_init(){
     *((u32*) intr_args) = 0;
-    // TODO: insert an instr to set the idtr to intr()'s address
+    void* intr_ptr = intr;
+    write_csr(uscratch, intr_ptr); // fake instr
+    // asm volatile("csrw uscratch, %0": "r"(intr_ptr));
+}
+
+void intr_open(){
+    int code = 1;
+    write_csr(uepc, code); // fake instr
+    // asm volatile("csrw uepc, %0": "r"(code));
+}
+
+void intr_close(){
+    int code = 0;
+    write_csr(uepc, code); // fake instr
+    // asm volatile("csrw uepc, %0": "r"(code));
 }
 
 void intr(){
@@ -14,6 +29,9 @@ void intr(){
         case 1: kbd_update(intr_args + 1); break;
         default: break;
     }
-    // TODO: insert a mret instr here
+    intr_close();
+    int code = 0;
+    write_csr(ucause, code); // fake MRET instr
+    // asm volatile("csrw ucause, %0": "r"(code));
     return;
 }

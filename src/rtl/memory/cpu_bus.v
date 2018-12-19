@@ -190,7 +190,7 @@ vga_memory vm(
 	);
 
 assign led_rdata = led_memory[0];
-  
+
 always @ (posedge clk) begin
 	if (led_wen) begin
 		if (WLEN == `WLEN_WR8)

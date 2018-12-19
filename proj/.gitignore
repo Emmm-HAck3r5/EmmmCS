@@ -1,0 +1,17 @@
+*.done
+*.rpt
+*map*
+incremental_db
+db/*
+
+*_dump.txt
+*.jdi
+*.pin
+*.sld
+*.sof
+*.fit.*
+*.sta.*
+greybox_tmp
+
+!db/emmmcs.db_info
+!db/emmmcs.sld_design_entry.sci
