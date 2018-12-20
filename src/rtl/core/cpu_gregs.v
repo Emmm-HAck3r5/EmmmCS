@@ -99,10 +99,10 @@ module cpu_gregs(
 
     always @(posedge clk)
     begin
-        if(!reset_n)
+        if(!reset_n) begin
             rx[0] = `CPU_XLEN'b0;
-        else
-        begin
+            rx[2] = `CPU_XLEN'h7fff0;
+        end else begin
             rs1_dat = rx[rs1_idx];
             rs2_dat = rx[rs2_idx];
             if(rd_wen && rd_idx!=`CPU_GREGIDX_WIDTH'b0)

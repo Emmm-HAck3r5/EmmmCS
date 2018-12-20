@@ -245,27 +245,27 @@ seg7_h s1(
 
 seg7_h s2(
     .en(1'b1),
-    .in(decoder_imm[3:0]),
+    .in(gregs_rd_dat[3:0]),
     .hex(HEX2)
 );
 
 seg7_h s3(
     .en(1'b1),
-    .in(decoder_imm[7:4]),
+    .in(gregs_rd_dat[7:4]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(decoder_imm[11:8]),
+    .in(gregs_rd_dat[11:8]),
     .hex(HEX4)
 );
-//
-//seg7_h s5(
-//    .en(1'b1),
-//    .in(status[3:0]),
-//    .hex(HEX5)
-//);
+
+seg7_h s5(
+   .en(1'b1),
+   .in(gregs_rd_dat[15:12]),
+   .hex(HEX5)
+);
 
 // assign LEDR[0] = bus_ready;
 // assign LEDR[1] = bus_en_n;
