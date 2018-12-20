@@ -15,9 +15,10 @@ module cpu_bus(
 	output reg  [31:0] addr_offset,
 	output reg [2:0]	bus_state,
 	output wire [15:0] cache_rdata,
+	output reg [15:0] wdata16,
 	/////////////// LED ///////////////
 	output 			[9:0]		LEDR,
-	//////////// VGA //////////
+	/////////////// VGA ///////////////
 	output		          		VGA_BLANK_N,
 	output		    [7:0]		VGA_B,
 	output		          		VGA_CLK,
@@ -30,11 +31,13 @@ module cpu_bus(
 
 `define ADDR_SIZE		32
 `define WORD_SIZE		16
+`define BYTE_SIZE		8
 
 `define	CACHE_MAXSIZE	32'h80000
 `define	LED_MAXSIZE		32'h4
 `define	VGA_MAXSIZE		32'h12d0
 `define VGA_MEMORY_SIZE	32'h12c0
+`define VGA_CREGS_SIZE  32'h10
 
 `define	CACHE_START		32'h0
 `define	LED_START		(`CACHE_START + `CACHE_MAXSIZE)
@@ -53,18 +56,19 @@ assign vga_en =  (address >= `VGA_START) && (address < `KB_START);
 // base ADDRESS
 wire [`ADDR_SIZE - 1:0] cache_addr;
 wire [`ADDR_SIZE - 1:0] led_addr;
-wire [`ADDR_SIZE - 1:0] vga_waddr;
-wire [`ADDR_SIZE - 1:0] vga_raddr;
+wire [`ADDR_SIZE - 1:0] vga_addr;
+wire [`ADDR_SIZE - 1:0] vga_dp_raddr;
 // reg  [`ADDR_SIZE - 1:0] addr_offset;
 
 assign cache_addr = address - `CACHE_START + addr_offset;
 assign led_addr = address - `LED_START + addr_offset;
-assign vga_waddr = address - `VGA_START + addr_offset;
+assign vga_addr = address - `VGA_START + addr_offset;
 
 // select output radata
 // wire [`WORD_SIZE - 1:0] cache_rdata;
 wire [`WORD_SIZE - 1:0] led_rdata;
 wire [`WORD_SIZE - 1:0] vga_rdata;
+wire [`WORD_SIZE - 1:0] vga_dp_rdata;
 // reg [`WORD_SIZE - 1:0] selected_rdata;
 
 always @ (negedge clk)
@@ -78,9 +82,10 @@ always @ (negedge clk)
 // wire cache_wen;
 wire led_wen;
 wire vga_wen;
-reg [`WORD_SIZE - 1:0] wdata16;
+// reg [`WORD_SIZE - 1:0] wdata16;
+reg writing = 0;
 
-assign global_wen = (WLEN != 2'h00) && !READY;
+assign global_wen = writing;
 assign cache_wen = cache_en && global_wen;
 assign led_wen = led_en && global_wen;
 assign vga_wen = vga_en && global_wen;
@@ -127,20 +132,29 @@ always @ (posedge clk) begin
 	endcase
 end
 
+// writing
+always @ (posedge clk)
+	case (bus_state)
+		`BUS_ST_WR8_W, `BUS_ST_WR16_W, `BUS_ST_WR32_W2: writing <= 0;
+		`BUS_ST_WR8_R: writing <= 1;
+		`BUS_ST_IDLE:
+			if (!EN_N)
+				case (WLEN)
+					`WLEN_RD32, `WLEN_WR8: writing <= 0;
+					`WLEN_WR16, `WLEN_WR32: writing <= 1;
+				endcase
+			else writing <= 0;
+		default: writing <= writing;
+	endcase
+
 // write-in data
 always @ (posedge clk) begin
-	case (bus_state)
-		`BUS_ST_IDLE : 
-			case(WLEN)
-				`WLEN_WR8:
-					if (address[0])
-						wdata16 <= {wdata[7:0], selected_rdata[7:0]};
-					else wdata16 <= {selected_rdata[`WORD_SIZE-1:8], wdata[7:0]};
-				`WLEN_WR16, `WLEN_WR32: wdata16 <= wdata[`WORD_SIZE-1:0];
-				default: ;
-			endcase
+	case(bus_state)
+		`BUS_ST_WR8_R:
+			if (address[0]) wdata16 <= {wdata[7:0], selected_rdata[7:0]};
+			else wdata16 <= {selected_rdata[`WORD_SIZE-1:8], wdata[7:0]};
 		`BUS_ST_WR32_W1:  wdata16 <= wdata[2*`WORD_SIZE-1:`WORD_SIZE];
-		`BUS_ST_WR32_W2:  wdata16 <= wdata[`WORD_SIZE-1:0];
+		default: wdata16 <= wdata[`WORD_SIZE-1:0];
 	endcase
 end
 
@@ -173,7 +187,8 @@ always @ (posedge clk) begin
 end
 
 // MEMORYS
-reg [`WORD_SIZE - 1 : 0] led_memory [`LED_MAXSIZE - 1:0];
+reg [`WORD_SIZE - 1 : 0] led_memory [`LED_MAXSIZE - 1 : 0];
+reg [`VGA_CREGS_SIZE * `BYTE_SIZE - 1 : 0 ] vga_ctrl = 0;
 
 cache c(
 	.address(cache_addr[18:1]),
@@ -183,14 +198,19 @@ cache c(
 	.q(cache_rdata)
 	);
 
-vga_memory vm(
+vga_memory2port vm2p(
 	.clock(clk),
-	.data(wdata16),
-	.rdaddress(vga_raddr),
-	.wraddress({vga_waddr[11:1], 1'b0}),
-	.wren(vga_wen),
-	.q(vga_rdata)
-	);
+	// display ctrl only read
+	.address_a(vga_dp_raddr[11:0]),
+	// data_a is not used
+	.wren_a(0),
+	.q_a(vga_dp_rdata),
+	// vga memory write/read
+	.address_b(vga_addr[12:1]),
+	.data_b(wdata16),
+	.wren_b(vga_wen),
+	.q_b(vga_rdata)
+);
 
 assign led_rdata = led_memory[0];
   
@@ -209,21 +229,13 @@ assign LEDR = led_memory[0][9:0];
 
 wire [7:0] x_addr;
 wire [4:0] y_addr;
-reg [127:0] vga_ctrl = 0;
-//wire [5:0] vga_ctrl_waddr;
 
-assign vga_raddr = ({7'b0,y_addr} << 6) + ({7'b0,y_addr} << 4) + x_addr;
-//assign vga_ctrl_waddr = address - `VGA_CTRL_START;
-
-//always @ (posedge clk) begin
-//	if ((address >= `VGA_CTRL_START) && (address < `KB_START - 32))
-//		vga_ctrl[vga_ctrl_waddr + 31 : vga_ctrl_waddr] <= wdata;
-//end
+assign vga_dp_raddr = ({7'b0,y_addr} << 6) + ({7'b0,y_addr} << 4) + x_addr;
 
 display_ctrl dp(
     .clk(clk),
     .reset_n(reset_n),
-    .in_data(vga_rdata),
+    .in_data(vga_dp_rdata),
     .ctrl_reg(vga_ctrl),
     .x_addr(x_addr),
     .y_addr(y_addr),
