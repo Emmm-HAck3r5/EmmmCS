@@ -106,13 +106,9 @@ wire decoder_fp_rm;
 wire decoder_fp_width;
 wire decoder_fp_fmt;
 // gRegs idx always be the decoding result
-// assign gregs_rs1_idx = greg_back_flag ? greg_back_no[`CPU_GREGIDX_WIDTH-1:0] : decoder_rs1_idx;
-// assign gregs_rs2_idx = decoder_rs2_idx;
-// assign gregs_rd_idx  = greg_restore_flag ? greg_back_no : decoder_rd_idx;
-
-assign gregs_rs1_idx = decoder_rs1_idx;
+assign gregs_rs1_idx = greg_back_flag ? greg_back_no[`CPU_GREGIDX_WIDTH-1:0] : decoder_rs1_idx;
 assign gregs_rs2_idx = decoder_rs2_idx;
-assign gregs_rd_idx  = decoder_rd_idx;
+assign gregs_rd_idx  = greg_restore_flag ? greg_back_no : decoder_rd_idx;
 
 // PC
 reg [31:0] pc;
@@ -162,7 +158,6 @@ assign ps2_proc = IF;
 cpu_gregs gregs(
     .clk     (clk),
     .rd_wen  (gregs_wen),
-    .reset_n (clr_n),
     .rs1_idx (gregs_rs1_idx),
     .rs2_idx (gregs_rs2_idx),
     .rd_idx  (gregs_rd_idx),
@@ -170,12 +165,12 @@ cpu_gregs gregs(
     .rs2_dat (gregs_rs2_dat),
     .rd_dat  (gregs_rd_dat),
 
-    .HEX0(),
-	.HEX1(),
-	.HEX2(),
-	.HEX3(),
-	.HEX4(),
-	.HEX5()
+    .HEX0(HEX0),
+	.HEX1(HEX1),
+	.HEX2(HEX2),
+	.HEX3(HEX3),
+	.HEX4(HEX4),
+	.HEX5(HEX5)
 );
 
 // alu
@@ -229,55 +224,12 @@ cpu_instr_decoder decoder(
     .fp_fmt(decoder_fp_fmt)
 );
 
-/////////////////////////////////////////
-
-seg7_h s0(
-    .en(1'b1),
-    .in(pc[3:0]),
-    .hex(HEX0)
-);
-
-seg7_h s1(
-    .en(1'b1),
-    .in(pc[7:4]),
-    .hex(HEX1)
-);
-
-seg7_h s2(
-    .en(1'b1),
-    .in(decoder_imm[3:0]),
-    .hex(HEX2)
-);
-
-seg7_h s3(
-    .en(1'b1),
-    .in(decoder_imm[7:4]),
-    .hex(HEX3)
-);
-
-seg7_h s4(
-    .en(1'b1),
-    .in(decoder_imm[11:8]),
-    .hex(HEX4)
-);
-//
-//seg7_h s5(
-//    .en(1'b1),
-//    .in(status[3:0]),
-//    .hex(HEX5)
-//);
-
-// assign LEDR[0] = bus_ready;
-// assign LEDR[1] = bus_en_n;
-////////////////////////////////////////
-
-wire clk_1s;
-clkgen_module #(8) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
-
+reg clk_1s;
+clkgen_module #(1) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
 // main logic
 always @(posedge clk_1s) begin
-    if (! KEY[0]) begin
+    if (!clr_n) begin
         pc     <= 0;
         status <= `STATUS_INIT;
         gregs_wen <= 0;
@@ -288,7 +240,7 @@ always @(posedge clk_1s) begin
     end else begin
         case(status)
             `STATUS_INIT: begin
-            if (SW[0]) begin
+            if (debug) begin
                 status <= `STATUS_INIT;
             end else begin
                 flag_alu   <= 0;
@@ -323,7 +275,6 @@ always @(posedge clk_1s) begin
                 status <= `STATUS_DECODING_INSTR;
             end
             `STATUS_DECODING_INSTR: begin
-                bus_en_n <= 1;
                 if (bus_ready == `BUS_STOP) begin
                     decoder_instr <= bus_rdata;
                     status <= `STATUS_SET_FLAG;
@@ -361,7 +312,7 @@ always @(posedge clk_1s) begin
                             status <= `STATUS_REG_WRITE;
                         end
                         `CPU_INSTR_GRP_BCC:    begin
-                            pc_nxt <= (decoder_imm + pc) & {{31{1'b1}}, 1'b0};
+                            pc_nxt <= (decoder_imm + gregs_rs1_dat) & {{31{1'b1}}, 1'b0};
                             case (decoder_funct[2:0])
                                 3'b000:  flag_branch <= (gregs_rs1_dat == gregs_rs2_dat);
                                 3'b001:  flag_branch <= (gregs_rs1_dat != gregs_rs2_dat);
@@ -494,7 +445,6 @@ always @(posedge clk_1s) begin
                 end
             end
             `STATUS_MEM_READING:    begin
-                bus_en_n = 1;
                 if (flag_mem_read) begin
                     if (bus_ready == `BUS_STOP) begin
                         case (decoder_funct[2:0])
@@ -546,7 +496,7 @@ always @(posedge clk_1s) begin
             end
             `STATUS_REG_WRITE:  begin
                 if (flag_reg_write) begin
-                    gregs_wen = 1;
+                    gregs_wen <= 1;
                 end
                 status <= `STATUS_REG_WRITE_POST;
             end
@@ -563,7 +513,6 @@ always @(posedge clk_1s) begin
                 end
             end
             `STATUS_MEM_WRITING:    begin
-                bus_en_n = 1;
                 if (flag_mem_write) begin
                     if (bus_ready == `BUS_STOP) begin
                         status <= `STATUS_BRANCH;
