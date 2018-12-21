@@ -13,43 +13,30 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: timer.c
+  File: common.c
   Project: EmmmCS
-  File Created: 2018-12-21 17:08:40
+  File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:06:59
+  Last Modified: 2018-12-21 19:55:18
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#include "timer.h"
-#include "../intr/intr.h"
-static void (*tick_handler)(void);
-static u32 timer_counter;
-void timer_init(void)
+#include "common.h"
+sprite_t *sprite_create(u8 w, u8 l, u8 x, u8 y, u8 p_w, u8 p_l, u8 p_x, u8 p_y, u8 *pxs)
 {
-    intr_handler_register(TIMER_INTR, timer_handler);
-    timer_counter = 0;
+    sprite_t *spr = (sprite_t *)malloc(sizeof(sprite_t));
+    spr->width = w;
+    spr->length = l;
+    spr->x = x;
+    spr->y = y;
+    spr->phy_width = p_w;
+    spr->phy_length = p_l;
+    spr->phy_x = p_x;
+    spr->phy_y = p_y;
+    spr->pixels = pxs;
 }
-
-void timer_handler(void)
+void sprite_destroy(sprite_t *spr)
 {
-    ++timer_counter;
-    if(tick_handler)
-        tick_handler();
-}
-
-void tick_handler_register(void *handler)
-{
-    tick_handler = (void (*)(void))handler;
-}
-
-void tick_handler_unregister(void)
-{
-    tick_handler = (void (*)(void))NULL;
-}
-
-u32 time(void)
-{
-    return timer_counter;
+    free(spr);
 }

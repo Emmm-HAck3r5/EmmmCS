@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:42:36
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-08 16:16:59
+  Last Modified: 2018-12-21 21:10:25
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "vga.h"
@@ -85,6 +85,13 @@ void vga_putc(u8 color, char c)
         if(c >= 0x20)
         {//printable
             *(vga_mem + (*cursor_y) * VGA_CHAR_X_SIZE + *cursor_x) = ((u16)color << 8) | c;
+            if(*cursor_x < VGA_CHAR_X_SIZE)
+                ++(*cursor_x);
+            else
+            {
+                *cursor_x = 0;
+                ++(*cursor_y);
+            }
         }
         break;
     }

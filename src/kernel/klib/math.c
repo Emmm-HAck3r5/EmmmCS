@@ -13,43 +13,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: timer.c
+  File: math.c
   Project: EmmmCS
-  File Created: 2018-12-21 17:08:40
+  File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:06:59
+  Last Modified: 2018-12-21 20:15:19
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#include "timer.h"
-#include "../intr/intr.h"
-static void (*tick_handler)(void);
-static u32 timer_counter;
-void timer_init(void)
-{
-    intr_handler_register(TIMER_INTR, timer_handler);
-    timer_counter = 0;
-}
+#include "math.h"
 
-void timer_handler(void)
-{
-    ++timer_counter;
-    if(tick_handler)
-        tick_handler();
-}
+static rand_seed;
 
-void tick_handler_register(void *handler)
+void srand(u32 seed)
 {
-    tick_handler = (void (*)(void))handler;
+    rand_seed = seed;
 }
-
-void tick_handler_unregister(void)
+u32 rand(void)
 {
-    tick_handler = (void (*)(void))NULL;
-}
-
-u32 time(void)
-{
-    return timer_counter;
+    rand_seed = (rand_seed * 31 + 13) % ((1 << 31) - 1);
+    return rand_seed;
 }

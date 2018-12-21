@@ -13,43 +13,17 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: timer.c
+  File: objects.h
   Project: EmmmCS
-  File Created: 2018-12-21 17:08:40
+  File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:06:59
+  Last Modified: 2018-12-21 20:16:58
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#include "timer.h"
-#include "../intr/intr.h"
-static void (*tick_handler)(void);
-static u32 timer_counter;
-void timer_init(void)
-{
-    intr_handler_register(TIMER_INTR, timer_handler);
-    timer_counter = 0;
-}
+#ifndef GAME_PB_OBJECTS_H
+#define GAME_PB_OBJECTS_H
 
-void timer_handler(void)
-{
-    ++timer_counter;
-    if(tick_handler)
-        tick_handler();
-}
-
-void tick_handler_register(void *handler)
-{
-    tick_handler = (void (*)(void))handler;
-}
-
-void tick_handler_unregister(void)
-{
-    tick_handler = (void (*)(void))NULL;
-}
-
-u32 time(void)
-{
-    return timer_counter;
-}
+#include "common.h"
+#endif
