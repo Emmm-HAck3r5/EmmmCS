@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 10:58:36
+  Last Modified: 2018-12-21 16:14:31
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "intr.h"
@@ -27,8 +27,8 @@
 
 static void *intr_handlers[INTR_COUNT];
 
-void intr_init(){
-    write_csr(uscratch, intr_handlers);
+void intr_init(void){
+    write_csr(mtvec, intr_handlers);
 }
 
 void intr_handler_register(u8 intrno, void *handler)
@@ -37,16 +37,18 @@ void intr_handler_register(u8 intrno, void *handler)
         intr_handlers[intrno] = handler;
 }
 
-void intr_on(){
-    write_csr(uepc, 1);
+void intr_on(void){
+    write_csr(mie, 1);
 }
-void intr_off(){
-    write_csr(uepc, 0);
+void intr_off(void){
+    write_csr(mie, 0);
 }
-void intr(u8 intrno){
+void intr(void){
+    u32 intrno;
+    read_csr(mcause, intrno);
     if(intrno < INTR_COUNT)
         (*(void (*)(void))(&intr_handlers[intrno]))();
-    write_csr(ucause, 0);
+    __asm__ volatile("mret");
 }
 // static u8* intr_args = (u8*)INDR_ADDR;
 
