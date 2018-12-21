@@ -46,41 +46,41 @@ module cpu_gregs(
     output [6:0] HEX5
     );
 
-    //seg7_h s0(
-    //    .en(1'b1),
-    //    .in(rx[15][3:0]),
-    //    .hex(HEX0)
-    //);
-//
-    //seg7_h s1(
-    //    .en(1'b1),
-    //    .in(rx[15][7:4]),
-    //    .hex(HEX1)
-    //);
-//
-    //seg7_h s2(
-    //    .en(1'b1),
-    //    .in(rx[15][11:8]),
-    //    .hex(HEX2)
-    //);
-//
-    //seg7_h s3(
-    //    .en(1'b1),
-    //    .in(rx[15][15:12]),
-    //    .hex(HEX3)
-    //);
+    seg7_h s0(
+       .en(1'b1),
+       .in(rx[12][3:0]),
+       .hex(HEX0)
+    );
 
-//seg7_h s4(
-//    .en(1'b1),
-//    .in(rd_idx[3:0]),
-//    .hex(HEX4)
-//);
+    seg7_h s1(
+       .en(1'b1),
+       .in(rx[12][7:4]),
+       .hex(HEX1)
+    );
 
-//seg7_h s5(
-//    .en(1'b1),
-//    .in(status[3:0]),
-//    .hex(HEX5)
-//);
+    seg7_h s2(
+       .en(1'b1),
+       .in(rx[12][11:8]),
+       .hex(HEX2)
+    );
+
+    seg7_h s3(
+       .en(1'b1),
+       .in(rx[12][15:12]),
+       .hex(HEX3)
+    );
+
+seg7_h s4(
+   .en(1'b1),
+   .in(rx[12][19:16]),
+   .hex(HEX4)
+);
+
+seg7_h s5(
+   .en(1'b1),
+   .in(rx[12][23:20]),
+   .hex(HEX5)
+);
 
 
    reg [`CPU_XLEN-1:0] rx [`CPU_GREG_COUNT-1:0];

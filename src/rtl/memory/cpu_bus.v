@@ -114,7 +114,7 @@ end
 // address offset
 always @ (posedge clk) begin
 	case (bus_state)
-	  `BUS_ST_IDLE: 
+	  `BUS_ST_IDLE:
 	  	if (!EN_N && WLEN == `WLEN_RD32)
 		  addr_offset <= 32'd2;
 		else addr_offset <= 32'd0;
@@ -160,7 +160,7 @@ end
 
 // state transformation
 always @ (posedge clk) begin
-	case (bus_state)	
+	case (bus_state)
 		`BUS_ST_IDLE : begin
 			READY <= 1;
 			if (EN_N) bus_state <= `BUS_ST_IDLE;
@@ -213,7 +213,7 @@ vga_memory2port vm2p(
 );
 
 assign led_rdata = led_memory[0];
-  
+
 always @ (posedge clk) begin
 	if (led_wen) begin
 		if (WLEN == `WLEN_WR8)

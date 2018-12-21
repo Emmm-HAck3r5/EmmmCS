@@ -170,12 +170,12 @@ cpu_gregs gregs(
     .rs2_dat (gregs_rs2_dat),
     .rd_dat  (gregs_rd_dat),
 
-    .HEX0(),
-	.HEX1(),
-	.HEX2(),
-	.HEX3(),
-	.HEX4(),
-	.HEX5()
+    .HEX0(HEX0),
+	.HEX1(HEX1),
+	.HEX2(HEX2),
+	.HEX3(HEX3),
+	.HEX4(HEX4),
+	.HEX5(HEX5)
 );
 
 // alu
@@ -201,7 +201,7 @@ cpu_bus bus(
     .READY(bus_ready),
     .rdata(bus_rdata),
 
-    .LEDR(LEDR),
+    .LEDR(),
     .VGA_BLANK_N(VGA_BLANK_N),
     .VGA_B(VGA_B),
     .VGA_CLK(VGA_CLK),
@@ -231,48 +231,51 @@ cpu_instr_decoder decoder(
 
 /////////////////////////////////////////
 
-seg7_h s0(
-    .en(1'b1),
-    .in(pc[3:0]),
-    .hex(HEX0)
-);
+// seg7_h s0(
+//     .en(1'b1),
+//     .in(bus_address[3:0]),
+//     .hex(HEX0)
+// );
 
-seg7_h s1(
-    .en(1'b1),
-    .in(pc[7:4]),
-    .hex(HEX1)
-);
+// seg7_h s1(
+//     .en(1'b1),
+//     .in(bus_address[7:4]),
+//     .hex(HEX1)
+// );
 
-seg7_h s2(
-    .en(1'b1),
-    .in(gregs_rd_dat[3:0]),
-    .hex(HEX2)
-);
+// seg7_h s2(
+//     .en(1'b1),
+//     .in(bus_address[11:8]),
+//     .hex(HEX2)
+// );
 
-seg7_h s3(
-    .en(1'b1),
-    .in(gregs_rd_dat[7:4]),
-    .hex(HEX3)
-);
+// seg7_h s3(
+//     .en(1'b1),
+//     .in(bus_address[15:12]),
+//     .hex(HEX3)
+// );
 
-seg7_h s4(
-    .en(1'b1),
-    .in(gregs_rd_dat[11:8]),
-    .hex(HEX4)
-);
+// seg7_h s4(
+//     .en(1'b1),
+//     .in(bus_address[3:0]),
+//     .hex(HEX4)
+// );
 
-seg7_h s5(
-   .en(1'b1),
-   .in(gregs_rd_dat[15:12]),
-   .hex(HEX5)
-);
+// seg7_h s5(
+//    .en(1'b1),
+//    .in(bus_address[7:4]),
+//    .hex(HEX5)
+// );
 
-// assign LEDR[0] = bus_ready;
-// assign LEDR[1] = bus_en_n;
+assign LEDR[0] = bus_wlen[0];
+assign LEDR[1] = bus_wlen[1];
+assign LEDR[2] = bus_en_n;
+assign LEDR[3] = bus_ready;
+assign LEDR[6:4] = decoder_funct[2:0];
 ////////////////////////////////////////
 
 wire clk_1s;
-clkgen_module #(8) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+clkgen_module #(10) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
 
 // main logic
@@ -297,7 +300,7 @@ always @(posedge clk_1s) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1 && ps2_ready) begin
+                if (is_intring == 0 && IF == 1) begin
                     pc_back = pc;
                     greg_back_flag = 1;
                     status = `STATUS_BACKUP;
@@ -387,6 +390,7 @@ always @(posedge clk_1s) begin
                         `CPU_INSTR_GRP_STORE:  begin
                             flag_mem_write <= 1;
                             bus_address    <= gregs_rs1_dat + decoder_imm;
+                            bus_wdata <= gregs_rs2_dat;
                             case (decoder_funct[2:0])
                                 3'b000: bus_wlen <= `BUS_WRITE_8;
                                 3'b001: bus_wlen <= `BUS_WRITE_16;
@@ -487,7 +491,7 @@ always @(posedge clk_1s) begin
 
             `STATUS_MEM_READ:   begin
                 if (flag_mem_read) begin
-                    bus_en_n = `BUS_RUN;
+                    bus_en_n = 0;
                     status = `STATUS_MEM_READING;
                 end else begin
                     status <= `STATUS_ALU;
@@ -551,12 +555,12 @@ always @(posedge clk_1s) begin
                 status <= `STATUS_REG_WRITE_POST;
             end
             `STATUS_REG_WRITE_POST:   begin
-                gregs_wen <= 0;
+                gregs_wen = 0;
                 status <= `STATUS_BRANCH;
             end
             `STATUS_MEM_WRITE:  begin
                 if (flag_mem_write) begin
-                    bus_en_n = `BUS_RUN;
+                    bus_en_n = 0;
                     status = `STATUS_MEM_WRITING;
                 end else begin
                     status <= `STATUS_BRANCH;
@@ -565,7 +569,7 @@ always @(posedge clk_1s) begin
             `STATUS_MEM_WRITING:    begin
                 bus_en_n = 1;
                 if (flag_mem_write) begin
-                    if (bus_ready == `BUS_STOP) begin
+                    if (bus_ready == 1) begin
                         status <= `STATUS_BRANCH;
                     end else begin
                         status <= `STATUS_MEM_WRITING;
