@@ -3,9 +3,9 @@
 .globl _start
 _start:
 	lui a1, 0x80
-	addi a1, a1, 0x006
+	addi a1, a1, 0x004
 	lui a3, 0x7
-	addi a3, a3, 0x30
+	addi a3, a3, 0x0
 	addi a2, a0, 0
 	addi a4, a0, 0
 	j main
