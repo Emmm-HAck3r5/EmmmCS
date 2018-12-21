@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 17:28:05
+  Last Modified: 2018-12-21 17:49:08
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "intr.h"
@@ -28,7 +28,7 @@ static void *intr_handlers[INTR_COUNT];
 
 void intr_init(void)
 {
-    write_csr(mtvec, （u32)intr);
+    write_csr(mtvec, (u32)intr);
 }
 
 void intr_handler_register(u8 intrno, void *handler)
