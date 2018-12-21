@@ -47,7 +47,8 @@ void kbd_init(void)
 
 void kbd_handler(void)
 {
-    read_csr(mtval, kbd_buf);
+    // kbd_buf = read_csr(mtval);
+    read_csr(mscratch, kbd_buf);
 }
 
 u8 kbd_getc(void)

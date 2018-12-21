@@ -20,7 +20,7 @@
 
 \section{中断发生}
 
-当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到mtvec[0]所指向的中断处理函数。其中，mcause寄存器存储中断号，mtval存储第一个参数，如硬件中断需要更多的参数传递，由mhpmevent3至mhpmevent31寄存器存储。
+当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到mtvec[0]所指向的中断处理函数。其中，mcause寄存器存储中断号，mscratch存储第一个参数，如硬件中断需要更多的参数传递，由mhpmevent3至mhpmevent31寄存器存储。
 
 \section{中断返回}
 
