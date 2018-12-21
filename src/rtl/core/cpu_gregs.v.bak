@@ -35,7 +35,7 @@ module cpu_gregs(
 
     output reg [`CPU_XLEN-1:0] rs1_dat,
     output reg [`CPU_XLEN-1:0] rs2_dat,
-    input [`CPU_XLEN-1:0] rd_dat,
+    input [`CPU_XLEN-1:0] rd_dat
 
     //DEBUG
     output [6:0] HEX0,
@@ -46,63 +46,39 @@ module cpu_gregs(
     output [6:0] HEX5
     );
 
-    //seg7_h s0(
-    //    .en(1'b1),
-    //    .in(rx[15][3:0]),
-    //    .hex(HEX0)
-    //);
-//
-    //seg7_h s1(
-    //    .en(1'b1),
-    //    .in(rx[15][7:4]),
-    //    .hex(HEX1)
-    //);
-//
-    //seg7_h s2(
-    //    .en(1'b1),
-    //    .in(rx[15][11:8]),
-    //    .hex(HEX2)
-    //);
-//
-    //seg7_h s3(
-    //    .en(1'b1),
-    //    .in(rx[15][15:12]),
-    //    .hex(HEX3)
-    //);
+    seg7 s0(
+        .en(1'b1),
+        .in(rx[15][3:0]),
+        .hex(HEX0)
+    );
 
-//seg7_h s4(
-//    .en(1'b1),
-//    .in(rd_idx[3:0]),
-//    .hex(HEX4)
-//);
+    seg7 s1(
+        .en(1'b1),
+        .in(rx[15][7:4]),
+        .hex(HEX1)
+    );
 
-//seg7_h s5(
-//    .en(1'b1),
-//    .in(status[3:0]),
-//    .hex(HEX5)
-//);
+    seg7 s2(
+        .en(1'b1),
+        .in(rx[15][11:8]),
+        .hex(HEX2)
+    );
+
+    seg7 s3(
+        .en(1'b1),
+        .in(rx[15][15:12]),
+        .hex(HEX3)
+    );
 
 
-   reg [`CPU_XLEN-1:0] rx [`CPU_GREG_COUNT-1:0];
-//
-//        seg7_h s2(
-//    .en(1'b1),
-//    .in(rx[1][3:0]),
-//    .hex(HEX2)
-//);
-//
-//seg7_h s3(
-//    .en(1'b1),
-//    .in(rx[1][7:4]),
-//    .hex(HEX3)
-//);
+    reg [`CPU_XLEN-1:0] rx [`CPU_GREG_COUNT-1:0];
 
     always @(posedge clk)
     begin
-        if(!reset_n) begin
+        if(!reset_n)
             rx[0] = `CPU_XLEN'b0;
-            rx[2] = `CPU_XLEN'h7fff0;
-        end else begin
+        else
+        begin
             rs1_dat = rx[rs1_idx];
             rs2_dat = rx[rs2_idx];
             if(rd_wen && rd_idx!=`CPU_GREGIDX_WIDTH'b0)

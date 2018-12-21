@@ -7,6 +7,14 @@
 *.userosscache
 *.sln.docstates
 
+# test file
+kernel_test
+
+# build file
+*.bin
+*.dump
+tools/*.mif
+
 #vscode settings
 .vscode/
 #compiled-tex
