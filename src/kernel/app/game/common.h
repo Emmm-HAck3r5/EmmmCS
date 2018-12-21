@@ -18,7 +18,7 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:22:56
+  Last Modified: 2018-12-21 21:35:14
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -45,6 +45,7 @@
 #define D_TRIANGLE 0x12
 typedef struct sprite_t
 {
+    u8 id;
     u8 width;
     u8 length;
     u8 x;
@@ -56,6 +57,6 @@ typedef struct sprite_t
     u8 *pixels;
 } sprite_t;
 
-sprite_t *sprite_create(u8 w, u8 l, u8 x, u8 y, u8 p_w, u8 p_l, u8 p_x, u8 p_y, u8 *pxs);
+sprite_t *sprite_create(u8 w, u8 l, u8 x, u8 y, u8 p_w, u8 p_l, u8 p_x, u8 p_y, u8 *pxs, u8 i);
 void sprite_destroy(sprite_t *spr);
 #endif

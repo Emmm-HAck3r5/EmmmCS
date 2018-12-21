@@ -18,7 +18,7 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:15:19
+  Last Modified: 2018-12-21 21:17:45
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -32,6 +32,6 @@ void srand(u32 seed)
 }
 u32 rand(void)
 {
-    rand_seed = (rand_seed * 31 + 13) % ((1 << 31) - 1);
+    rand_seed = (rand_seed * 31 + 13) % (((u32)1 << 31) - 1);
     return rand_seed;
 }

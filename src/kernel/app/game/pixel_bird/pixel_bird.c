@@ -13,26 +13,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: objects.h
+  File: pixel_bird.c
   Project: EmmmCS
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 21:38:16
+  Last Modified: 2018-12-21 21:36:30
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#ifndef GAME_PB_OBJECTS_H
-#define GAME_PB_OBJECTS_H
+#include "objects.h"
 
-#include "../common.h"
+int pixel_bird(void)
+{
 
-#define BIRD_X 10
-#define BIRD_PHY_X 11
-#define BIRD_ACT_UP 0
-#define BIRD_ACT_DOWN 1
-u8 *tube_pixels_generate(int l, int w);
-void tube_pixels_destroy(u8 *tube);
-
-void scene_create(void);
-#endif
+}

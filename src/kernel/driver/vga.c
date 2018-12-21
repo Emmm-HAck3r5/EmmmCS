@@ -18,15 +18,15 @@
   File Created: 2018-12-04 22:42:36
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 21:10:25
+  Last Modified: 2018-12-21 21:46:04
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "vga.h"
 #include "../klib/mem.h"
 static u16 * const vga_mem = (u16 *)0x80004;
 
-static u8 *const cursor_x = (u8 *)0x812C0;
-static u8 *const cursor_y = (u8 *)0x812C1;
+static u8 *const cursor_x = (u8 *)0x812C4;
+static u8 *const cursor_y = (u8 *)0x812C5;
 
 void vga_init()
 {
