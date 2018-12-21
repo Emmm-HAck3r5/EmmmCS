@@ -13,21 +13,21 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: mm.h
+  File: intr.c
   Project: EmmmCS
   File Created: 2018-12-21 10:17:05
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:14:31
+  Last Modified: 2018-12-21 16:49:47
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "intr.h"
-#include "../riscv_asm.h"
 
 static void *intr_handlers[INTR_COUNT];
 
-void intr_init(void){
+void intr_init(void)
+{
     write_csr(mtvec, intr_handlers);
 }
 
@@ -37,17 +37,22 @@ void intr_handler_register(u8 intrno, void *handler)
         intr_handlers[intrno] = handler;
 }
 
-void intr_on(void){
+void intr_on(void)
+{
     write_csr(mie, 1);
 }
-void intr_off(void){
+void intr_off(void)
+{
     write_csr(mie, 0);
 }
-void intr(void){
+void intr(void)
+{
+    intr_off();
     u32 intrno;
     read_csr(mcause, intrno);
     if(intrno < INTR_COUNT)
         (*(void (*)(void))(&intr_handlers[intrno]))();
+    intr_on();
     __asm__ volatile("mret");
 }
 // static u8* intr_args = (u8*)INDR_ADDR;

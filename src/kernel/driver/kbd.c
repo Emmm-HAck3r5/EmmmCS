@@ -1,10 +1,34 @@
+/*
+  Copyright 2018 EmmmHackers
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  --------------------------
+  File: kbd.c
+  Project: EmmmCS
+  File Created: 2018-12-21 10:17:05
+  Author: Chen Haodong (easyai@outlook.com)
+          Xie Nairong (jujianai@hotmail.com)
+  --------------------------
+  Last Modified: 2018-12-21 16:49:41
+  Modified By: Chen Haodong (easyai@outlook.com)
+ */
 #include "kbd.h"
 #include "../intr/intr.h"
-#include "../mm/mm.h"
 
-static u8* kbd_buf;
-static u32 kbd_ptr = 0, kbd_ptr_r = 0;;
+// static u8* kbd_buf;
+// static u32 kbd_ptr = 0, kbd_ptr_r = 0;;
 
+static u8 kbd_buf;
 static const u8 scan_to_ascii[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x60, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x71, 0x31, 0x00, 0x00, 0x00, 0x7A, 0x73, 0x61, 0x77, 0x32, 0x00,
@@ -16,28 +40,44 @@ static const u8 scan_to_ascii[] = {
     0x30, 0x2E, 0x32, 0x35, 0x36, 0x38, 0x00, 0x00, 0x00, 0x2B, 0x33, 0x2C, 0x2A, 0x39, 0x00, 0x00
 };
 
-void kbd_init(){
-    kbd_buf = (u8*)mm_alloc(KBD_BUF_SIZE);
+void kbd_init(void)
+{
+    intr_handler_register(KBD_INTR, kbd_handler);
 }
 
-void kbd_update(u8* args){
-    if (args[0] == 1){
-        kbd_buf[kbd_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
-        args[0] = 0;
-        kbd_ptr++;
-    }
-    return;
+void kbd_handler(void)
+{
+    read_csr(mtval, kbd_buf);
 }
 
-u8 kbd_getc(){
-    u8 ret = 0;
-    intr_open();
-    while(1){
-        if (kbd_ptr != kbd_ptr_r){
-            ret = kbd_buf[kbd_ptr_r % KBD_BUF_SIZE];
-            kbd_ptr_r++;
-            break;
-        }
-    }
-    return ret;
+u8 kbd_getc(void)
+{
+    u8 key = kbd_buf;
+    kbd_buf = 0;
+    return key;
 }
+// void kbd_init(){
+//     kbd_buf = (u8*)mm_alloc(KBD_BUF_SIZE);
+// }
+
+// void kbd_update(u8* args){
+//     if (args[0] == 1){
+//         kbd_buf[kbd_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
+//         args[0] = 0;
+//         kbd_ptr++;
+//     }
+//     return;
+// }
+
+// u8 kbd_getc(){
+//     u8 ret = 0;
+//     intr_open();
+//     while(1){
+//         if (kbd_ptr != kbd_ptr_r){
+//             ret = kbd_buf[kbd_ptr_r % KBD_BUF_SIZE];
+//             kbd_ptr_r++;
+//             break;
+//         }
+//     }
+//     return ret;
+// }

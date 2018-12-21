@@ -13,24 +13,31 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: mm.h
+  File: intr.h
   Project: EmmmCS
   File Created: 2018-12-21 10:17:05
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 10:44:41
+  Last Modified: 2018-12-21 16:49:53
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef KERNEL_INTR_H
 #define KERNEL_INTR_H
 
 #include "../typedef.h"
+#include "../riscv_asm.h"
 
 #define INTR_COUNT 3
 #define FATAL_ERROR 0x0
 #define KBD_INTR 0x1
 #define TIMER_INTR 0x2
+
+void intr_init(void);
+void intr_handler_register(u8 intrno, void *handler);
+void intr_on(void);
+void intr_off(void);
+void intr(void);
 //#define INDR_ADDR 0x7fffc
 
 //void intr_init();
