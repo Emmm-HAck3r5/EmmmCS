@@ -37,6 +37,9 @@ module cpu_gregs(
     output reg [`CPU_XLEN-1:0] rs2_dat,
     input [`CPU_XLEN-1:0] rd_dat,
 
+    input backup,
+    input restore,
+
     //DEBUG
     output [6:0] HEX0,
     output [6:0] HEX1,
@@ -84,6 +87,7 @@ seg7_h s5(
 
 
    reg [`CPU_XLEN-1:0] rx [`CPU_GREG_COUNT-1:0];
+   reg [`CPU_XLEN-1:0] rx_back [`CPU_GREG_COUNT-1:0];
 //
 //        seg7_h s2(
 //    .en(1'b1),
@@ -96,12 +100,19 @@ seg7_h s5(
 //    .in(rx[1][7:4]),
 //    .hex(HEX3)
 //);
+integer i;
 
-    always @(posedge clk)
+   always @(posedge clk)
     begin
         if(!reset_n) begin
             rx[0] = `CPU_XLEN'b0;
             rx[2] = `CPU_XLEN'h7fff0;
+        end else if (backup) begin
+            for (i = 0; i < `CPU_GREG_COUNT; i = i + 1)
+                rx_back[i] = rx[i];
+        end else if (restore) begin
+            for (i = 0; i < `CPU_GREG_COUNT; i = i + 1)
+                rx[i] = rx_back[i];
         end else begin
             rs1_dat = rx[rs1_idx];
             rs2_dat = rx[rs2_idx];
