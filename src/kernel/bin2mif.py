@@ -21,7 +21,10 @@ if __name__ == "__main__":
         write_head(File)
         with open(conf['filename'], "rb") as Bin:
             for i in range(0, conf['word_bin']):
-                num = struct.unpack('H', Bin.read(2))[0]
-                File.write('{:x} : {:x};\n'.format(i, num))
+                try:
+                    num = struct.unpack('H', Bin.read(2))[0]
+                    File.write('{:x} : {:x};\n'.format(i, num))
+                except:
+                    pass
             File.write('[{:x}..{:x}] : 0;\n'.format(conf['word_bin'], conf['word_count'] - 1))
             File.write('END;\n')

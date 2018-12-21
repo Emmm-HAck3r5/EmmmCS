@@ -32,13 +32,26 @@ void init(void);
 
 int main(void)
 {
-    // led_on(0);
     // init();
-    u32* a = 0x10000;
-    u32 b;
+    // led_on(1);
+    // u32* ptr = 0x80000;
+    // *ptr = 0x3;
+    // u16* ptr2 = 0x80010;
+    // *ptr2 = 0x7031;
+    // while (1){
+    //     vga_putc(0x70, 'f');
+    // }
+    led_on(1);
+    int i = 0;
+    u16* ptr_char = 0x80004;
+    for (i = 0; i < 0x81000; i++){
+        *(ptr_char + i) = 0x7031;
+    }
+    u16* ptr_cur = 0x812C4;
+    *ptr_cur = 0x21;
+
     while(1){
-        *a = 0x55555555;
-        b = *a;
+        ;
     }
     return 0;
 }

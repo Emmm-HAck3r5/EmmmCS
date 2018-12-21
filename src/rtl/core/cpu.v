@@ -199,7 +199,7 @@ cpu_bus bus(
     .READY(bus_ready),
     .rdata(bus_rdata),
 
-    .LEDR(),
+    .LEDR(LEDR),
     .VGA_BLANK_N(VGA_BLANK_N),
     .VGA_B(VGA_B),
     .VGA_CLK(VGA_CLK),
@@ -286,19 +286,20 @@ seg7_h s5(
    .hex(HEX5)
 );
 
-assign LEDR[0] = bus_wlen[0];
-assign LEDR[1] = bus_wlen[1];
-assign LEDR[2] = bus_en_n;
-assign LEDR[3] = bus_ready;
-assign LEDR[6:4] = decoder_funct[2:0];
+// assign LEDR[0] = bus_wlen[0];
+// assign LEDR[1] = bus_wlen[1];
+// assign LEDR[2] = bus_en_n;
+// assign LEDR[3] = bus_ready;
+// assign LEDR[6:4] = decoder_funct[2:0];
 ////////////////////////////////////////
 
 wire clk_1s;
-clkgen_module #(1000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+clkgen_module #(250000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
-
+wire clk_real;
+assign clk_real = clk_1s;
 // main logic
-always @(posedge clk_1s) begin
+always @(posedge clk_real) begin
     if (!KEY[0]) begin
         pc     <= 0;
         status <= `STATUS_INIT;

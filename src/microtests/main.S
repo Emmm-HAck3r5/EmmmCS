@@ -18,6 +18,7 @@ main:
 	addi a2, a2, 2
 	j main
 
+
 .section .rodata
 msg:
 	.string "fuck"
