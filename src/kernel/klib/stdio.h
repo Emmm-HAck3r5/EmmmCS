@@ -5,8 +5,9 @@
 
 char  getchar();
 char* gets(char* str);
+int getn();
 
-int   putchar(char cha);
+int putchar(char cha);
 int   puts(const char* str);
 void  putn(u32 n, u8 mode);
 int   putchar_color(u8 color, char cha);
