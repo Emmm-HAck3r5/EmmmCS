@@ -18,10 +18,7 @@
 `define STATUS_MEM_WRITE      `STATUS_LEN'd10
 `define STATUS_MEM_WRITING    `STATUS_LEN'd11
 `define STATUS_BRANCH         `STATUS_LEN'd12
-`define STATUS_BACKUP         `STATUS_LEN'd14
-`define STATUS_RESTORE        `STATUS_LEN'd15
-
-`define INTR_ADDR `CPU_XLEN'h0x7fffc
+`define STATUS_INTR_ON_OFF         `STATUS_LEN'd14
 
 module cpu(
     input 		     [3:0]		KEY,
@@ -73,6 +70,8 @@ wire [`CPU_GREGIDX_WIDTH-1:0] gregs_rd_idx;
 wire [`CPU_XLEN-1:0] gregs_rs1_dat;
 wire [`CPU_XLEN-1:0] gregs_rs2_dat;
 reg  [`CPU_XLEN-1:0] gregs_rd_dat;
+reg gregs_backup;
+reg gregs_restore;
 
 // alu
 reg  [`CPU_XLEN-1:0] alu_src_A;
@@ -127,13 +126,9 @@ reg flag_branch;
 // status
 reg [`STATUS_LEN-1 : 0] status;
 
-reg greg_back_flag; //1=backing 0=not backing
-reg greg_restore_flag; //1=restoring 0=not restoring
 reg [`CPU_GREGIDX_WIDTH : 0] greg_back_no;
-reg [`CPU_XLEN-1 : 0]        greg_backup [`CPU_GREGIDX_WIDTH : 0];
 reg is_intring;
 reg IF;
-reg [`CPU_XLEN-1 : 0] idtr;
 
 //=======================================================
 //  Structural coding
@@ -170,6 +165,9 @@ cpu_gregs gregs(
     .rs2_dat (gregs_rs2_dat),
     .rd_dat  (gregs_rd_dat),
 
+    .backup(gregs_backup),
+    .restore(gregs_restore),
+
     .HEX0(),
 	.HEX1(),
 	.HEX2(),
@@ -201,7 +199,7 @@ cpu_bus bus(
     .READY(bus_ready),
     .rdata(bus_rdata),
 
-    .LEDR(LEDR),
+    .LEDR(),
     .VGA_BLANK_N(VGA_BLANK_N),
     .VGA_B(VGA_B),
     .VGA_CLK(VGA_CLK),
@@ -229,6 +227,27 @@ cpu_instr_decoder decoder(
     .fp_fmt(decoder_fp_fmt)
 );
 
+//========================================
+//  CSRs
+//========================================
+
+`define CSR_READ  3'b001
+`define CSR_WRITE 3'b010
+
+`define CSR_MTVEC 3'h305
+`define CSR_MIE 3'h304
+`define CSR_MCAUSE 3'h342
+`define CSR_MSCRATCH 3'h340
+
+reg [`CPU_XLEN-1 : 0] csr_mtvec;
+reg [`CPU_XLEN-1 : 0] csr_mie;
+reg [`CPU_XLEN-1 : 0] csr_mcause;
+reg [`CPU_XLEN-1 : 0] csr_mscratch;
+
+//========================================
+//
+//========================================
+
 /////////////////////////////////////////
 
 seg7_h s0(
@@ -245,39 +264,42 @@ seg7_h s1(
 
 seg7_h s2(
     .en(1'b1),
-    .in(gregs_rd_dat[3:0]),
+    .in(pc[11:8]),
     .hex(HEX2)
 );
 
 seg7_h s3(
     .en(1'b1),
-    .in(gregs_rd_dat[7:4]),
+    .in(pc[15:12]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(gregs_rd_dat[11:8]),
+    .in(gregs_rs1_dat[3:0]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(gregs_rd_dat[15:12]),
+   .in(gregs_rs1_dat[7:4]),
    .hex(HEX5)
 );
 
-// assign LEDR[0] = bus_ready;
-// assign LEDR[1] = bus_en_n;
+assign LEDR[0] = bus_wlen[0];
+assign LEDR[1] = bus_wlen[1];
+assign LEDR[2] = bus_en_n;
+assign LEDR[3] = bus_ready;
+assign LEDR[6:4] = decoder_funct[2:0];
 ////////////////////////////////////////
 
 wire clk_1s;
-clkgen_module #(8) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+clkgen_module #(1000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
 
 // main logic
 always @(posedge clk_1s) begin
-    if (! KEY[0]) begin
+    if (!KEY[0]) begin
         pc     <= 0;
         status <= `STATUS_INIT;
         gregs_wen <= 0;
@@ -291,26 +313,23 @@ always @(posedge clk_1s) begin
             if (SW[0]) begin
                 status <= `STATUS_INIT;
             end else begin
+                gregs_restore <= 0;
                 flag_alu   <= 0;
                 flag_reg_write  <= 0;
                 flag_mem_read   <= 0;
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1 && ps2_ready) begin
+                if (is_intring == 0 && IF == 1 && 0) begin
+                    gregs_backup <= 1;
                     pc_back = pc;
-                    greg_back_flag = 1;
-                    status = `STATUS_BACKUP;
-                    greg_back_no = 0;
+                    status = `STATUS_INTR_ON_OFF;
                     is_intring = 1;
                     flag_branch <= 1;
-                    pc_nxt = idtr;
-                    flag_mem_write <= 1;
-                    bus_wlen    = `BUS_WRITE_32;
-                    bus_address = idtr;
-                    bus_wdata   = {8'h0, ps2_kbcode, 16'h0101}; // temp: return scancode instead of ascii
+                    pc_nxt = csr_mtvec;
+                    // TODO: Add data to CSR
                 end else begin
-                    greg_back_flag <= 0;
+                    gregs_backup <= 0;
                     status <= `STATUS_FETCHING_INSTR;
                 end
             end
@@ -387,6 +406,7 @@ always @(posedge clk_1s) begin
                         `CPU_INSTR_GRP_STORE:  begin
                             flag_mem_write <= 1;
                             bus_address    <= gregs_rs1_dat + decoder_imm;
+                            bus_wdata <= gregs_rs2_dat;
                             case (decoder_funct[2:0])
                                 3'b000: bus_wlen <= `BUS_WRITE_8;
                                 3'b001: bus_wlen <= `BUS_WRITE_16;
@@ -433,23 +453,49 @@ always @(posedge clk_1s) begin
                             status <= `STATUS_ALU;
                         end
                         `CPU_INSTR_GRP_FENCE:  begin
+                            status <= `STATUS_INIT;
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
                             case(decoder_funct[2:0])
-                                3'b001:
+                                3'b000: begin
+                                    is_intring <= 0;
+                                    gregs_restore <= 1;
+                                    pc <= pc_back;
+                                    pc_nxt <= pc_back;
+                                    flag_branch <= 1;
+                                    status <= `STATUS_INTR_ON_OFF;
+                                end
+                                `CSR_READ: begin
+                                    flag_reg_write <= 1;
+                                    status <= `STATUS_REG_WRITE;
                                     case(decoder_imm)
-                                        12'h040: idtr = gregs_rs1_dat;  // fake sidt
-                                        12'h041: IF = gregs_rs1_dat[0]; // fake [open,close]_intr()
-                                        12'h042: begin // fake MRET
-                                            pc = pc_back;
-                                            greg_restore_flag = 1;
-                                            status = `STATUS_RESTORE;
-                                            greg_back_no = 0;
-                                        end
+                                        `CSR_MCAUSE:
+                                            gregs_rd_dat <= csr_mcause;
+                                        `CSR_MIE:
+                                            gregs_rd_dat <= {31'b0, IF};
+                                        `CSR_MTVEC:
+                                            gregs_rd_dat <= csr_mtvec;
+                                        `CSR_MSCRATCH:
+                                            gregs_rd_dat <= csr_mscratch;
                                         default:
-                                            status = `STATUS_BRANCH;
+                                            gregs_rd_dat <= 32'b0;
                                     endcase
+                                end
+                                `CSR_WRITE: begin
+                                    status <= `STATUS_BRANCH;
+                                    case(decoder_imm)
+                                        `CSR_MCAUSE:
+                                            csr_mcause <= gregs_rs1_dat;
+                                        `CSR_MIE:
+                                            IF <= gregs_rs1_dat[0];
+                                        `CSR_MTVEC:
+                                            csr_mtvec <= gregs_rs1_dat;
+                                        `CSR_MSCRATCH:
+                                            csr_mscratch <= gregs_rs1_dat;
+                                    endcase
+                                end
+
                                 default:
                                     status = `STATUS_BRANCH;
                             endcase
@@ -487,7 +533,7 @@ always @(posedge clk_1s) begin
 
             `STATUS_MEM_READ:   begin
                 if (flag_mem_read) begin
-                    bus_en_n = `BUS_RUN;
+                    bus_en_n = 0;
                     status = `STATUS_MEM_READING;
                 end else begin
                     status <= `STATUS_ALU;
@@ -551,12 +597,12 @@ always @(posedge clk_1s) begin
                 status <= `STATUS_REG_WRITE_POST;
             end
             `STATUS_REG_WRITE_POST:   begin
-                gregs_wen <= 0;
+                gregs_wen = 0;
                 status <= `STATUS_BRANCH;
             end
             `STATUS_MEM_WRITE:  begin
                 if (flag_mem_write) begin
-                    bus_en_n = `BUS_RUN;
+                    bus_en_n = 0;
                     status = `STATUS_MEM_WRITING;
                 end else begin
                     status <= `STATUS_BRANCH;
@@ -565,7 +611,7 @@ always @(posedge clk_1s) begin
             `STATUS_MEM_WRITING:    begin
                 bus_en_n = 1;
                 if (flag_mem_write) begin
-                    if (bus_ready == `BUS_STOP) begin
+                    if (bus_ready == 1) begin
                         status <= `STATUS_BRANCH;
                     end else begin
                         status <= `STATUS_MEM_WRITING;
@@ -582,35 +628,10 @@ always @(posedge clk_1s) begin
                 end
                 status <= `STATUS_INIT;
             end
-            `STATUS_BACKUP: begin
-                if (greg_back_flag) begin
-                    greg_backup[greg_back_no] = gregs_rs1_dat;
-                    if (greg_back_no <= 8'hff) begin
-                        greg_back_no = greg_back_no + 1;
-                        status = `STATUS_BACKUP;
-                    end else begin
-                        greg_back_flag = 0;
-                        status = `STATUS_MEM_WRITE;
-                    end
-                end else begin
-                    status <= `STATUS_INIT;
-                end
-            end
-            `STATUS_RESTORE:begin
-                if (greg_restore_flag) begin
-                    if (greg_back_no <= 8'hff) begin
-                        greg_back_no = greg_back_no + 1;
-                        gregs_rd_dat = greg_backup[greg_back_no];
-                    end else begin
-                        greg_restore_flag = 0;
-                        status = `STATUS_BRANCH;
-                        pc_nxt = pc_back;
-                        flag_branch = 1;
-                        is_intring = 0;
-                    end
-                end else begin
-                    status <= `STATUS_INIT;
-                end
+            `STATUS_INTR_ON_OFF: begin
+                gregs_backup <= 0;
+                gregs_restore <= 0;
+                status <= `STATUS_BRANCH;
             end
             default: begin
                 status = `STATUS_INIT;

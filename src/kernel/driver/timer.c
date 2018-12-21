@@ -13,26 +13,36 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: kbd.h
+  File: timer.c
   Project: EmmmCS
-  File Created: 2018-12-21 10:17:05
+  File Created: 2018-12-21 17:08:40
   Author: Chen Haodong (easyai@outlook.com)
-          Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:51:26
+  Last Modified: 2018-12-21 17:18:36
   Modified By: Chen Haodong (easyai@outlook.com)
  */
-#ifndef DRIVER_KBD_H
-#define DRIVER_KBD_H
-#include "../typedef.h"
 
-void kbd_init(void);
-void kbd_handler(void);
-u8 kbd_getc(void);
-//#define KBD_BUF_SIZE 256
+#include "timer.h"
+#include "../intr/intr.h"
+static void (*tick_handler)(void);
 
-//void kbd_init();
-//void kbd_update();
-//u8   kbd_getc();
+void timer_init(void)
+{
+    intr_handler_register(TIMER_INTR, timer_handler);
+}
 
-#endif
+void timer_handler(void)
+{
+    if(tick_handler)
+        tick_handler();
+}
+
+void tick_handler_register(void *handler)
+{
+    tick_handler = (void (*)(void))handler;
+}
+
+void tick_handler_unregister(void)
+{
+    tick_handler = (void (*)(void))NULL;
+}

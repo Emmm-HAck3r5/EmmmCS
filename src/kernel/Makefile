@@ -16,7 +16,9 @@ kernel: $(OBJS)
 
 dump: kernel
 	$(OD) -D kernel > kernel.dump \
-	&& $(CP) -S --set-section-flags .bss=alloc,contents -O binary kernel kernel.bin
+	&& $(CP) -S --set-section-flags .bss=alloc,contents -O binary kernel kernel.bin \
+	&& python3 bin2mif.py \
+	&& cp cache.mif ../rtl/memory/
 
 $(OBJS): typedef.h
 

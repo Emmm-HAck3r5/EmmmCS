@@ -32,9 +32,14 @@ void init(void);
 
 int main(void)
 {
-    init();
-    while(1)
-        ;
+    // led_on(0);
+    // init();
+    u32* a = 0x10000;
+    u32 b;
+    while(1){
+        *a = 0x55555555;
+        b = *a;
+    }
     return 0;
 }
 
