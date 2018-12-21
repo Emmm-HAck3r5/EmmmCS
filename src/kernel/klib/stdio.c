@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:49:33
+  Last Modified: 2018-12-21 16:58:03
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "stdio.h"
@@ -38,15 +38,37 @@ char getchar(){
 char* gets(char* str){
     char* ptr = str;
     while (1){
-        *ptr = kbd_getc();
+        *ptr = getchar();
         if (*ptr == '\n')
             break;
-        else if(*ptr == 0)
-            continue;
         ptr++;
     }
     *ptr = '\0';
     return str;
+}
+
+int getn()
+{
+    int n = 0;
+    char c;
+    u8 st = 1;
+    while(1)
+    {
+        n *= 10;
+        c = getchar();
+        if(c == '-' && (st & 0x1))
+            st ^= 0x3;
+        else if(c >= '0' && c <='9')
+            n += c - '0';
+        else
+        {
+            n /= 10;
+            break;
+        }
+    }
+    if(st & 0x2)
+        n = -n;
+    return n;
 }
 
 int putchar(char cha){
