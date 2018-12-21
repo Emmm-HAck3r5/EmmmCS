@@ -7,13 +7,13 @@
 \section{中断控制}
 
 \subsubsection{初始化}
-通过写入 \texttt{0x40} 号 csr mtvec，设置中断处理向量表。
+通过写入mtvec寄存器，设置中断处理向量表。
 
 \subsubsection{打开中断}
-通过给 \texttt{0x41} 号 csr mie 赋值为 1，打开中断。
+通过给mie寄存器赋值为 1，打开中断。
 
 \subsubsection{关闭中断}
-通过给 \texttt{0x41} 号 csr mie 赋值为 0，关闭中断。
+通过给mie寄存器赋值为 0，关闭中断。
 
 \subsubsection{中断返回}
 通过MRET指令，从中断中返回。
