@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:42:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-18 16:20:39
+  Last Modified: 2018-12-21 21:56:48
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_VGA_H

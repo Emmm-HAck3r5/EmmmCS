@@ -18,13 +18,14 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 21:47:41
+  Last Modified: 2018-12-21 22:05:30
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
 #include "objects.h"
 
 static u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
+static u8 bird_color[3] = {VGA_F_CYAN, VGA_F_BLUE, VGA_F_RED};
 static sprite_t* sprite_array[9];
 
 u8 *tube_pixels_generate(int l, int w)
@@ -44,5 +45,5 @@ static void bird_create(void)
 }
 void scene_create(void)
 {
-
+      
 }
