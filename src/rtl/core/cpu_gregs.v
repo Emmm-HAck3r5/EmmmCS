@@ -106,7 +106,6 @@ integer i;
     begin
         if(!reset_n) begin
             rx[0] = `CPU_XLEN'b0;
-            rx[2] = `CPU_XLEN'h7fff0;
         end else if (backup) begin
             for (i = 0; i < `CPU_GREG_COUNT; i = i + 1)
                 rx_back[i] = rx[i];
