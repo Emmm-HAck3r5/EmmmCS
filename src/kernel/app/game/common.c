@@ -18,12 +18,12 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:28:17
+  Last Modified: 2018-12-22 21:33:44
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
 #include "common.h"
-sprite_t *sprite_create(u8 w, u8 l, u8 x, u8 y, u8 p_w, u8 p_l, u8 p_x, u8 p_y, u8 *pxs)
+sprite_t *sprite_create(u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y, u8 *pxs)
 {
     sprite_t *spr = (sprite_t *)malloc(sizeof(sprite_t));
     spr->width = w;

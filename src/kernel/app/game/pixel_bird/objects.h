@@ -18,7 +18,7 @@
   File Created: 2018-12-22 20:24:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:25:34
+  Last Modified: 2018-12-22 21:00:55
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -26,12 +26,12 @@
 #define GAME_PB_OBJECTS_H
 #include "../common.h"
 
-#define BIRD_X 10
-#define BIRD_PHY_X 11
+#define BIRD_X 5
+#define BIRD_PHY_X 6
 #define BIRD_ACT_UP 0
 #define BIRD_ACT_DOWN 1
 u8 *tube_pixels_generate(int l, int w);
 void tube_pixels_destroy(u8 *tube);
 
-void scene_create(void);
+extern u8 bird[2][3];
 #endif

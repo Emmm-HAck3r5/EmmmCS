@@ -13,28 +13,30 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: objects.c
+  File: physics.h
   Project: EmmmCS
-  File Created: 2018-12-21 19:44:05
+  File Created: 2018-12-22 20:30:47
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:53:31
+  Last Modified: 2018-12-22 20:45:57
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
+#ifndef GAME_PB_PHYSICS_H
+#define GAME_PB_PHYSICS_H
+
 #include "objects.h"
 
-u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
+//gravity acceleration
+#define PB_PHY_G 1
+typedef struct pb_rigid_body_t
+{
+    int x_speed;
+    int y_speed;
+    sprite_t *spr;
+} pb_rigid_body_t;
 
-u8 *tube_pixels_generate(int l, int w);
-void tube_pixels_destroy(u8 *tube);
-u8 *tube_pixels_generate(int l, int w)
-{
-      u8 *pixel = (u8 *)malloc(sizeof(u8) * l * w);
-      memset(pixel, SOLID_SQUARE, l * w);
-      return pixel;
-}
-void tube_pixels_destroy(u8 *tube)
-{
-      free(tube);
-}
+pb_rigid_body_t* pb_rigid_body_create(u8 x_s, u8 y_s, sprite_t *spr);
+void pb_rigid_body_destroy(pb_rigid_body_t *body);
+void pb_physics_update(pb_rigid_body_t *bodys, u8 sz);
+#endif
