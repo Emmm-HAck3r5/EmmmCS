@@ -203,7 +203,7 @@ cpu_bus bus(
     .READY(bus_ready),
     .rdata(bus_rdata),
 
-    .LEDR(LEDR),
+    .LEDR(),
     .VGA_BLANK_N(VGA_BLANK_N),
     .VGA_B(VGA_B),
     .VGA_CLK(VGA_CLK),
@@ -235,13 +235,10 @@ cpu_instr_decoder decoder(
 //  CSRs
 //========================================
 
-`define CSR_READ  3'b001
-`define CSR_WRITE 3'b010
-
-`define CSR_MTVEC 3'h305
-`define CSR_MIE 3'h304
-`define CSR_MCAUSE 3'h342
-`define CSR_MSCRATCH 3'h340
+`define CSR_MTVEC 12'h305
+`define CSR_MIE 12'h304
+`define CSR_MCAUSE 12'h342
+`define CSR_MSCRATCH 12'h340
 
 reg [`CPU_XLEN-1 : 0] csr_mtvec;
 reg [`CPU_XLEN-1 : 0] csr_mie;
@@ -272,21 +269,45 @@ seg7_h s2(
     .hex(HEX2)
 );
 
+// seg7_h s3(
+//     .en(1'b1),
+//     .in(pc[15:12]),
+//     .hex(HEX3)
+// );
+
+// seg7_h s3(
+//     .en(1'b1),
+//     .in(csr_mcause[3:0]),
+//     .hex(HEX3)
+// );
+
+// seg7_h s4(
+//     .en(1'b1),
+//     .in(csr_mscratch[3:0]),
+//     .hex(HEX4)
+// );
+
+// seg7_h s5(
+//    .en(1'b1),
+//    .in(csr_mtvec[3:0]),
+//    .hex(HEX5)
+// );
+
 seg7_h s3(
     .en(1'b1),
-    .in(alu_src_A[3:0]),
+    .in(csr_mtvec[3:0]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(alu_src_B[3:0]),
+    .in(csr_mtvec[7:4]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(alu_dest[3:0]),
+   .in(csr_mtvec[11:8]),
    .hex(HEX5)
 );
 
@@ -294,16 +315,28 @@ seg7_h s5(
 // assign LEDR[1] = bus_wlen[1];
 // assign LEDR[2] = bus_en_n;
 // assign LEDR[3] = bus_ready;
-// assign LEDR[6:4] = decoder_funct[2:0];
+assign LEDR[4:0] = decoder_dec_instr_info[12:8];
+assign LEDR[9:7] = decoder_funct[2:0];
 ////////////////////////////////////////
 
-wire clk_1s;
-clkgen_module #(2500000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+reg [9:0] LEDR_reg;
 
-wire clk_real;
-assign clk_real = clk_1s;
+// assign LEDR[`STATUS_LEN-1:0] = status;
+// assign LEDR[`STATUS_LEN] = IF;
+// assign LEDR[`STATUS_LEN+1] = is_intring;
+// assign LEDR[9:7] = LEDR_reg[9:7];
+
+wire clk_slow;
+clkgen_module #(100) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_slow));
+
+wire clk_fast;
+clkgen_module #(10000000) cursorclk2(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_fast));
+
+wire clk_cpu;
+assign clk_cpu = SW[1] ? clk_slow : clk_fast;
+
 // main logic
-always @(posedge clk_real) begin
+always @(posedge clk_cpu) begin
     if (!KEY[0]) begin
         pc     <= 0;
         status <= `STATUS_INIT;
@@ -330,8 +363,6 @@ always @(posedge clk_real) begin
                     pc_back = pc;
                     status = `STATUS_INTR_HANDEL;
                     is_intring = 1;
-                    flag_branch <= 1;
-                    pc_nxt = csr_mtvec;
                     // TODO: Add data to CSR
                 end else begin
                     gregs_backup <= 0;
@@ -465,6 +496,7 @@ always @(posedge clk_real) begin
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
+                            LEDR_reg[9:7] <= decoder_funct[2:0];
                             case(decoder_funct[2:0])
                                 3'b000: begin
                                     is_intring <= 0;
@@ -474,7 +506,7 @@ always @(posedge clk_real) begin
                                     flag_branch <= 1;
                                     status <= `STATUS_INTR_OFF;
                                 end
-                                `CSR_READ: begin
+                                3'b010: begin
                                     flag_reg_write <= 1;
                                     status <= `STATUS_REG_WRITE;
                                     case(decoder_imm[11:0])
@@ -485,13 +517,12 @@ always @(posedge clk_real) begin
                                         `CSR_MTVEC:
                                             gregs_rd_dat <= csr_mtvec;
                                         `CSR_MSCRATCH:
-                                            gregs_rd_dat <= 32'h35;
-                                            // gregs_rd_dat <= csr_mscratch;
+                                            gregs_rd_dat <= csr_mscratch;
                                         default:
                                             gregs_rd_dat <= 32'b0;
                                     endcase
                                 end
-                                `CSR_WRITE: begin
+                                3'b001: begin //rw
                                     status <= `STATUS_BRANCH;
                                     case(decoder_imm[11:0])
                                         `CSR_MCAUSE:
@@ -502,6 +533,19 @@ always @(posedge clk_real) begin
                                             csr_mtvec <= gregs_rs1_dat;
                                         `CSR_MSCRATCH:
                                             csr_mscratch <= gregs_rs1_dat;
+                                    endcase
+                                end
+                                3'b101: begin //rwi
+                                    status <= `STATUS_BRANCH;
+                                    case(decoder_imm[11:0])
+                                        `CSR_MCAUSE:
+                                            csr_mcause <= {{27{1'b0}}, gregs_rs1_idx};
+                                        `CSR_MIE:
+                                            IF <= gregs_rs1_idx[0];
+                                        `CSR_MTVEC:
+                                            csr_mtvec <= {{27{1'b0}}, gregs_rs1_idx};
+                                        `CSR_MSCRATCH:
+                                            csr_mscratch <= {{27{1'b0}}, gregs_rs1_idx};
                                     endcase
                                 end
 
@@ -656,10 +700,19 @@ always @(posedge clk_real) begin
                 status <= `STATUS_BRANCH;
             end
             `STATUS_INTR_HANDEL: begin
+                if (1) begin // Case kbd
+                    flag_branch <= 1;
+                    pc_nxt = csr_mtvec;
+                    status <= `STATUS_INTR_KBD;
+                    csr_mcause <= 1;
+                    csr_mscratch <= 32'h33;
+
+                end else begin
+                    flag_branch <= 0;
+                    status <= `STATUS_BRANCH;
+                end
                 gregs_backup <= 0;
-                csr_mcause <= 1;
-                csr_mscratch <= 32'h33;
-                status <= `STATUS_BRANCH;
+
             end
             `STATUS_INTR_KBD: begin
                 status <= `STATUS_BRANCH;
