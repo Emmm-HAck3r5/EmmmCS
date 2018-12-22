@@ -188,16 +188,27 @@ void vga_putn(u8 color, u32 n, u8 mode)
             return;
         }
         u8 skip_zero = TRUE;
+        // for(u8 i = 0;i <= 28;i+=4)
+        // {
+        //     u8 tmp = (n >> (28 - i)) & 0xF;
+        //     if(tmp == 0 && skip_zero)
+        //         continue;
+        //     skip_zero = FALSE;
+        //     if(tmp >=0xA)
+        //         vga_putc(color, tmp - 0xA + 'A');
+        //     else
+        //         vga_putc(color, tmp + '0');
+        // }
         for (s8 i = 28; i >= 0;i-=4)
         {
-            u8 tmp = (n >> i) & 0xF;
-            if(tmp == 0 && skip_zero)
-                continue;
-            skip_zero = FALSE;
-            if(tmp >=0xA)
-                vga_putc(color, tmp - 0xA + 'A');
-            else
-                vga_putc(color, tmp + '0');
+           u8 tmp = (n >> i) & 0xF;
+           if(tmp == 0 && skip_zero)
+               continue;
+           skip_zero = FALSE;
+           if(tmp >=0xA)
+               vga_putc(color, tmp - 0xA + 'A');
+           else
+               vga_putc(color, tmp + '0');
         }
     }
 }

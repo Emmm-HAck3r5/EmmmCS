@@ -23,12 +23,13 @@
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "kbd.h"
+#include "vga.h"  //tmp
 #include "../intr/intr.h"
 
 // static u8* kbd_buf;
 // static u32 kbd_ptr = 0, kbd_ptr_r = 0;;
 
-static u8 kbd_buf;
+static u32 kbd_buf;
 static const u8 scan_to_ascii[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x60, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x71, 0x31, 0x00, 0x00, 0x00, 0x7A, 0x73, 0x61, 0x77, 0x32, 0x00,
@@ -49,11 +50,14 @@ void kbd_handler(void)
 {
     // kbd_buf = read_csr(mtval);
     read_csr(mscratch, kbd_buf);
+    vga_putn(0x70, kbd_buf, VGA_N_HEX);
 }
 
 u8 kbd_getc(void)
 {
     u8 key = kbd_buf;
+    // u8 key = scan_to_ascii[kbd_buf];
+    // vga_putc(0x70, key);
     kbd_buf = 0;
     return key;
 }

@@ -47,12 +47,12 @@ void intr_off(void)
 }
 void intr(void)
 {
-    intr_off();
+    // intr_off();
     u32 intrno;
     read_csr(mcause, intrno);
     if(intrno < INTR_COUNT)
         (*(void (*)(void))(&intr_handlers[intrno]))();
-    intr_on();
+    // intr_on();
     __asm__ volatile("mret");
 }
 // static u8* intr_args = (u8*)INDR_ADDR;

@@ -3,22 +3,26 @@
 `include "alu_define.v"
 
 // cpu status
-`define STATUS_LEN 4
+`define STATUS_LEN 5
 `define STATUS_INIT           `STATUS_LEN'd0
 `define STATUS_FETCHING_INSTR `STATUS_LEN'd1
 `define STATUS_DECODING_INSTR `STATUS_LEN'd2
 `define STATUS_SET_FLAG       `STATUS_LEN'd3
+`define STATUS_REG_WRITE_POST `STATUS_LEN'd4
 `define STATUS_MEM_READ       `STATUS_LEN'd5
 `define STATUS_MEM_READING    `STATUS_LEN'd6
 `define STATUS_ALU            `STATUS_LEN'd7
-`define STATUS_ALU_2          `STATUS_LEN'd13
 `define STATUS_ALUING         `STATUS_LEN'd8
 `define STATUS_REG_WRITE      `STATUS_LEN'd9
-`define STATUS_REG_WRITE_POST `STATUS_LEN'd4
 `define STATUS_MEM_WRITE      `STATUS_LEN'd10
 `define STATUS_MEM_WRITING    `STATUS_LEN'd11
 `define STATUS_BRANCH         `STATUS_LEN'd12
-`define STATUS_INTR_ON_OFF         `STATUS_LEN'd14
+`define STATUS_ALU_2          `STATUS_LEN'd13
+`define STATUS_INTR_OFF    `STATUS_LEN'd14
+`define STATUS_INTR_HANDEL    `STATUS_LEN'd15
+`define STATUS_INTR_KBD       `STATUS_LEN'd16
+
+
 
 module cpu(
     input 		     [3:0]		KEY,
@@ -270,19 +274,19 @@ seg7_h s2(
 
 seg7_h s3(
     .en(1'b1),
-    .in(pc[15:12]),
+    .in(alu_src_A[3:0]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(gregs_rs1_dat[3:0]),
+    .in(alu_src_B[3:0]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(gregs_rs1_dat[7:4]),
+   .in(alu_dest[3:0]),
    .hex(HEX5)
 );
 
@@ -294,7 +298,7 @@ seg7_h s5(
 ////////////////////////////////////////
 
 wire clk_1s;
-clkgen_module #(250000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+clkgen_module #(2500000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
 wire clk_real;
 assign clk_real = clk_1s;
@@ -321,10 +325,10 @@ always @(posedge clk_real) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1 && 0) begin
+                if (is_intring == 0 && IF == 1) begin
                     gregs_backup <= 1;
                     pc_back = pc;
-                    status = `STATUS_INTR_ON_OFF;
+                    status = `STATUS_INTR_HANDEL;
                     is_intring = 1;
                     flag_branch <= 1;
                     pc_nxt = csr_mtvec;
@@ -388,9 +392,12 @@ always @(posedge clk_real) begin
                                 3'b100:  flag_branch <= (gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
                                                         ((gregs_rs1_dat[31] == gregs_rs2_dat[31]) &&
                                                          (gregs_rs1_dat     <  gregs_rs2_dat));
-                                3'b101:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
-                                                        ((gregs_rs1_dat[31] != gregs_rs2_dat[31]) ||
-                                                         (gregs_rs1_dat     >= gregs_rs2_dat));
+                                // 3'b101:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
+                                //                         ((gregs_rs1_dat[31] != gregs_rs2_dat[31]) ||
+                                //                          (gregs_rs1_dat     >= gregs_rs2_dat));
+                                3'b101: flag_branch <=  !((gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
+                                                        ((gregs_rs1_dat[31] == gregs_rs2_dat[31]) &&
+                                                         (gregs_rs1_dat     <  gregs_rs2_dat)));
                                 3'b110: flag_branch <= (gregs_rs1_dat <  gregs_rs2_dat);
                                 3'b111: flag_branch <= (gregs_rs1_dat >= gregs_rs2_dat);
                                 default:  flag_branch <= 0;
@@ -465,12 +472,12 @@ always @(posedge clk_real) begin
                                     pc <= pc_back;
                                     pc_nxt <= pc_back;
                                     flag_branch <= 1;
-                                    status <= `STATUS_INTR_ON_OFF;
+                                    status <= `STATUS_INTR_OFF;
                                 end
                                 `CSR_READ: begin
                                     flag_reg_write <= 1;
                                     status <= `STATUS_REG_WRITE;
-                                    case(decoder_imm)
+                                    case(decoder_imm[11:0])
                                         `CSR_MCAUSE:
                                             gregs_rd_dat <= csr_mcause;
                                         `CSR_MIE:
@@ -478,14 +485,15 @@ always @(posedge clk_real) begin
                                         `CSR_MTVEC:
                                             gregs_rd_dat <= csr_mtvec;
                                         `CSR_MSCRATCH:
-                                            gregs_rd_dat <= csr_mscratch;
+                                            gregs_rd_dat <= 32'h35;
+                                            // gregs_rd_dat <= csr_mscratch;
                                         default:
                                             gregs_rd_dat <= 32'b0;
                                     endcase
                                 end
                                 `CSR_WRITE: begin
                                     status <= `STATUS_BRANCH;
-                                    case(decoder_imm)
+                                    case(decoder_imm[11:0])
                                         `CSR_MCAUSE:
                                             csr_mcause <= gregs_rs1_dat;
                                         `CSR_MIE:
@@ -502,7 +510,7 @@ always @(posedge clk_real) begin
                             endcase
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
-                            //NOT SUPPORT
+                            flag_alu <= 1;
                             flag_reg_write <= 1;
                             alu_src_A <= gregs_rs1_dat;
                             alu_src_B <= gregs_rs2_dat;
@@ -545,14 +553,28 @@ always @(posedge clk_real) begin
                 if (flag_mem_read) begin
                     if (bus_ready == `BUS_STOP) begin
                         case (decoder_funct[2:0])
-                            3'b000:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
+                            3'b000:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= (bus_rdata[7] == 0) ?
                                             {{24{1'b0}}, bus_rdata[7:0]} :
                                             {{24{1'b1}}, bus_rdata[7:0]};
-                            3'b001:  gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                else
+                                    gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                            {{24{1'b0}}, bus_rdata[15:8]} :
+                                            {{24{1'b1}}, bus_rdata[15:8]};
+
+                            3'b001: gregs_rd_dat <= (bus_rdata[15] == 0) ?
                                             {{16{1'b0}}, bus_rdata[15:0]} :
                                             {{16{1'b1}}, bus_rdata[15:0]};
-                            3'b010:  gregs_rd_dat <= bus_rdata;
-                            3'b100: gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+
+                            3'b010: gregs_rd_dat <= bus_rdata;
+
+                            3'b100:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+                                else
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[15:8]};
+
                             3'b101: gregs_rd_dat <= {{16{1'b0}}, bus_rdata[15:0]};
                         endcase
                         status <= `STATUS_REG_WRITE;
@@ -629,9 +651,17 @@ always @(posedge clk_real) begin
                 end
                 status <= `STATUS_INIT;
             end
-            `STATUS_INTR_ON_OFF: begin
-                gregs_backup <= 0;
+            `STATUS_INTR_OFF: begin
                 gregs_restore <= 0;
+                status <= `STATUS_BRANCH;
+            end
+            `STATUS_INTR_HANDEL: begin
+                gregs_backup <= 0;
+                csr_mcause <= 1;
+                csr_mscratch <= 32'h33;
+                status <= `STATUS_BRANCH;
+            end
+            `STATUS_INTR_KBD: begin
                 status <= `STATUS_BRANCH;
             end
             default: begin
