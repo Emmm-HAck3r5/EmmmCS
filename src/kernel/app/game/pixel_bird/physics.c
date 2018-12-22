@@ -13,28 +13,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: objects.c
+  File: physics.c
   Project: EmmmCS
-  File Created: 2018-12-21 19:44:05
+  File Created: 2018-12-22 20:30:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:53:31
+  Last Modified: 2018-12-22 21:28:49
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#include "objects.h"
+#include "physics.h"
 
-u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
-
-u8 *tube_pixels_generate(int l, int w);
-void tube_pixels_destroy(u8 *tube);
-u8 *tube_pixels_generate(int l, int w)
+pb_rigid_body_t *pb_rigid_body_create(u8 x_s, u8 y_s, sprite_t *spr)
 {
-      u8 *pixel = (u8 *)malloc(sizeof(u8) * l * w);
-      memset(pixel, SOLID_SQUARE, l * w);
-      return pixel;
+    pb_rigid_body_t *body = (pb_rigid_body_t *)malloc(sizeof(pb_rigid_body_t));
+    body->x_speed = x_s;
+    body->y_speed = y_s;
+    body->spr = spr;
 }
-void tube_pixels_destroy(u8 *tube)
+void pb_rigid_body_destroy(pb_rigid_body_t *body)
 {
-      free(tube);
+    free(body);
 }
