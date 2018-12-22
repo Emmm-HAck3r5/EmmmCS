@@ -13,37 +13,25 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: objects.c
+  File: objects.h
   Project: EmmmCS
-  File Created: 2018-12-21 19:44:05
+  File Created: 2018-12-22 20:24:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:26:02
+  Last Modified: 2018-12-22 20:25:34
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
-#include "objects.h"
+#ifndef GAME_PB_OBJECTS_H
+#define GAME_PB_OBJECTS_H
+#include "../common.h"
 
-static u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
-static sprite_t *sprite_array[9];
-
+#define BIRD_X 10
+#define BIRD_PHY_X 11
+#define BIRD_ACT_UP 0
+#define BIRD_ACT_DOWN 1
 u8 *tube_pixels_generate(int l, int w);
 void tube_pixels_destroy(u8 *tube);
-u8 *tube_pixels_generate(int l, int w)
-{
-      u8 *pixel = (u8 *)malloc(sizeof(u8) * l * w);
-      memset(pixel, SOLID_SQUARE, l * w);
-      return pixel;
-}
-void tube_pixels_destroy(u8 *tube)
-{
-      free(tube);
-}
 
-static void bird_create(void)
-{
-      sprite_array[0] = sprite_create(3, 1, BIRD_X, 15, 1, 1, BIRD_PHY_X, 15, bird[0], 0);
-}
-void scene_create(void)
-{
-}
+void scene_create(void);
+#endif

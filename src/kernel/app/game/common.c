@@ -18,7 +18,7 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 19:55:18
+  Last Modified: 2018-12-22 20:28:17
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -39,4 +39,15 @@ sprite_t *sprite_create(u8 w, u8 l, u8 x, u8 y, u8 p_w, u8 p_l, u8 p_x, u8 p_y, 
 void sprite_destroy(sprite_t *spr)
 {
     free(spr);
+}
+void sprite_draw(sprite_t *spr, u8 color)
+{
+    int i, j;
+    for (i = 0; i < spr->length; ++i)
+    {
+        for (j = 0; j < spr->width; ++j)
+        {
+            vga_writec(color, spr->pixels[i * spr->width + j], spr->x + j, spr->y - i);
+        }
+    }
 }
