@@ -270,19 +270,19 @@ seg7_h s2(
 
 seg7_h s3(
     .en(1'b1),
-    .in(pc[15:12]),
+    .in(alu_src_A[3:0]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(gregs_rs1_dat[3:0]),
+    .in(alu_src_B[3:0]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(gregs_rs1_dat[7:4]),
+   .in(alu_dest[3:0]),
    .hex(HEX5)
 );
 
@@ -294,7 +294,7 @@ seg7_h s5(
 ////////////////////////////////////////
 
 wire clk_1s;
-clkgen_module #(250000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+clkgen_module #(2500000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
 
 wire clk_real;
 assign clk_real = clk_1s;
@@ -502,7 +502,7 @@ always @(posedge clk_real) begin
                             endcase
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
-                            //NOT SUPPORT
+                            flag_alu <= 1;
                             flag_reg_write <= 1;
                             alu_src_A <= gregs_rs1_dat;
                             alu_src_B <= gregs_rs2_dat;
@@ -545,14 +545,28 @@ always @(posedge clk_real) begin
                 if (flag_mem_read) begin
                     if (bus_ready == `BUS_STOP) begin
                         case (decoder_funct[2:0])
-                            3'b000:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
+                            3'b000:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= (bus_rdata[7] == 0) ?
                                             {{24{1'b0}}, bus_rdata[7:0]} :
                                             {{24{1'b1}}, bus_rdata[7:0]};
-                            3'b001:  gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                else
+                                    gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                            {{24{1'b0}}, bus_rdata[15:8]} :
+                                            {{24{1'b1}}, bus_rdata[15:8]};
+
+                            3'b001: gregs_rd_dat <= (bus_rdata[15] == 0) ?
                                             {{16{1'b0}}, bus_rdata[15:0]} :
                                             {{16{1'b1}}, bus_rdata[15:0]};
-                            3'b010:  gregs_rd_dat <= bus_rdata;
-                            3'b100: gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+
+                            3'b010: gregs_rd_dat <= bus_rdata;
+
+                            3'b100:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+                                else
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[15:8]};
+
                             3'b101: gregs_rd_dat <= {{16{1'b0}}, bus_rdata[15:0]};
                         endcase
                         status <= `STATUS_REG_WRITE;

@@ -25,8 +25,8 @@
 #include "../klib/mem.h"
 static u16 * const vga_mem = (u16 *)0x80004;
 
-static u8 *const cursor_x = (u8 *)0x812C5;
-static u8 *const cursor_y = (u8 *)0x812C4;
+static u8 *const cursor_x = (u8 *)0x812C4;
+static u8 *const cursor_y = (u8 *)0x812C5;
 
 void vga_init()
 {
