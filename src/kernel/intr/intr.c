@@ -51,7 +51,7 @@ void intr(void)
     u32 intrno;
     read_csr(mcause, intrno);
     if(intrno < INTR_COUNT)
-        (*(void (*)(void))(&intr_handlers[intrno]))();
+        (*(void (*)(void))(intr_handlers[intrno]))();
     // intr_on();
     __asm__ volatile("mret");
 }
