@@ -18,12 +18,12 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 20:16:58
+  Last Modified: 2018-12-22 20:17:00
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
 #ifndef GAME_PB_OBJECTS_H
 #define GAME_PB_OBJECTS_H
 
-#include "common.h"
+#include "../scommon.h"
 #endif
