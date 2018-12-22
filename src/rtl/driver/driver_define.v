@@ -18,7 +18,7 @@
   File Created: 2018-11-27 22:10:44
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-11-27 22:14:26
+  Last Modified: 2018-12-22 14:27:21
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -28,5 +28,5 @@
 //display
 `define DP_X_ADDR_WIDTH 8
 `define DP_Y_ADDR_WIDTH 5
-`define DP_REG_WIDTH 128
+`define DP_REG_WIDTH 16
 `define DP_COLOR_WIDTH 4
