@@ -25,5 +25,5 @@
 #ifndef GAME_PB_OBJECTS_H
 #define GAME_PB_OBJECTS_H
 
-#include "common.h"
+#include "../common.h"
 #endif

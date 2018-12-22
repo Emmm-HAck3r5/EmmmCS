@@ -23,14 +23,17 @@
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "stdio.h"
+#include "../intr/intr.h"
 #include "../driver/kbd.h"
 #include "../driver/vga.h"
 
 char getchar(){
+    intr_on();
     u8 c;
     while(1)
         if((c=kbd_getc())!=0)
             return c;
+    intr_off();
     //FATAL ERROR
     return 0;
 }
