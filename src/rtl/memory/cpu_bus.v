@@ -1,3 +1,47 @@
+`define YAMM_IDLE 0
+`define YAMM_1BYTE 1
+`define YAMM_2BYTE 2
+`define YAMM_3BYTE 3
+`define YAMM_4BYTE 4
+`define YAMM_FINISHED 5
+
+`define YAMM_VGA_MEM_OPR 6
+`define YAMM_VGA_REG_OPR 7
+`define YAMM_LED_OPR 8
+`define YAMM_MEM_OPR 9
+
+`define YAMM_VGA_MEM_OPR_FIN 10
+`define YAMM_VGA_MEM_REG_FIN 11
+`define YAMM_LED_OPR_FIN 12
+`define YAMM_1BYTE_FIN 13
+`define YAMM_2BYTE_FIN 14
+`define YAMM_3BYTE_FIN 15
+`define YAMM_4BYTE_FIN 16
+
+`define YAMM_MODE_R32 0
+`define YAMM_MODE_W8 1
+`define YAMM_MODE_W16 2
+`define YAMM_MODE_W32 3
+
+`define YAMM_MEM 0
+`define YAMM_VGA_MEM 1
+`define YAMM_LED_MEM 2
+
+//hard coded
+`define YAMM_MEM_BEGIN 32'h0
+`define YAMM_MEM_END 32'h80000
+`define YAMM_VGA_MEM_BEGIN 32'h80004
+`define YAMM_VGA_MEM_END 32'h812C4
+`define YAMM_VGA_REG_BEGIN 32'h812C4
+`define YAMM_VGA_REG_END 32'h812C6
+`define YAMM_LED_MEM_BEGIN 32'h80000
+`define YAMM_LED_MEM_END 32'h80002
+
+//hard coded
+`define YAMM_LED_ADDR1 32'h80000
+`define YAMM_LED_ADDR2 32'h80001
+`define YAMM_VGA_CURSOR_X 32'h812C4
+`define YAMM_VGA_CURSOR_Y 32'h812C5
 module cpu_bus(
 	input 						clk,
 	input						reset_n,
