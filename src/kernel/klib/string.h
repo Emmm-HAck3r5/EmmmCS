@@ -30,5 +30,10 @@
 int strcmp(const char *s1, const char *s2);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
-u32 strlen(char *s);
+u32 strlen(const char *s);
+
+char* strtok(char* str, const char delim);
+char* find(char* str, const char* targets);
+int str2int(const char *str, const char* end);
+
 #endif
