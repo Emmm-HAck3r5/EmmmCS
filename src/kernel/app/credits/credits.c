@@ -18,7 +18,7 @@
   File Created: 2018-12-23 12:51:46
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 18:00:05
+  Last Modified: 2018-12-23 18:23:04
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
@@ -46,7 +46,7 @@ static void update_anime()
         int idx = i * 33;
         for (int j = 47; j < 80; j++)
         {
-            vga_writec(0x07, (char)anime_frame[cur_frame][idx + j], j, i);
+            vga_writec(0x07, (char)anime_frame[cur_frame][idx + j - 47], j, i);
         }
     }
     cur_frame = (cur_frame + 1) % 18;
