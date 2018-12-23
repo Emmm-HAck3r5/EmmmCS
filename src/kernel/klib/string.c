@@ -47,10 +47,53 @@ char *strcat(char *dest, const char *src)
     strcpy(tmp_dest, src);
     return dest;
 }
-u32 strlen(char *s)
+u32 strlen(const char *s)
 {
     u32 count = 0;
     while ((*s++) != '\0')
         count++;
     return count;
+}
+
+char* strtok(char* str, const char delim)
+{
+	static char* ptr = NULL;
+	if (str != NULL) ptr = str;
+	if (ptr == NULL) return NULL; // failed
+	if (*ptr == '\0') return NULL;
+
+	char* token_head = ptr;
+	while(*ptr != delim && *ptr != '\0') ptr++;
+	if (*ptr == delim) {
+		*ptr = '\0';
+		ptr++;
+	}
+
+	return token_head;
+}
+
+char* find(char* str, const char* targets){
+	int rptr = 0;
+	int tlen = strlen(targets);
+	while(str[rptr] != '\0') {
+		for(int i = 0; i < tlen; i++)
+			if (str[rptr] == targets[i])
+				return str + rptr;
+		rptr++;
+	}
+	return str + rptr;
+}
+
+int str2int(const char *str, const char* end)
+{
+	int rptr = 0, res = 0;
+	const char ASCII_ZERO = 0x30;
+	while(str[rptr] != '\0' && (str + rptr) != end)
+	{
+		char c = str[rptr];
+		res *= 10;
+		res += (c - ASCII_ZERO);
+		rptr++;
+	}
+	return res;
 }

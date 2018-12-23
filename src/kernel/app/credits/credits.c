@@ -18,7 +18,7 @@
   File Created: 2018-12-23 12:51:46
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 16:42:25
+  Last Modified: 2018-12-23 17:43:53
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
@@ -36,17 +36,17 @@ static int cur_data_print;
 static BOOL is_refresh;
 static void credits_tick()
 {
-    cur_anime_time = (cur_anime_time + 1) & 0x7;
-    cur_time = (cur_time + 1) & 0x3FF;
+    cur_anime_time = (cur_anime_time + 1) & 0x3FF;
+    cur_time = (cur_time + 1) & 0x3FFF;
 }
 static void update_anime()
 {
     for (int i = 0; i < 30;i++)
     {
-        int idx = i * 80;
+        int idx = i * 33;
         for (int j = 47; j < 80; j++)
         {
-            vga_writec(anime_frame[cur_frame][idx + j] >> 8, (char)anime_frame[cur_frame][idx + j], j, i);
+            vga_writec(0x07, (char)anime_frame[cur_frame][idx + j], j, i);
         }
     }
     cur_frame = (cur_frame + 1) % 18;
@@ -184,6 +184,7 @@ static void print_pos()
 }
 int credits(void)
 {
+    vga_clean();
     cur_frame = 0;
     cur_time = 0;
     cur_anime_time = 0;
@@ -205,6 +206,7 @@ int credits(void)
                 else if (cur_pos_print == 13 && cur_data_print < 38)
                 {
                     vga_force_scroll(0, 47);
+                    ++cur_data_print;
                 }
                 else
                 {
@@ -227,7 +229,10 @@ int credits(void)
         }
         if(cur_anime_time == 0)
             update_anime();
+        if(kbd_getc()=='q')
+            break;
     }
+    credits_exit();
 }
 
 void credits_exit()
