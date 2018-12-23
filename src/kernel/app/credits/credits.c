@@ -18,7 +18,7 @@
   File Created: 2018-12-23 12:51:46
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 17:29:11
+  Last Modified: 2018-12-23 17:31:22
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
@@ -201,9 +201,6 @@ int credits(void)
                 if (cur_pos_print < 13)
                 {
                     print_pos();
-                    vga_putn(0x70, cur_pos_print, VGA_N_U_DEC);
-                    vga_putc(0x07, ' ');
-                    vga_putn(0x70, cur_data_print, VGA_N_U_DEC);
                     vga_force_scroll(0, 47);
                 }
                 else if (cur_pos_print == 13 && cur_data_print < 38)
