@@ -4,7 +4,6 @@
 #include "../typedef.h"
 
 char  getchar();
-char  getchar_silence();
 char* gets(char* str);
 int getn();
 

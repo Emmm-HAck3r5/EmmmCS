@@ -94,7 +94,10 @@ void vga_putc(u8 color, char c)
     {
     case 0x08:// \b
         if(*cursor_x)
+        {
             --(*cursor_x);
+            *(vga_mem + *cursor_y * VGA_CHAR_X_SIZE + *cursor_x) = 0x0020;
+        }
         else
         {
             if(*cursor_y)

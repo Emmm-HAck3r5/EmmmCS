@@ -12,8 +12,8 @@
 void sh(){
     while (1){
         vga_puts(0x02, "EmmmCS>");
-        vga_puts(0x01, "~");
         vga_puts(VGA_F_RED|VGA_B_BLACK, "(DEBUG)");
+        vga_puts(0x01, "~");
         vga_puts(0x07, "$ ");
         char tmp[101];
         gets(tmp);
@@ -26,6 +26,8 @@ void sh(){
             credits();
         }else if (strcmp(tmp, "fuck") == 0){
             vga_puts(0x40, "Fuck you\n");
+        }else if (strcmp(tmp, "uname") == 0){
+            vga_puts(0x07, "EmmmOS EmmmCS 1.0.0-273-Emmm_Hackers RISC-V\n");
         }else if (strcmp(tmp, "clear") == 0){
             vga_init();
         }else if (strcmp(tmp, "eval") == 0){
@@ -35,6 +37,8 @@ void sh(){
             vga_puts(VGA_F_RED|VGA_B_BLACK, ex);
             vga_puts(VGA_F_RED|VGA_B_BLACK, "\n");
             vga_putn(VGA_F_RED|VGA_B_BLACK, eval(ex), VGA_N_S_DEC);
+        }else if (strcmp(tmp, "exit") == 0){
+            return;
         }else if (strcmp(tmp, "bc") == 0){
             sh_bc();
         }else if (tmp[0] == '\0'){

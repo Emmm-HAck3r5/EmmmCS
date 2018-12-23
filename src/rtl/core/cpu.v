@@ -387,7 +387,8 @@ always @(posedge clk_cpu) begin
                 cpu_clk <= 0;
 
                 if (is_intring == 0 && IF == 1) begin
-                    if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
+                    if (ps2_kbcode != 0) begin
+                    // if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
                         gregs_backup <= 1;
                         pc_back = pc;
                         status = `STATUS_INTR_HANDEL;
@@ -545,7 +546,7 @@ always @(posedge clk_cpu) begin
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
-                            
+
                             case(decoder_funct[2:0])
                                 3'b000: begin
                                     is_intring <= 0;
