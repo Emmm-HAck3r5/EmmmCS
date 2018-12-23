@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:42:36
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:15:48
+  Last Modified: 2018-12-23 15:49:53
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "vga.h"
@@ -94,7 +94,10 @@ void vga_putc(u8 color, char c)
     {
     case 0x08:// \b
         if(*cursor_x)
+        {
             --(*cursor_x);
+            *(vga_mem + *cursor_y * VGA_CHAR_X_SIZE + *cursor_x) = 0x0020;
+        }
         else
         {
             if(*cursor_y)
@@ -136,7 +139,12 @@ void vga_putc(u8 color, char c)
         *cursor_x = 0;
         ++(*cursor_y);
     }
-    scroll();
+    // scroll();
+    if (*cursor_y >= 30){
+        vga_force_scroll(0, 47);
+        *cursor_x = 0;
+        *cursor_y = 29;
+    }
 }
 void vga_puts(u8 color, const char *str)
 {
@@ -218,5 +226,19 @@ void vga_clean(void)
     {
         //black space
         *(vga_mem + i) = 0x0020;
+    }
+}
+
+void vga_force_scroll(int begin,int end)
+{
+    if(end <= begin)
+        return;
+    for (int i = 0; i < VGA_CHAR_Y_SIZE - 1;i++)
+    {
+        memmove((vga_mem + i * VGA_CHAR_X_SIZE + begin), (vga_mem + (i + 1) * VGA_CHAR_X_SIZE + begin), (end - begin) * sizeof(u16));
+    }
+    for (int i = begin; i < end;i++)
+    {
+        *(vga_mem + 29 * VGA_CHAR_X_SIZE + i) = 0x0020;
     }
 }

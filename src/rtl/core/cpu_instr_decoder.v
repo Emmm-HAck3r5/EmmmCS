@@ -78,10 +78,13 @@ module cpu_instr_decoder(
             `OPCODE_WIDTH'b0000011:begin instr_type = `INSTR_TYPE_I; instr_info = `CPU_INSTR_GRP_LOAD; end//LOAD
             `OPCODE_WIDTH'b0100011:begin instr_type = `INSTR_TYPE_S; instr_info = `CPU_INSTR_GRP_STORE; end//STORE
             `OPCODE_WIDTH'b0010011:begin instr_type = `INSTR_TYPE_I; instr_info = `CPU_INSTR_GRP_ALUI; end//ALUI
-            `OPCODE_WIDTH'b0110011:begin instr_type = `INSTR_TYPE_R; instr_info = `CPU_INSTR_GRP_ALU; end//ALU
+            `OPCODE_WIDTH'b0110011:begin
+                instr_type = `INSTR_TYPE_R;
+                instr_info = (instr[25] == 0 ? `CPU_INSTR_GRP_ALU : `CPU_INSTR_GRP_MULDIV);
+            end//ALU
             `OPCODE_WIDTH'b0001111:begin instr_type = `INSTR_TYPE_I; instr_info = `CPU_INSTR_GRP_FENCE; end//FENCE
             `OPCODE_WIDTH'b1110011:begin instr_type = `INSTR_TYPE_I; instr_info = `CPU_INSTR_GRP_E_CSR; end//ECALL,EBREAK,CSR
-            `OPCODE_WIDTH'b0110011:begin instr_type = `INSTR_TYPE_R; instr_info = `CPU_INSTR_GRP_MULDIV; end//[M]
+            // `OPCODE_WIDTH'b0110011:begin instr_type = `INSTR_TYPE_R; instr_info = `CPU_INSTR_GRP_MULDIV; end//[M]
             //[F]
             `OPCODE_WIDTH'b0000111:begin instr_type = `INSTR_TYPE_I; instr_info = `CPU_INSTR_GRP_F_FLW; end//FLW
             `OPCODE_WIDTH'b0100111:begin instr_type = `INSTR_TYPE_S; instr_info = `CPU_INSTR_GRP_F_FSW; end//FSW

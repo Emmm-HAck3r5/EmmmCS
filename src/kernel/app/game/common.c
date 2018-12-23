@@ -34,11 +34,22 @@ sprite_t *sprite_create(u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y, 
     spr->phy_length = p_l;
     spr->phy_x = p_x;
     spr->phy_y = p_y;
-    spr->pixels = pxs;
+    //spr->pixels = pxs;
 }
 void sprite_destroy(sprite_t *spr)
 {
     free(spr);
+}
+void sprite_clear(sprite_t *spr)
+{
+        int i, j;
+    for (i = 0; i < spr->length; ++i)
+    {
+        for (j = 0; j < spr->width; ++j)
+        {
+            vga_writec(0x07, ' ', spr->x + j,29 - ( spr->y + i));
+        }
+    }
 }
 void sprite_draw(sprite_t *spr, u8 color)
 {
@@ -47,7 +58,7 @@ void sprite_draw(sprite_t *spr, u8 color)
     {
         for (j = 0; j < spr->width; ++j)
         {
-            vga_writec(color, spr->pixels[i * spr->width + j], spr->x + j, spr->y - i);
+            vga_writec(color, spr->pixels[i * spr->width + j], spr->x + j, 29 - ( spr->y + i));
         }
     }
 }

@@ -5,7 +5,7 @@ conf = {
     'output': "cache.mif",
     'word_len': 16,
     'word_count': 262144,
-    'word_bin': 0x10000
+    'word_bin': 0x80000
 }
 
 def write_head(File):

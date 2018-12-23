@@ -18,13 +18,13 @@
   File Created: 2018-12-23 12:51:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 13:48:41
+  Last Modified: 2018-12-23 17:31:09
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 const char *const credits_position[] =
 {
     "Project Director",
-    "Quality Assurancce"
+    "Quality Assurance",
     "System Architect",
     "Technical Director",
     "Art Director",
@@ -32,9 +32,9 @@ const char *const credits_position[] =
     "Software Engineers",
     "UI Designers",
     "Core Contributers",
-    "Testers"
-    "Simulation Engineer",
-    "Special Thanks"
+    "Testers",
+    "Simulation Engineers",
+    "Special Thanks",
     "Copyrights"
 };
 
