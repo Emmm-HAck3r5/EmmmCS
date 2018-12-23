@@ -81,8 +81,9 @@ int empty(Stack* st) {
 	return (st->size <= 0);
 }
 
-int raise_error()
+int raise_error(int* error)
 {
+	*error = 1;
 #ifdef STD_DEBUG
 	printf("Error. Program terminated.\n");
 #else
@@ -170,7 +171,7 @@ int operator_exec(char opr, int lopd, int ropd)
 	return 0;
 }
 
-int stack_calculate(Token* stream, int size)
+int stack_calculate(Token* stream, int size, int* error)
 {
 	int val = 0;
 	Stack opd, opr;
@@ -194,12 +195,12 @@ int stack_calculate(Token* stream, int size)
 				char sym = top(&opr).symbol; pop(&opr);
 				if (sym == '(' || sym == ')') continue;
 
-				if (opd.size < 2) return raise_error();
+				if (opd.size < 2) return raise_error(error);
 				int ropd = top(&opd).value; pop(&opd);
 				int lopd = top(&opd).value; pop(&opd);
 				if (sym == '/' || sym == '%')
 					if (ropd == 0)
-						return raise_error();
+						return raise_error(error);
 				int res = operator_exec(sym, lopd, ropd);		// do 'lopd opr ropd' 
 				Token r = { 
 					.ascii = 0, 
@@ -211,7 +212,7 @@ int stack_calculate(Token* stream, int size)
 		}
 		i++;
 	}
-	if (opd.size >= 2) return raise_error();
+	if (opd.size >= 2) return raise_error(error);
 	val = opd.mem[0].value;
 
 #ifdef STD_DEBUG
@@ -225,20 +226,18 @@ int stack_calculate(Token* stream, int size)
 	return val;
 }
 
-int eval(const char* express)
+int eval(const char* express, int* error)
 {
 	int len = strlen(express);
 	char* epr = epr_cpy(express, len);
 
 	if (check_epr_invalid(express, len))
-		return raise_error(); 
-#ifdef STD_DEBUG
+		return raise_error(error); 
 	Token* stream = (Token*)malloc(sizeof(Token) * len);
-#else
-	Token* stream = (Token*)mm_alloc(sizeof(Token) * len);
-#endif // STD_DEBUG
+
 	int stack_size = build_stream(epr, len, stream);
 
+	int val = stack_calculate(stream, stack_size, error);
 #ifdef STD_DEBUG
 	free(epr);
 	free(stream);
@@ -247,6 +246,6 @@ int eval(const char* express)
 	mm_dealloc(stream);
 #endif // STD_DEBUG
 
-	return stack_calculate(stream, stack_size);
+	return val;
 }
 
