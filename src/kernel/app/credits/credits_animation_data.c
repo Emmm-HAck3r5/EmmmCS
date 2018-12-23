@@ -18,11 +18,11 @@
   File Created: 2018-12-23 12:51:31
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 18:12:28
+  Last Modified: 2018-12-23 18:24:02
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
-static u16 anime_frame[][990] = 
+u16 anime_frame[][990] = 
 {
 /*width:33, length:30*/
 {
