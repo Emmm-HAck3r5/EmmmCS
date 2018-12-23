@@ -28,12 +28,14 @@
 #include "../driver/vga.h"
 
 char getchar(){
+    // vga_puts(0x07, "Hit getchar\n");
     intr_on();
     u8 c;
     while(1)
-        if((c=kbd_getc())!=0)
+        if((c=kbd_getc())!=0){
+            intr_off();
             return c;
-    intr_off();
+        }
     //FATAL ERROR
     return 0;
 }

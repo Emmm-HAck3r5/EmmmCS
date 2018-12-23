@@ -26,7 +26,9 @@
 #include "driver/vga.h"
 #include "driver/kbd.h"
 #include "mm/mm.h"
-#include "intr/intr.h".
+
+#include "intr/intr.h"
+#include "riscv_asm.h"
 
 #include "klib/stdio.h"
 
@@ -34,37 +36,19 @@ void init(void);
 
 int main(void)
 {
-    // init();
-    // led_on(1);
-    // u32* ptr = 0x80000;
-    // *ptr = 0x3;
-    // u16* ptr2 = 0x80010;
-    // *ptr2 = 0x7031;
-    // while (1){
-    //     vga_putc(0x70, 'f');
-    // // }
-    // led_on(1);
-    // int i = 0;
-    // u16* ptr_char = 0x80004;
-    // for (i = 0; i < 0x81000; i++){
-    //     *(ptr_char + i) = 0x7031;
-    // }
-    // u16* ptr_cur = 0x812C4;
-    // *ptr_cur = 0x21;
     init();
-    // vga_putn(0x70, i, VGA_N_HEX);
-    // vga_putn(0x70, i-3>=0, VGA_N_HEX);
-    // vga_putn(0x70, i-3, VGA_N_HEX);
-        // vga_putn(0x07, i >= 0, VGA_N_HEX);
-        // vga_puts(0x07, "\t");
-        // vga_putn(0x07, i, VGA_N_HEX);
-        // vga_puts(0x07, "\n");
-        // if (a > 8){
-        //     break;
-        // }
-    vga_putn(0x07, 0x123ff, VGA_N_HEX);
-    while(1){
-        getchar();
+    vga_puts(0x07, "Welcome to EmmmCS!\n");
+    vga_puts(0x02, "forewing@EmmmCS:");
+    vga_puts(0x01, "~$ ");
+    int i;
+    for (i = 0; i < 10; i++){
+        vga_putc(0x70, getchar());
+    }
+    while (1){
+        // vga_puts(0x07, "\nc= ");
+        char str[100];
+        gets(str);
+        vga_puts(0x70, str);
     }
     return 0;
 }

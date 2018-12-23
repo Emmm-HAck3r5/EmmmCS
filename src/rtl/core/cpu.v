@@ -60,9 +60,9 @@ module cpu(
 //=======================================================
 
 //ps2
-wire ps2_proc;
+// wire ps2_proc;
 wire ps2_ready;
-wire ps2_ovf;
+// wire ps2_ovf;
 wire [7:0] ps2_kbcode;
 wire [7:0] scan2ascii_ascii;
 
@@ -145,17 +145,25 @@ kbd_scan2ascii s2a(
 );
 
 // ps2 kbd
-keyboard_ctrl kbd(
-    .RST_N    (clr_n),
-    .PROC     (ps2_proc),
-    .READY    (ps2_ready),
-    .OVERFLOW (ps2_ovf),
-    .kbcode   (ps2_kbcode),
-    .CLOCK_50 (clk),
-    .PS2_CLK  (PS2_CLK),
-    .PS2_DAT  (PS2_DAT)
+// keyboard_ctrl kbd(
+//     .RST_N    (clr_n),
+//     .PROC     (ps2_proc),
+//     .READY    (ps2_ready),
+//     .OVERFLOW (ps2_ovf),
+//     .kbcode   (ps2_kbcode),
+//     .CLOCK_50 (clk),
+//     .PS2_CLK  (PS2_CLK),
+//     .PS2_DAT  (PS2_DAT)
+// );
+// assign ps2_proc = IF;
+ps2 ps2_e(
+    .clk(clk_cpu),
+    .clr_n(clr_n),
+    .ps2_clk(PS2_CLK),
+    .ps2_data(PS2_DAT),
+    .ps2_scan_out(ps2_kbcode),
+    .ps2_output_en(ps2_ready)
 );
-assign ps2_proc = IF;
 
 // gregs
 cpu_gregs gregs(
@@ -295,19 +303,19 @@ seg7_h s2(
 
 seg7_h s3(
     .en(1'b1),
-    .in(csr_mtvec[3:0]),
+    .in(pc[15:12]),
     .hex(HEX3)
 );
 
 seg7_h s4(
     .en(1'b1),
-    .in(csr_mtvec[7:4]),
+    .in(ps2_kbcode[3:0]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(csr_mtvec[11:8]),
+   .in(ps2_kbcode[7:4]),
    .hex(HEX5)
 );
 
@@ -315,8 +323,9 @@ seg7_h s5(
 // assign LEDR[1] = bus_wlen[1];
 // assign LEDR[2] = bus_en_n;
 // assign LEDR[3] = bus_ready;
-assign LEDR[4:0] = decoder_dec_instr_info[12:8];
-assign LEDR[9:7] = decoder_funct[2:0];
+// assign LEDR[4:0] = decoder_dec_instr_info[12:8];
+// assign LEDR[9:7] = decoder_funct[2:0];
+assign LEDR[9] = ps2_ready;
 ////////////////////////////////////////
 
 reg [9:0] LEDR_reg;
@@ -358,11 +367,15 @@ always @(posedge clk_cpu) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1) begin
+                if (is_intring == 0 && IF == 1 && ps2_ready) begin
                     gregs_backup <= 1;
                     pc_back = pc;
                     status = `STATUS_INTR_HANDEL;
                     is_intring = 1;
+                    flag_branch <= 1;
+                    pc_nxt = csr_mtvec;
+                    csr_mcause <= 1;
+                    csr_mscratch <= ps2_kbcode;
                     // TODO: Add data to CSR
                 end else begin
                     gregs_backup <= 0;
@@ -700,19 +713,8 @@ always @(posedge clk_cpu) begin
                 status <= `STATUS_BRANCH;
             end
             `STATUS_INTR_HANDEL: begin
-                if (1) begin // Case kbd
-                    flag_branch <= 1;
-                    pc_nxt = csr_mtvec;
-                    status <= `STATUS_INTR_KBD;
-                    csr_mcause <= 1;
-                    csr_mscratch <= 32'h33;
-
-                end else begin
-                    flag_branch <= 0;
-                    status <= `STATUS_BRANCH;
-                end
                 gregs_backup <= 0;
-
+                status <= `STATUS_BRANCH;
             end
             `STATUS_INTR_KBD: begin
                 status <= `STATUS_BRANCH;

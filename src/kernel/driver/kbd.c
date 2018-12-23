@@ -43,6 +43,7 @@ static const u8 scan_to_ascii[] = {
 
 void kbd_init(void)
 {
+    kbd_buf = 0;
     intr_handler_register(KBD_INTR, kbd_handler);
 }
 
@@ -50,14 +51,24 @@ void kbd_handler(void)
 {
     // kbd_buf = read_csr(mtval);
     read_csr(mscratch, kbd_buf);
-    vga_putn(0x70, kbd_buf, VGA_N_HEX);
+    // vga_puts(0x07, "Hit kbd_handel: ");
+    // vga_putn(0x07, kbd_buf, VGA_N_HEX);
+    // vga_puts(0x07, "\n");
+    // vga_putn(0x07, &kbd_buf, VGA_N_HEX);
+    // vga_putn(0x70, kbd_buf, VGA_N_HEX);
 }
 
 u8 kbd_getc(void)
 {
-    u8 key = kbd_buf;
-    // u8 key = scan_to_ascii[kbd_buf];
-    // vga_putc(0x70, key);
+    u8 key;
+    if (kbd_buf <= 0xFF){
+        key = scan_to_ascii[kbd_buf];
+    }else{
+        key = 0;
+    }
+    // u8 key = kbd_buf;
+    // vga_puts(0x70, "kbd_getc\n");
+    // vga_putn(0x70, kbd_buf, VGA_N_HEX);
     kbd_buf = 0;
     return key;
 }
