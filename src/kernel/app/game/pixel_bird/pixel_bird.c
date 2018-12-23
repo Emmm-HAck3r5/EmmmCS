@@ -18,7 +18,7 @@
   File Created: 2018-12-22 20:25:43
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 21:52:01
+  Last Modified: 2018-12-23 16:51:08
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -104,6 +104,7 @@ int pixel_bird(void)
     tick_handler_register(tick);
     while (!is_gameover)
         ;
+    tick_handler_unregister();
     sprite_destroy(rigid_bodys[0]->spr);
     pb_rigid_body_destroy(rigid_bodys[0]);
     for (int i = 1; i < 9;i++)
