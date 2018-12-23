@@ -24,7 +24,7 @@
 
 #include "objects.h"
 
-u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
+u8 bird[2][3] = {{0x5F, SOLID_SQUARE, DL_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
 
 void tube_pixels_generate(u8 *buf, int l, int w)
 {

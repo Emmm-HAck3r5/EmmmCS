@@ -6,7 +6,7 @@
 #endif // STD_DEBUG
 
 #define VAILD_SYMS "()+-*/%>=<&| "
-
+#define MAXSIZE 60
 
 typedef struct {
 	int ascii;
@@ -44,7 +44,7 @@ int priority(char symbol, int in)
 
 typedef struct {
 	// Token* mem;
-	Token mem[32];
+	Token mem[MAXSIZE];
 	int capacity;
 	int size;
 } Stack;
@@ -231,13 +231,16 @@ int eval(const char* express, int* error)
 {
 	int len = strlen(express);
 	// char* epr = epr_cpy(express, len);
-	char epr[32] = { 0 };
-	strcpy(epr, express);
+	char epr[MAXSIZE] = { 0 };
+	epr[0] = '(';
+	strcpy(epr + 1, express);
+	epr[len + 1] = ')';
+	epr[len + 2] = '\0';
 
 	if (check_epr_invalid(express, len))
 		return raise_error(error);
 	// Token* stream = (Token*)malloc(sizeof(Token) * len);
-	Token stream[32];
+	Token stream[MAXSIZE];
 
 	int stack_size = build_stream(epr, len, stream);
 

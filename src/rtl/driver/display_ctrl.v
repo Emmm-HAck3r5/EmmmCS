@@ -65,8 +65,11 @@ module display_ctrl(
     assign cur_x_addr = ctrl_reg[7:0];
     assign cur_y_addr = ctrl_reg[12:8];
     assign in_ascii = in_data[7:0];
-    assign fg_color = in_data[11:8];
-    assign bg_color = in_data[15:12];
+    //assign fg_color = in_data[11:8];
+    //assign bg_color = in_data[15:12];
+
+    assign fg_color = x_addr == cur_x_addr && y_addr == cur_y_addr && font_y_addr == 4'hf && cur_clk?4'h7:in_data[11:8];
+    assign bg_color = x_addr == cur_x_addr && y_addr == cur_y_addr && font_y_addr == 4'hf && cur_clk?4'h0:in_data[15:12];
 
     assign vga_syncn = 1'b0;
 
@@ -87,7 +90,7 @@ module display_ctrl(
                 .vga_b(vga_b));
     //font
     vga_font_rom from(.address(font_line_addr),.clock(~clk),.q(font_line_bitmap));
-	 
+
 	 //color
 	 vga_color_decoder(.fb(real_font_line_bitmap[font_x_addr]),.fg_color(fg_color),.bg_color(bg_color),.rgb(vga_data));
 

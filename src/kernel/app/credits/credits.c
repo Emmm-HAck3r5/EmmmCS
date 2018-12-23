@@ -35,7 +35,7 @@ static int cur_anime_time;
 static int cur_pos_print;
 static int cur_data_print;
 static BOOL is_refresh;
-
+static int refresh_period;
 
 void credits_exit()
 {
@@ -44,8 +44,10 @@ void credits_exit()
 
 static void credits_tick()
 {
-    cur_anime_time = (cur_anime_time + 1) & 0x1f;
-    cur_time = (cur_time + 1) & 0xff;
+    cur_anime_time = (cur_anime_time + 1) & 0x7;
+    cur_time = (cur_time + 1) & 0x1F;
+    // vga_putn(0X70, cur_time, VGA_N_U_DEC);
+    // vga_puts(0x7, "\n");
 }
 static void update_anime()
 {
@@ -199,6 +201,7 @@ int credits(void)
     cur_anime_time = 0;
     cur_pos_print = 0;
     cur_data_print = 0;
+    refresh_period = 0x7;
     is_refresh = 1;
     tick_handler_register(credits_tick);
     while (1)
@@ -232,6 +235,7 @@ int credits(void)
                         vga_writec(VGA_B_BLACK | VGA_F_WHITE, credits_data[3][i], i, 17);
                     }
                     is_refresh = FALSE;
+                    refresh_period = 0x3;
                 }
             else
                 ;
@@ -241,5 +245,7 @@ int credits(void)
         if(kbd_getc_async()=='q')
             break;
     }
+    intr_off();
     credits_exit();
+
 }

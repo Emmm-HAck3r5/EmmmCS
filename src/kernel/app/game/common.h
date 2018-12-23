@@ -59,4 +59,5 @@ typedef struct sprite_t
 sprite_t *sprite_create(u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y, u8 *pxs);
 void sprite_destroy(sprite_t *spr);
 void sprite_draw(sprite_t *spr, u8 color);
+void sprite_clear(sprite_t *spr);
 #endif

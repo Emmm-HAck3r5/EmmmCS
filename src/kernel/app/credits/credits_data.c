@@ -24,7 +24,7 @@
 const char *const credits_position[] =
 {
     "Project Director",
-    "Quality Assurancce",
+    "Quality Assurance",
     "System Architect",
     "Technical Director",
     "Art Director",

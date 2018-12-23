@@ -26,9 +26,12 @@
 #include "objects.h"
 #include "../../../klib/math.h"
 #include "../../../driver/timer.h"
+#include "../../../intr/intr.h"
 
 #define KBD_SPACE 0x20
+extern pb_rigid_body_t rigid_bodys[9];
 static BOOL is_gameover;
+static int cur_time;
 void pb_physics_update(pb_rigid_body_t *bodys)
 {
     for (u8 i = 0; i < 9; i++)
@@ -44,12 +47,12 @@ void pb_physics_update(pb_rigid_body_t *bodys)
 //          | <- tube2
 //bird -> .
 //          | <- tube1
-BOOL is_bird_die()
+static BOOL is_bird_die()
 {
-    sprite_t *bird = &rigid_bodys[0].spr;
+    sprite_t *bird = &(rigid_bodys[0].spr);
     if (bird->x >= 80 || bird->x < 0 || bird->y >=30 || bird->y < 0)
         return TRUE;
-    sprite_t *tube1 = &rigid_bodys[1].spr, *tube2 = &rigid_bodys[2].spr;
+    sprite_t *tube1 = &(rigid_bodys[1].spr), *tube2 = &(rigid_bodys[2].spr);
     if (bird->phy_x >= tube1->phy_x && bird->phy_x < tube1->phy_x + tube1->width)
     {
         if(bird->phy_y >= tube2->phy_y || bird->phy_y <= tube1->phy_y)
@@ -72,24 +75,20 @@ void update_tubes()
         int l2 = rand() % 14;
         pb_rigid_body_create(7,-1, 0, 8, l1, 60, 0, 8, l1, 60, 0);
         tube_pixels_generate(rigid_bodys[7].spr.pixels,l1, 8);
-        pb_rigid_body_create(8,-1, 0, 8, l2, 60, 16, 8, l2, 60, 16);
+        pb_rigid_body_create(8,-1, 0, 8, l2, 60, 29-l2, 8, l2, 60, 16);
         tube_pixels_generate(rigid_bodys[8].spr.pixels, l2, 8);
     }
 }
 static void tick(void)
 {
-    //main logic
-    pb_physics_update(rigid_bodys);
-    if (kbd_getc() == KBD_SPACE)
-        rigid_bodys[0].y_speed += 2;
-    if(is_bird_die())
-        is_gameover = TRUE;
-    update_tubes();
+    cur_time = (cur_time + 1) & 0x3F;
 }
 int pixel_bird(void)
 {
     //init the scene
     srand(time());
+    vga_clean();
+    cur_time == 0;
     pb_rigid_body_create(0,0,0,3, 1, BIRD_X, 15, 1, 1, BIRD_PHY_X, 15);
     memcpy(rigid_bodys[0].spr.pixels, bird[0], 3);
     for (u8 i = 1; i <= 4;i++)
@@ -99,15 +98,39 @@ int pixel_bird(void)
         int x = 15 * i;
         pb_rigid_body_create(i*2-1,-1, 0, 8, l1, x, 0, 8, l1, x, 0);
         tube_pixels_generate(rigid_bodys[i * 2 - 1].spr.pixels, l1, 8);
-        pb_rigid_body_create(i*2,-1, 0, 8, l2, x, 16, 8, l2, x, 16);
+        pb_rigid_body_create(i*2,-1, 0, 8, l2, x, 29-l2, 8, l2, x, 16);
         tube_pixels_generate(rigid_bodys[i * 2].spr.pixels, l2, 8);
+    }
+    for(u8 i =0;i<9;i++)
+    {
+        sprite_draw(&rigid_bodys[i].spr,0x7);
     }
     //scene init finished
     is_gameover = FALSE;
     //register game main logic as the timer handler
+    intr_on();
     tick_handler_register(tick);
     while (!is_gameover)
-        ;
+    {
+        if(cur_time == 0)
+        {
+                //main logic
+                        for(u8 i =0;i<9;i++)
+            {
+                sprite_clear(&rigid_bodys[i].spr);
+            }
+            pb_physics_update(rigid_bodys);
+            for(u8 i =0;i<9;i++)
+            {
+                sprite_draw(&rigid_bodys[i].spr,0x7);
+            }
+            if (kbd_getc() == KBD_SPACE)
+                rigid_bodys[0].y_speed += 2;
+            if(is_bird_die())
+                is_gameover = TRUE;
+            update_tubes();
+        }
+    }
     tick_handler_unregister();
     //sprite_destroy(rigid_bodys[0]->spr);
     //pb_rigid_body_destroy(rigid_bodys[0]);
@@ -120,5 +143,6 @@ int pixel_bird(void)
     //        pb_rigid_body_destroy(rigid_bodys[i]);
     //    }
     //}
+    vga_clean();
     return 0;
 }

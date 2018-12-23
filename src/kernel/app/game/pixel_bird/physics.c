@@ -23,7 +23,7 @@
  */
 
 #include "physics.h"
-static pb_rigid_body_t rigid_bodys[9];
+pb_rigid_body_t rigid_bodys[9];
 void pb_rigid_body_create(u8 idx, u8 x_s, u8 y_s, u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y)
 {
     pb_rigid_body_t *body = &rigid_bodys[idx];
