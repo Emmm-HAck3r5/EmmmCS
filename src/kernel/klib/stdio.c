@@ -47,6 +47,7 @@ char* gets(char* str){
             break;
         if (*ptr == '\b'){
             *ptr = 0;
+            ptr--;
         }else{
             ptr++;
         }
@@ -64,6 +65,7 @@ char* gets_drawback(char* str){
             break;
         if (*ptr == '\b'){
             *ptr = 0;
+            ptr--;
         }else{
             ptr++;
         }

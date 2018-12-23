@@ -417,7 +417,7 @@ always @(posedge clk_cpu) begin
                     status <= `STATUS_FETCHING_INSTR;
                 end
 
-                ps2_kbcode_last <= ps2_kbcode;
+                // ps2_kbcode_last <= ps2_kbcode;
             end
             end
             `STATUS_FETCHING_INSTR: begin
