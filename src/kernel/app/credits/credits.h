@@ -18,7 +18,7 @@
   File Created: 2018-12-23 15:35:10
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 15:35:38
+  Last Modified: 2018-12-23 16:48:23
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef APP_CREDITS_H
@@ -26,4 +26,5 @@
 
 int credits();
 
+void credits_exit();
 #endif
