@@ -6,7 +6,7 @@
 #endif // STD_DEBUG
 
 #define VAILD_SYMS "()+-*/%>=<&| "
-
+#define MAXSIZE 60
 
 typedef struct {
 	int ascii;
@@ -43,25 +43,26 @@ int priority(char symbol, int in)
 }
 
 typedef struct {
-	Token* mem;
+	// Token* mem;
+	Token mem[MAXSIZE];
 	int capacity;
 	int size;
 } Stack;
 
 Stack stack_init(int c_) {
 	Stack s = {
-#ifdef STD_DEBUG
-		.mem = (Token*)malloc(sizeof(Token) * c_),
-#else
-		.mem = (Token*)mm_alloc(sizeof(Token) * c_),
-#endif // STD_DEBUG
+// #ifdef STD_DEBUG
+// 		.mem = (Token*)malloc(sizeof(Token) * c_),
+// #else
+// 		.mem = (Token*)mm_alloc(sizeof(Token) * c_),
+// #endif // STD_DEBUG
 		.capacity = c_,
 		.size = 0
 	};
 	return s;
-} 
+}
 
-Token top(Stack* st) { 
+Token top(Stack* st) {
 	Token empty_t = {0, 0};
 	if (st->size <=  0) return empty_t;
 	return st->mem[st->size - 1];
@@ -116,7 +117,7 @@ char* epr_cpy(const char* express, int len){
 	strcpy(epr, express);
 	epr[len] = '\0';
 
-	return epr;	
+	return epr;
 }
 
 int check_epr_invalid(const char* str, int len){
@@ -201,10 +202,10 @@ int stack_calculate(Token* stream, int size, int* error)
 				if (sym == '/' || sym == '%')
 					if (ropd == 0)
 						return raise_error(error);
-				int res = operator_exec(sym, lopd, ropd);		// do 'lopd opr ropd' 
-				Token r = { 
-					.ascii = 0, 
-					.value = res 
+				int res = operator_exec(sym, lopd, ropd);		// do 'lopd opr ropd'
+				Token r = {
+					.ascii = 0,
+					.value = res
 				};
 				push(&opd, r);									// push result
 				continue;
@@ -215,13 +216,13 @@ int stack_calculate(Token* stream, int size, int* error)
 	if (opd.size >= 2) return raise_error(error);
 	val = opd.mem[0].value;
 
-#ifdef STD_DEBUG
-	free(opd.mem);
-	free(opr.mem);
-#else
-	mm_dealloc(opd.mem);
-	mm_dealloc(opr.mem);
-#endif // STD_DEBUG
+// #ifdef STD_DEBUG
+// 	free(opd.mem);
+// 	free(opr.mem);
+// #else
+// 	mm_dealloc(opd.mem);
+// 	mm_dealloc(opr.mem);
+// #endif // STD_DEBUG
 
 	return val;
 }
@@ -229,23 +230,28 @@ int stack_calculate(Token* stream, int size, int* error)
 int eval(const char* express, int* error)
 {
 	int len = strlen(express);
-	char* epr = epr_cpy(express, len);
+	// char* epr = epr_cpy(express, len);
+	char epr[MAXSIZE] = { 0 };
+	epr[0] = '(';
+	strcpy(epr + 1, express);
+	epr[len + 1] = ')';
+	epr[len + 2] = '\0';
 
 	if (check_epr_invalid(express, len))
-		return raise_error(error); 
-	Token* stream = (Token*)malloc(sizeof(Token) * len);
+		return raise_error(error);
+	// Token* stream = (Token*)malloc(sizeof(Token) * len);
+	Token stream[MAXSIZE];
 
 	int stack_size = build_stream(epr, len, stream);
 
 	int val = stack_calculate(stream, stack_size, error);
-#ifdef STD_DEBUG
-	free(epr);
-	free(stream);
-#else
-	mm_dealloc(epr);
-	mm_dealloc(stream);
-#endif // STD_DEBUG
+// #ifdef STD_DEBUG
+// 	free(epr);
+// 	free(stream);
+// #else
+// 	mm_dealloc(epr);
+// 	mm_dealloc(stream);
+// #endif // STD_DEBUG
 
 	return val;
 }
-

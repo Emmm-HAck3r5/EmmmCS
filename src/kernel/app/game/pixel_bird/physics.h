@@ -18,7 +18,7 @@
   File Created: 2018-12-22 20:30:47
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:45:57
+  Last Modified: 2018-12-23 20:44:05
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -33,10 +33,11 @@ typedef struct pb_rigid_body_t
 {
     int x_speed;
     int y_speed;
-    sprite_t *spr;
+    sprite_t spr;
 } pb_rigid_body_t;
 
-pb_rigid_body_t* pb_rigid_body_create(u8 x_s, u8 y_s, sprite_t *spr);
+void pb_rigid_body_create(u8 idx, u8 x_s, u8 y_s, u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y);
 void pb_rigid_body_destroy(pb_rigid_body_t *body);
-void pb_physics_update(pb_rigid_body_t **bodys);
+void pb_physics_update(pb_rigid_body_t *bodys);
+extern pb_rigid_body_t rigid_bodys[9];
 #endif

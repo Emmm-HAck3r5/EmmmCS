@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-23 20:09:11
+  Last Modified: 2018-12-23 20:15:20
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "stdio.h"
@@ -47,6 +47,9 @@ char* gets(char* str){
             break;
         if (*ptr == '\b'){
             *ptr = 0;
+            if (ptr > str){
+                ptr--;
+            }
             ptr--;
         }else{
             ptr++;
@@ -65,7 +68,9 @@ char* gets_drawback(char* str){
             break;
         if (*ptr == '\b'){
             *ptr = 0;
-            ptr--;
+            if (ptr > str){
+                ptr--;
+            }
         }else{
             ptr++;
         }

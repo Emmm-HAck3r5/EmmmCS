@@ -139,7 +139,12 @@ void vga_putc(u8 color, char c)
         *cursor_x = 0;
         ++(*cursor_y);
     }
-    scroll();
+    // scroll();
+    if (*cursor_y >= 30){
+        vga_force_scroll(0, 47);
+        *cursor_x = 0;
+        *cursor_y = 29;
+    }
 }
 void vga_puts(u8 color, const char *str)
 {
