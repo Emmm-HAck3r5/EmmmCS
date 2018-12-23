@@ -18,13 +18,13 @@
   File Created: 2018-12-23 12:51:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 16:20:56
+  Last Modified: 2018-12-23 17:31:09
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 const char *const credits_position[] =
 {
     "Project Director",
-    "Quality Assurancce"
+    "Quality Assurancce",
     "System Architect",
     "Technical Director",
     "Art Director",
@@ -32,9 +32,9 @@ const char *const credits_position[] =
     "Software Engineers",
     "UI Designers",
     "Core Contributers",
-    "Testers"
+    "Testers",
     "Simulation Engineers",
-    "Special Thanks"
+    "Special Thanks",
     "Copyrights"
 };
 
@@ -48,4 +48,3 @@ const char * const credits_data[] =
     "Terasic Inc.",
     "RISC-V Foundation"
 };
-

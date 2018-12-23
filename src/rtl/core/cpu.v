@@ -221,7 +221,7 @@ cpu_bus bus(
     .READY(bus_ready),
     .rdata(bus_rdata),
 
-    .LEDR(),
+    .LEDR(LEDR),
     .VGA_BLANK_N(VGA_BLANK_N),
     .VGA_B(VGA_B),
     .VGA_CLK(VGA_CLK),
@@ -335,10 +335,7 @@ seg7_h s5(
 // assign LEDR[3] = bus_ready;
 // assign LEDR[4:0] = decoder_dec_instr_info[12:8];
 // assign LEDR[9:7] = decoder_funct[2:0];
-assign LEDR[9] = ps2_ready;
 ////////////////////////////////////////
-
-reg [9:0] LEDR_reg;
 
 // assign LEDR[`STATUS_LEN-1:0] = status;
 // assign LEDR[`STATUS_LEN] = IF;
@@ -357,7 +354,8 @@ wire clk_1ms;
 clkgen_module #(100) cursorclk3(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1ms));
 
 wire clk_cpu;
-assign clk_cpu = SW[1] ? clk_slow : clk_fast;
+assign clk_cpu = clk_slow;
+// assign clk_cpu = SW[1] ? clk_slow : clk_fast;
 
 // main logic
 always @(posedge clk_cpu) begin
@@ -389,7 +387,8 @@ always @(posedge clk_cpu) begin
                 cpu_clk <= 0;
 
                 if (is_intring == 0 && IF == 1) begin
-                    if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
+                    if (ps2_kbcode != 0) begin
+                    // if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
                         gregs_backup <= 1;
                         pc_back = pc;
                         status = `STATUS_INTR_HANDEL;
@@ -418,7 +417,7 @@ always @(posedge clk_cpu) begin
                     status <= `STATUS_FETCHING_INSTR;
                 end
 
-                ps2_kbcode_last <= ps2_kbcode;
+                // ps2_kbcode_last <= ps2_kbcode;
             end
             end
             `STATUS_FETCHING_INSTR: begin
@@ -547,7 +546,7 @@ always @(posedge clk_cpu) begin
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
-                            LEDR_reg[9:7] <= decoder_funct[2:0];
+
                             case(decoder_funct[2:0])
                                 3'b000: begin
                                     is_intring <= 0;

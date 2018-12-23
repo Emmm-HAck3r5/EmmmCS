@@ -18,11 +18,12 @@
   File Created: 2018-12-23 14:38:49
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 16:40:35
+  Last Modified: 2018-12-23 17:38:29
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
 #include "../../typedef.h"
-#include "../../../driver/vga.h"
-#include "../../../klib/string.h"
-#include "../../../driver/timer.h"
+#include "../../driver/vga.h"
+#include "../../klib/string.h"
+#include "../../driver/timer.h"
+#include "../../driver/kbd.h"

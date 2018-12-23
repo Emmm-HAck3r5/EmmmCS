@@ -27,50 +27,44 @@
 #include "driver/kbd.h"
 #include "driver/timer.h"
 #include "mm/mm.h"
+#include "sh/sh.h"
+
+#include "klib/stdio.h"
 
 #include "intr/intr.h"
 #include "riscv_asm.h"
 
-#include "klib/stdio.h"
-#include "klib/string.h"
-
 void init(void);
 
+extern u16 emmmcs_logo[];
+extern const char * const credits_data[];
 int main(void)
 {
     init();
-
-    int i;
-    // for (i = 0; i < 10; i++){
-    //     vga_putc(0x70, getchar());
-    // }
-    vga_puts(0x07, "Press ANY Key to Start.");
-    getchar();
-    vga_puts(0x07, "Welcome to EmmmCS!\n");
-    while (1){
-        vga_puts(0x02, "forewing@EmmmCS:");
-        vga_puts(0x01, "~$ ");
-        char tmp[101];
-        int i;
-        for (i = 0; i < 100; i++){
-            tmp[i] = getchar();
-            vga_putc(0x7, tmp[i]);
-            if (tmp[i] == '\n'){
-                tmp[i] = '\0';
-                break;
-            }
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 34; j++){
+            vga_putc(emmmcs_logo[i*34+j]>>8, emmmcs_logo[i*34+j] & 0xff);
         }
-        if (strcmp(tmp, "hello") == 0){
-            vga_puts(0x3, "Hello, world!\n");
-        }else if (strcmp(tmp, "time") == 0){
-            vga_putn(0x07, uptime(), VGA_N_HEX);
-            vga_puts(0x7, "\n");
-        }else if (strcmp(tmp, "fuck") == 0){
-            vga_puts(0x50, "Fuck you\n");
-        }else{
-            vga_puts(0x50, "Invalid command\n");
-        }
+        vga_putc(0x07, '\n');
     }
+    vga_puts(0x7, "======================================\n");
+    vga_puts(0x7, credits_data[0]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[1]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[2]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, "======================================\n\n");
+    led_on(0);
+    // vga_puts(0x07, "Press ANY Key to Start.\n");
+    // getchar();
+    // vga_puts(0x07, "Welcome to EmmmCS!\n");
+    while (1){
+        sh();
+        vga_puts(0x7, "Press Any Key to Start Shell.\n");
+        getchar();
+    }
+
     return 0;
 }
 

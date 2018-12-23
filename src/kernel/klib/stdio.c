@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:58:03
+  Last Modified: 2018-12-23 20:09:11
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "stdio.h"
@@ -28,7 +28,6 @@
 #include "../driver/vga.h"
 
 char getchar(){
-    // vga_puts(0x07, "Hit getchar\n");
     intr_on();
     u8 c;
     while(1)
@@ -46,7 +45,30 @@ char* gets(char* str){
         *ptr = getchar();
         if (*ptr == '\n')
             break;
-        ptr++;
+        if (*ptr == '\b'){
+            *ptr = 0;
+            ptr--;
+        }else{
+            ptr++;
+        }
+    }
+    *ptr = '\0';
+    return str;
+}
+
+char* gets_drawback(char* str){
+    char* ptr = str;
+    while (1){
+        *ptr = getchar();
+        vga_putc(0x7, *ptr);
+        if (*ptr == '\n')
+            break;
+        if (*ptr == '\b'){
+            *ptr = 0;
+            ptr--;
+        }else{
+            ptr++;
+        }
     }
     *ptr = '\0';
     return str;
@@ -76,6 +98,30 @@ int getn()
     return n;
 }
 
+int sgetn(char *str, u32 len)
+{
+    int n = 0;
+    char c;
+    u8 st = 1;
+    int count;
+    for (count = 0; count < len;++count)
+    {
+        n *= 10;
+        c = str[count];
+        if (c == '-' && (st & 0x1))
+            st ^= 0x3;
+        else if (c >= '0' && c <= '9')
+            n += c - '0';
+        else
+        {
+            n /= 10;
+            break;
+        }
+    }
+    if (st & 0x2)
+        n = -n;
+    return n;
+}
 int putchar(char cha){
     vga_putc(VGA_B_BLACK | VGA_F_WHITE, cha);
     return 0;

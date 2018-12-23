@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:51:45
+  Last Modified: 2018-12-23 17:59:38
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "kbd.h"
@@ -72,28 +72,32 @@ u8 kbd_getc(void)
     kbd_buf = 0;
     return key;
 }
-// void kbd_init(){
-//     kbd_buf = (u8*)mm_alloc(KBD_BUF_SIZE);
-// }
+u8 kbd_getc_async(void)
+{
+    return kbd_buf;
+}
+    // void kbd_init(){
+    //     kbd_buf = (u8*)mm_alloc(KBD_BUF_SIZE);
+    // }
 
-// void kbd_update(u8* args){
-//     if (args[0] == 1){
-//         kbd_buf[kbd_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
-//         args[0] = 0;
-//         kbd_ptr++;
-//     }
-//     return;
-// }
+    // void kbd_update(u8* args){
+    //     if (args[0] == 1){
+    //         kbd_buf[kbd_ptr % KBD_BUF_SIZE] = scan_to_ascii[args[1] % 128];
+    //         args[0] = 0;
+    //         kbd_ptr++;
+    //     }
+    //     return;
+    // }
 
-// u8 kbd_getc(){
-//     u8 ret = 0;
-//     intr_open();
-//     while(1){
-//         if (kbd_ptr != kbd_ptr_r){
-//             ret = kbd_buf[kbd_ptr_r % KBD_BUF_SIZE];
-//             kbd_ptr_r++;
-//             break;
-//         }
-//     }
-//     return ret;
-// }
+    // u8 kbd_getc(){
+    //     u8 ret = 0;
+    //     intr_open();
+    //     while(1){
+    //         if (kbd_ptr != kbd_ptr_r){
+    //             ret = kbd_buf[kbd_ptr_r % KBD_BUF_SIZE];
+    //             kbd_ptr_r++;
+    //             break;
+    //         }
+    //     }
+    //     return ret;
+    // }
