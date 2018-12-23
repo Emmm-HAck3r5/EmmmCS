@@ -18,7 +18,7 @@
   File Created: 2018-12-04 22:42:41
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-18 16:20:39
+  Last Modified: 2018-12-23 15:51:03
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_VGA_H
@@ -54,4 +54,5 @@ void vga_putc(u8 color, char c);
 void vga_puts(u8 color, const char *str);
 void vga_putn(u8 color, u32 n, u8 mode);
 void vga_clean(void);
+void vga_force_scroll(int begin, int end);
 #endif

@@ -13,39 +13,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: credits_data.c
+  File: credits.h
   Project: EmmmCS
-  File Created: 2018-12-23 12:51:39
+  File Created: 2018-12-23 15:35:10
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 16:20:56
+  Last Modified: 2018-12-23 16:48:23
   Modified By: Chen Haodong (easyai@outlook.com)
  */
-const char *const credits_position[] =
-{
-    "Project Director",
-    "Quality Assurancce"
-    "System Architect",
-    "Technical Director",
-    "Art Director",
-    "Hardware Engineers",
-    "Software Engineers",
-    "UI Designers",
-    "Core Contributers",
-    "Testers"
-    "Simulation Engineers",
-    "Special Thanks"
-    "Copyrights"
-};
+#ifndef APP_CREDITS_H
+#define APP_CREDITS_H
 
-const char * const credits_data[] =
-{
-    "EasyAI Chen(easyai@outlook.com)",
-    "Forewing Xie(jujianai@hotmail.com)",
-    "Niffle Wu(1102365274@qq.com)",
-    "Copyright 2018 EmmmHackers. All rights reserved.",
-    "Intel Corporation",
-    "Terasic Inc.",
-    "RISC-V Foundation"
-};
+int credits();
 
+void credits_exit();
+#endif
