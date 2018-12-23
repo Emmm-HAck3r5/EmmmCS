@@ -59,9 +59,9 @@ Stack stack_init(int c_) {
 		.size = 0
 	};
 	return s;
-} 
+}
 
-Token top(Stack* st) { 
+Token top(Stack* st) {
 	Token empty_t = {0, 0};
 	if (st->size <=  0) return empty_t;
 	return st->mem[st->size - 1];
@@ -115,7 +115,7 @@ char* epr_cpy(const char* express, int len){
 	strcpy(epr, express);
 	epr[len] = '\0';
 
-	return epr;	
+	return epr;
 }
 
 int check_epr_invalid(const char* str, int len){
@@ -200,10 +200,10 @@ int stack_calculate(Token* stream, int size)
 				if (sym == '/' || sym == '%')
 					if (ropd == 0)
 						return raise_error();
-				int res = operator_exec(sym, lopd, ropd);		// do 'lopd opr ropd' 
-				Token r = { 
-					.ascii = 0, 
-					.value = res 
+				int res = operator_exec(sym, lopd, ropd);		// do 'lopd opr ropd'
+				Token r = {
+					.ascii = 0,
+					.value = res
 				};
 				push(&opd, r);									// push result
 				continue;
@@ -231,7 +231,7 @@ int eval(const char* express)
 	char* epr = epr_cpy(express, len);
 
 	if (check_epr_invalid(express, len))
-		return raise_error(); 
+		return raise_error();
 #ifdef STD_DEBUG
 	Token* stream = (Token*)malloc(sizeof(Token) * len);
 #else
@@ -249,4 +249,3 @@ int eval(const char* express)
 
 	return stack_calculate(stream, stack_size);
 }
-

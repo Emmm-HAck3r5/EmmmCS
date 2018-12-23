@@ -1,7 +1,7 @@
 #ifndef __KLIBAPP_H__
 #define __KLIBAPP_H__
 
-#define STD_DEBUG
+//#define STD_DEBUG
 
 #include "../klib/string.h"
 
