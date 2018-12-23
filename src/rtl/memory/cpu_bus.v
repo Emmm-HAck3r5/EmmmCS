@@ -36,7 +36,7 @@ module cpu_bus(
 
 `define	CACHE_MAXSIZE	32'h80000
 `define	LED_MAXSIZE		32'h4
-`define VGA_MEMORY_SIZE	32'h12BC
+`define VGA_MEMORY_SIZE	32'h12C0
 `define VGA_CREGS_SIZE  32'h10
 
 `define	CACHE_START		32'h0
@@ -238,7 +238,7 @@ always @ (posedge clk) begin
 	if (vgac_wen && ~vgac_addr[4]) begin
 		// MAGIC OPERATORS '+:' / '-:'
 		vga_ctrl[{vgac_addr[3:1], 4'hf} -: `WORD_SIZE] <= wdata16;
-	end 
+	end
 end
 
 // DEVICE OUTPUT

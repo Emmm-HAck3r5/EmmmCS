@@ -6,7 +6,7 @@ CP := riscv32-unknown-elf-objcopy
 LD := riscv32-unknown-elf-ld
 CFLAGS := -nostdinc -fno-stack-protector -fno-builtin -static -Ttext=0x00000 -march=rv32im -mabi=ilp32 -nostdlib
 
-CFILES := main.c
+CFILES := boot.S main.c
 CFILES += $(shell find ! -name "main.c" -name "*.c")
 OBJS := $(CFILES:.c=.o)
 PRO := kernel

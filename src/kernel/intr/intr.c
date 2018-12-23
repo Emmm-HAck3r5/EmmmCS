@@ -24,6 +24,8 @@
  */
 #include "intr.h"
 
+#include "../driver/vga.h"
+
 static void *intr_handlers[INTR_COUNT];
 
 void intr_init(void)
@@ -39,20 +41,23 @@ void intr_handler_register(u8 intrno, void *handler)
 
 void intr_on(void)
 {
+    // vga_puts(0x07, "INTR on\n");
     write_csr(mie, 1);
 }
 void intr_off(void)
 {
+    // vga_puts(0x07, "INTR off\n");
     write_csr(mie, 0);
 }
 void intr(void)
 {
-    intr_off();
+    // intr_off();
     u32 intrno;
     read_csr(mcause, intrno);
     if(intrno < INTR_COUNT)
-        (*(void (*)(void))(&intr_handlers[intrno]))();
-    intr_on();
+        (*(void (*)(void))(intr_handlers[intrno]))();
+    // intr_off();
+    // vga_puts(0x07, "Hit mret\n");
     __asm__ volatile("mret");
 }
 // static u8* intr_args = (u8*)INDR_ADDR;

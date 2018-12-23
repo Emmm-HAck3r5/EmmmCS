@@ -21,7 +21,7 @@
 % File Created: 2018-11-30 20:24:53
 % Author: Chen Haodong (easyai@outlook.com)
 % --------------------------
-% Last Modified: 2018-12-18 16:26:41
+% Last Modified: 2018-12-23 13:59:39
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
@@ -196,3 +196,18 @@
     0x11&	左下三角形\\\hline
     0x12&	下三角形\\\hline
 \end{tabular}\\
+\section{键盘驱动}
+\subsection{基本信息}
+模块名：yakbd
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input & 1 &clk & 时钟信号\\\hline
+	input & 1 &clrn & 清零信号\\\hline
+	input & 1 &ps2\_clk &ps2时钟\\\hline
+	input & 1 &ps2\_data &ps2数据\\\hline
+    output & 8 &o\_ascii &输出数据\\\hline
+\end{tabular}
+\subsection{说明}
+本模块提供对键盘的硬件驱动，内部使用实际键盘驱动文件ps2\_keyboard处理键盘输入数据，经过yakbd\_ps2ascii转成ascii码后进行输出。本模块内置大小写支持和组合键扩展。当键盘输入无信号时，输出0，当键盘输入为Ctrl+C组合键时，输出0x14控制信号。\textbf{原键盘驱动(keyboard\_ctrl) IS DEPRECATED}

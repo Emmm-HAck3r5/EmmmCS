@@ -3,22 +3,26 @@
 `include "alu_define.v"
 
 // cpu status
-`define STATUS_LEN 4
+`define STATUS_LEN 5
 `define STATUS_INIT           `STATUS_LEN'd0
 `define STATUS_FETCHING_INSTR `STATUS_LEN'd1
 `define STATUS_DECODING_INSTR `STATUS_LEN'd2
 `define STATUS_SET_FLAG       `STATUS_LEN'd3
+`define STATUS_REG_WRITE_POST `STATUS_LEN'd4
 `define STATUS_MEM_READ       `STATUS_LEN'd5
 `define STATUS_MEM_READING    `STATUS_LEN'd6
 `define STATUS_ALU            `STATUS_LEN'd7
-`define STATUS_ALU_2          `STATUS_LEN'd13
 `define STATUS_ALUING         `STATUS_LEN'd8
 `define STATUS_REG_WRITE      `STATUS_LEN'd9
-`define STATUS_REG_WRITE_POST `STATUS_LEN'd4
 `define STATUS_MEM_WRITE      `STATUS_LEN'd10
 `define STATUS_MEM_WRITING    `STATUS_LEN'd11
 `define STATUS_BRANCH         `STATUS_LEN'd12
-`define STATUS_INTR_ON_OFF         `STATUS_LEN'd14
+`define STATUS_ALU_2          `STATUS_LEN'd13
+`define STATUS_INTR_OFF    `STATUS_LEN'd14
+`define STATUS_INTR_HANDEL    `STATUS_LEN'd15
+`define STATUS_INTR_KBD       `STATUS_LEN'd16
+
+
 
 module cpu(
     input 		     [3:0]		KEY,
@@ -56,10 +60,11 @@ module cpu(
 //=======================================================
 
 //ps2
-wire ps2_proc;
+// wire ps2_proc;
 wire ps2_ready;
-wire ps2_ovf;
+// wire ps2_ovf;
 wire [7:0] ps2_kbcode;
+reg [7:0] ps2_kbcode_last;
 wire [7:0] scan2ascii_ascii;
 
 // gregs
@@ -141,17 +146,34 @@ kbd_scan2ascii s2a(
 );
 
 // ps2 kbd
-keyboard_ctrl kbd(
-    .RST_N    (clr_n),
-    .PROC     (ps2_proc),
-    .READY    (ps2_ready),
-    .OVERFLOW (ps2_ovf),
-    .kbcode   (ps2_kbcode),
-    .CLOCK_50 (clk),
-    .PS2_CLK  (PS2_CLK),
-    .PS2_DAT  (PS2_DAT)
+// keyboard_ctrl kbd(
+//     .RST_N    (clr_n),
+//     .PROC     (ps2_proc),
+//     .READY    (ps2_ready),
+//     .OVERFLOW (ps2_ovf),
+//     .kbcode   (ps2_kbcode),
+//     .CLOCK_50 (clk),
+//     .PS2_CLK  (PS2_CLK),
+//     .PS2_DAT  (PS2_DAT)
+// );
+// assign ps2_proc = IF;
+// ps2 ps2_e(
+//     .clk(clk_cpu),
+//     .clr_n(clr_n),
+//     .ps2_clk(PS2_CLK),
+//     .ps2_data(PS2_DAT),
+//     .ps2_scan_out(ps2_kbcode),
+//     .ps2_output_en(ps2_ready)
+// );
+keyboard kbd(
+    .clk(clk_cpu),
+    .clrn(clr_n),
+    .ps2_clk(PS2_CLK),
+    .ps2_data(PS2_DAT),
+    .o_ascii(ps2_kbcode),
+    .hexascii()
 );
-assign ps2_proc = IF;
+
 
 // gregs
 cpu_gregs gregs(
@@ -231,13 +253,10 @@ cpu_instr_decoder decoder(
 //  CSRs
 //========================================
 
-`define CSR_READ  3'b001
-`define CSR_WRITE 3'b010
-
-`define CSR_MTVEC 3'h305
-`define CSR_MIE 3'h304
-`define CSR_MCAUSE 3'h342
-`define CSR_MSCRATCH 3'h340
+`define CSR_MTVEC 12'h305
+`define CSR_MIE 12'h304
+`define CSR_MCAUSE 12'h342
+`define CSR_MSCRATCH 12'h340
 
 reg [`CPU_XLEN-1 : 0] csr_mtvec;
 reg [`CPU_XLEN-1 : 0] csr_mie;
@@ -268,6 +287,30 @@ seg7_h s2(
     .hex(HEX2)
 );
 
+// seg7_h s3(
+//     .en(1'b1),
+//     .in(pc[15:12]),
+//     .hex(HEX3)
+// );
+
+// seg7_h s3(
+//     .en(1'b1),
+//     .in(csr_mcause[3:0]),
+//     .hex(HEX3)
+// );
+
+// seg7_h s4(
+//     .en(1'b1),
+//     .in(csr_mscratch[3:0]),
+//     .hex(HEX4)
+// );
+
+// seg7_h s5(
+//    .en(1'b1),
+//    .in(csr_mtvec[3:0]),
+//    .hex(HEX5)
+// );
+
 seg7_h s3(
     .en(1'b1),
     .in(pc[15:12]),
@@ -276,29 +319,48 @@ seg7_h s3(
 
 seg7_h s4(
     .en(1'b1),
-    .in(gregs_rs1_dat[3:0]),
+    .in(ps2_kbcode[3:0]),
     .hex(HEX4)
 );
 
 seg7_h s5(
    .en(1'b1),
-   .in(gregs_rs1_dat[7:4]),
+   .in(ps2_kbcode[7:4]),
    .hex(HEX5)
 );
 
-assign LEDR[0] = bus_wlen[0];
-assign LEDR[1] = bus_wlen[1];
-assign LEDR[2] = bus_en_n;
-assign LEDR[3] = bus_ready;
-assign LEDR[6:4] = decoder_funct[2:0];
+// assign LEDR[0] = bus_wlen[0];
+// assign LEDR[1] = bus_wlen[1];
+// assign LEDR[2] = bus_en_n;
+// assign LEDR[3] = bus_ready;
+// assign LEDR[4:0] = decoder_dec_instr_info[12:8];
+// assign LEDR[9:7] = decoder_funct[2:0];
+assign LEDR[9] = ps2_ready;
 ////////////////////////////////////////
 
-wire clk_1s;
-clkgen_module #(1000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1s));
+reg [9:0] LEDR_reg;
 
+// assign LEDR[`STATUS_LEN-1:0] = status;
+// assign LEDR[`STATUS_LEN] = IF;
+// assign LEDR[`STATUS_LEN+1] = is_intring;
+// assign LEDR[9:7] = LEDR_reg[9:7];
+
+wire clk_slow;
+clkgen_module #(10000000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_slow));
+
+wire clk_fast;
+clkgen_module #(15000000) cursorclk2(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_fast));
+
+reg clk_1s_ed;
+reg [`CPU_XLEN-1 : 0] cnt_1ms;
+wire clk_1ms;
+clkgen_module #(100) cursorclk3(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1ms));
+
+wire clk_cpu;
+assign clk_cpu = SW[1] ? clk_slow : clk_fast;
 
 // main logic
-always @(posedge clk_1s) begin
+always @(posedge clk_cpu) begin
     if (!KEY[0]) begin
         pc     <= 0;
         status <= `STATUS_INIT;
@@ -307,12 +369,17 @@ always @(posedge clk_1s) begin
         cpu_clk <= 0;
         is_intring <= 0;
         IF = 0;
+        clk_1s_ed <= 0;
+        cnt_1ms <= 0;
     end else begin
         case(status)
             `STATUS_INIT: begin
             if (SW[0]) begin
                 status <= `STATUS_INIT;
             end else begin
+                if (clk_1ms == 0) begin
+                    clk_1s_ed <= 0;
+                end
                 gregs_restore <= 0;
                 flag_alu   <= 0;
                 flag_reg_write  <= 0;
@@ -320,18 +387,38 @@ always @(posedge clk_1s) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1 && 0) begin
-                    gregs_backup <= 1;
-                    pc_back = pc;
-                    status = `STATUS_INTR_ON_OFF;
-                    is_intring = 1;
-                    flag_branch <= 1;
-                    pc_nxt = csr_mtvec;
-                    // TODO: Add data to CSR
+
+                if (is_intring == 0 && IF == 1) begin
+                    if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
+                        gregs_backup <= 1;
+                        pc_back = pc;
+                        status = `STATUS_INTR_HANDEL;
+                        is_intring = 1;
+                        flag_branch <= 1;
+                        pc_nxt = csr_mtvec;
+                        csr_mcause <= 1;
+                        csr_mscratch <= {24'h0, ps2_kbcode[7:0]};
+                    end else if (clk_1ms == 1 && clk_1s_ed == 0) begin
+                        gregs_backup <= 1;
+                        pc_back = pc;
+                        status = `STATUS_INTR_HANDEL;
+                        is_intring = 1;
+                        flag_branch <= 1;
+                        pc_nxt = csr_mtvec;
+                        csr_mcause <= 2;
+                        csr_mscratch <= cnt_1ms;
+                        cnt_1ms <= cnt_1ms + 1;
+                        clk_1s_ed <= 1;
+                    end else begin
+                        gregs_backup <= 0;
+                        status <= `STATUS_FETCHING_INSTR;
+                    end
                 end else begin
                     gregs_backup <= 0;
                     status <= `STATUS_FETCHING_INSTR;
                 end
+
+                ps2_kbcode_last <= ps2_kbcode;
             end
             end
             `STATUS_FETCHING_INSTR: begin
@@ -387,9 +474,12 @@ always @(posedge clk_1s) begin
                                 3'b100:  flag_branch <= (gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
                                                         ((gregs_rs1_dat[31] == gregs_rs2_dat[31]) &&
                                                          (gregs_rs1_dat     <  gregs_rs2_dat));
-                                3'b101:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
-                                                        ((gregs_rs1_dat[31] != gregs_rs2_dat[31]) ||
-                                                         (gregs_rs1_dat     >= gregs_rs2_dat));
+                                // 3'b101:  flag_branch <= (gregs_rs1_dat[31] <= gregs_rs2_dat[31]) &&
+                                //                         ((gregs_rs1_dat[31] != gregs_rs2_dat[31]) ||
+                                //                          (gregs_rs1_dat     >= gregs_rs2_dat));
+                                3'b101: flag_branch <=  !((gregs_rs1_dat[31] >  gregs_rs2_dat[31]) ||
+                                                        ((gregs_rs1_dat[31] == gregs_rs2_dat[31]) &&
+                                                         (gregs_rs1_dat     <  gregs_rs2_dat)));
                                 3'b110: flag_branch <= (gregs_rs1_dat <  gregs_rs2_dat);
                                 3'b111: flag_branch <= (gregs_rs1_dat >= gregs_rs2_dat);
                                 default:  flag_branch <= 0;
@@ -457,6 +547,7 @@ always @(posedge clk_1s) begin
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
+                            LEDR_reg[9:7] <= decoder_funct[2:0];
                             case(decoder_funct[2:0])
                                 3'b000: begin
                                     is_intring <= 0;
@@ -464,12 +555,12 @@ always @(posedge clk_1s) begin
                                     pc <= pc_back;
                                     pc_nxt <= pc_back;
                                     flag_branch <= 1;
-                                    status <= `STATUS_INTR_ON_OFF;
+                                    status <= `STATUS_INTR_OFF;
                                 end
-                                `CSR_READ: begin
+                                3'b010: begin
                                     flag_reg_write <= 1;
                                     status <= `STATUS_REG_WRITE;
-                                    case(decoder_imm)
+                                    case(decoder_imm[11:0])
                                         `CSR_MCAUSE:
                                             gregs_rd_dat <= csr_mcause;
                                         `CSR_MIE:
@@ -482,9 +573,9 @@ always @(posedge clk_1s) begin
                                             gregs_rd_dat <= 32'b0;
                                     endcase
                                 end
-                                `CSR_WRITE: begin
+                                3'b001: begin //rw
                                     status <= `STATUS_BRANCH;
-                                    case(decoder_imm)
+                                    case(decoder_imm[11:0])
                                         `CSR_MCAUSE:
                                             csr_mcause <= gregs_rs1_dat;
                                         `CSR_MIE:
@@ -495,13 +586,26 @@ always @(posedge clk_1s) begin
                                             csr_mscratch <= gregs_rs1_dat;
                                     endcase
                                 end
+                                3'b101: begin //rwi
+                                    status <= `STATUS_BRANCH;
+                                    case(decoder_imm[11:0])
+                                        `CSR_MCAUSE:
+                                            csr_mcause <= {{27{1'b0}}, gregs_rs1_idx};
+                                        `CSR_MIE:
+                                            IF <= gregs_rs1_idx[0];
+                                        `CSR_MTVEC:
+                                            csr_mtvec <= {{27{1'b0}}, gregs_rs1_idx};
+                                        `CSR_MSCRATCH:
+                                            csr_mscratch <= {{27{1'b0}}, gregs_rs1_idx};
+                                    endcase
+                                end
 
                                 default:
                                     status = `STATUS_BRANCH;
                             endcase
                         end
                         `CPU_INSTR_GRP_MULDIV: begin
-                            //NOT SUPPORT
+                            flag_alu <= 1;
                             flag_reg_write <= 1;
                             alu_src_A <= gregs_rs1_dat;
                             alu_src_B <= gregs_rs2_dat;
@@ -544,14 +648,28 @@ always @(posedge clk_1s) begin
                 if (flag_mem_read) begin
                     if (bus_ready == `BUS_STOP) begin
                         case (decoder_funct[2:0])
-                            3'b000:  gregs_rd_dat <= (bus_rdata[7] == 0) ?
+                            3'b000:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= (bus_rdata[7] == 0) ?
                                             {{24{1'b0}}, bus_rdata[7:0]} :
                                             {{24{1'b1}}, bus_rdata[7:0]};
-                            3'b001:  gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                else
+                                    gregs_rd_dat <= (bus_rdata[15] == 0) ?
+                                            {{24{1'b0}}, bus_rdata[15:8]} :
+                                            {{24{1'b1}}, bus_rdata[15:8]};
+
+                            3'b001: gregs_rd_dat <= (bus_rdata[15] == 0) ?
                                             {{16{1'b0}}, bus_rdata[15:0]} :
                                             {{16{1'b1}}, bus_rdata[15:0]};
-                            3'b010:  gregs_rd_dat <= bus_rdata;
-                            3'b100: gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+
+                            3'b010: gregs_rd_dat <= bus_rdata;
+
+                            3'b100:
+                                if (bus_address[0] == 0)
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[7:0]};
+                                else
+                                    gregs_rd_dat <= {{24{1'b0}}, bus_rdata[15:8]};
+
                             3'b101: gregs_rd_dat <= {{16{1'b0}}, bus_rdata[15:0]};
                         endcase
                         status <= `STATUS_REG_WRITE;
@@ -628,9 +746,15 @@ always @(posedge clk_1s) begin
                 end
                 status <= `STATUS_INIT;
             end
-            `STATUS_INTR_ON_OFF: begin
-                gregs_backup <= 0;
+            `STATUS_INTR_OFF: begin
                 gregs_restore <= 0;
+                status <= `STATUS_BRANCH;
+            end
+            `STATUS_INTR_HANDEL: begin
+                gregs_backup <= 0;
+                status <= `STATUS_BRANCH;
+            end
+            `STATUS_INTR_KBD: begin
                 status <= `STATUS_BRANCH;
             end
             default: begin

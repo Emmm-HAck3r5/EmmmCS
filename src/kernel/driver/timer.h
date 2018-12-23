@@ -18,7 +18,7 @@
   File Created: 2018-12-21 17:08:40
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-21 17:18:34
+  Last Modified: 2018-12-21 20:06:53
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -31,4 +31,6 @@ void timer_init(void);
 void timer_handler(void);
 void tick_handler_register(void *handler);
 void tick_handler_unregister(void);
+u32 time(void);
+u32 uptime(void);
 #endif
