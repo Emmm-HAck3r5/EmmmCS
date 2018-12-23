@@ -44,7 +44,7 @@ void credits_exit()
 
 static void credits_tick()
 {
-    cur_anime_time = (cur_anime_time + 1) & 0x7;
+    cur_anime_time = (cur_anime_time + 1) & 0x1f;
     cur_time = (cur_time + 1) & 0xff;
 }
 static void update_anime()
@@ -192,7 +192,7 @@ static void print_pos()
 }
 int credits(void)
 {
-    // intr_on();
+    intr_on();
     vga_clean();
     cur_frame = 0;
     cur_time = 0;

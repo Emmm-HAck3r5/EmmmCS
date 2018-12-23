@@ -7,7 +7,8 @@
 
 #ifndef STD_DEBUG
 #include "../mm/mm.h"
-//#include "../klib/stdio.h"
+#include "../klib/stdio.h"
+#include "../klib/mem.h"
 #endif // STD_DEBUG
 
 int eval(const char* express, int* error);

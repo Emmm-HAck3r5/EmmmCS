@@ -8,6 +8,7 @@
 #include "../klib/string.h"
 #include "../app/credits/credits.h"
 #include "../app/app.h"
+#include "../app/game/pixel_bird/pixel_bird.h"
 
 void sh(){
     while (1){
@@ -27,16 +28,22 @@ void sh(){
         }else if (strcmp(tmp, "fuck") == 0){
             vga_puts(0x40, "Fuck you\n");
         }else if (strcmp(tmp, "uname") == 0){
-            vga_puts(0x07, "EmmmOS EmmmCS 1.0.0-273-Emmm_Hackers RISC-V\n");
+            vga_puts(0x07, "EmmmCS 1.0.0-Build275-Emmm_Hackers RISC-V\n");
         }else if (strcmp(tmp, "clear") == 0){
             vga_init();
         }else if (strcmp(tmp, "eval") == 0){
             char ex[100];
-            gets(ex);
+            gets_drawback(ex);
             vga_puts(VGA_F_RED|VGA_B_BLACK, "ex:\n");
             vga_puts(VGA_F_RED|VGA_B_BLACK, ex);
             vga_puts(VGA_F_RED|VGA_B_BLACK, "\n");
-            vga_putn(VGA_F_RED|VGA_B_BLACK, eval(ex), VGA_N_S_DEC);
+            int ret, errno;
+            ret = eval(ex, &errno);
+            if (errno != 1){
+                vga_putn(VGA_F_RED|VGA_B_BLACK, ret, VGA_N_S_DEC);
+            }
+        }else if (strcmp(tmp, "bird") == 0){
+            pixel_bird();
         }else if (strcmp(tmp, "exit") == 0){
             return;
         }else if (strcmp(tmp, "bc") == 0){
