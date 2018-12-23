@@ -22,6 +22,7 @@
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
+#include "../../intr/intr.h"
 extern const char *const credits_position[];
 extern const char *const credits_data[];
 extern u16 eh_logo[];
@@ -191,6 +192,7 @@ static void print_pos()
 }
 int credits(void)
 {
+    intr_on();
     vga_clean();
     cur_frame = 0;
     cur_time = 0;

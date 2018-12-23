@@ -36,14 +36,34 @@
 
 void init(void);
 
+extern u16 emmmcs_logo[];
+extern const char * const credits_data[];
 int main(void)
 {
     init();
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 34; j++){
+            vga_putc(emmmcs_logo[i*34+j]>>8, emmmcs_logo[i*34+j] & 0xff);
+        }
+        vga_putc(0x07, '\n');
+    }
+    vga_puts(0x7, "======================================\n");
+    vga_puts(0x7, credits_data[0]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[1]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[2]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, "======================================\n\n");
     led_on(0);
     // vga_puts(0x07, "Press ANY Key to Start.\n");
     // getchar();
     // vga_puts(0x07, "Welcome to EmmmCS!\n");
-    sh();
+    while (1){
+        sh();
+        vga_puts(0x7, "Press Any Key to Start Shell.\n");
+        getchar();
+    }
 
     return 0;
 }

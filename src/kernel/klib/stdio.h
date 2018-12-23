@@ -4,9 +4,9 @@
 #include "../typedef.h"
 
 char  getchar();
-char  getchar_silence();
 char* gets(char* str);
 int getn();
+char* gets_drawback(char* str);
 
 int putchar(char cha);
 int   puts(const char* str);

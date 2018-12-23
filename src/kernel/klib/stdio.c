@@ -32,19 +32,6 @@ char getchar(){
     u8 c;
     while(1)
         if((c=kbd_getc())!=0){
-            vga_putc(0x7, c);
-            intr_off();
-            return c;
-        }
-    //FATAL ERROR
-    return 0;
-}
-
-char getchar_silence(){
-    intr_on();
-    u8 c;
-    while(1)
-        if((c=kbd_getc())!=0){
             intr_off();
             return c;
         }
@@ -58,8 +45,28 @@ char* gets(char* str){
         *ptr = getchar();
         if (*ptr == '\n')
             break;
-        if (*ptr != 0x08)
+        if (*ptr == '\b'){
+            *ptr = 0;
+        }else{
             ptr++;
+        }
+    }
+    *ptr = '\0';
+    return str;
+}
+
+char* gets_drawback(char* str){
+    char* ptr = str;
+    while (1){
+        *ptr = getchar();
+        vga_putc(0x7, *ptr);
+        if (*ptr == '\n')
+            break;
+        if (*ptr == '\b'){
+            *ptr = 0;
+        }else{
+            ptr++;
+        }
     }
     *ptr = '\0';
     return str;

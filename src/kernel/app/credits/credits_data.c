@@ -48,4 +48,3 @@ const char * const credits_data[] =
     "Terasic Inc.",
     "RISC-V Foundation"
 };
-
