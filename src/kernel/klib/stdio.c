@@ -28,7 +28,19 @@
 #include "../driver/vga.h"
 
 char getchar(){
-    // vga_puts(0x07, "Hit getchar\n");
+    intr_on();
+    u8 c;
+    while(1)
+        if((c=kbd_getc())!=0){
+            vga_putc(0x7, c);
+            intr_off();
+            return c;
+        }
+    //FATAL ERROR
+    return 0;
+}
+
+char getchar_silence(){
     intr_on();
     u8 c;
     while(1)
@@ -46,7 +58,8 @@ char* gets(char* str){
         *ptr = getchar();
         if (*ptr == '\n')
             break;
-        ptr++;
+        if (*ptr != 0x08)
+            ptr++;
     }
     *ptr = '\0';
     return str;
