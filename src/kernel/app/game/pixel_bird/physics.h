@@ -38,5 +38,5 @@ typedef struct pb_rigid_body_t
 
 pb_rigid_body_t* pb_rigid_body_create(u8 x_s, u8 y_s, sprite_t *spr);
 void pb_rigid_body_destroy(pb_rigid_body_t *body);
-void pb_physics_update(pb_rigid_body_t *bodys, u8 sz);
+void pb_physics_update(pb_rigid_body_t **bodys);
 #endif

@@ -24,8 +24,8 @@
 
 #include "physics.h"
 #include "objects.h"
-#include "../../klib/math.h"
-#include "../../driver/timer.h"
+#include "../../../klib/math.h"
+#include "../../../driver/timer.h"
 
 #define KBD_SPACE 0x20
 static pb_rigid_body_t* rigid_bodys[9];
@@ -78,7 +78,7 @@ void update_tubes()
 static void tick(void)
 {
     //main logic
-    pb_physics_update(rigid_bodys, 9);
+    pb_physics_update(rigid_bodys);
     if (kbd_getc() == KBD_SPACE)
         rigid_bodys[0]->y_speed += 2;
     if(is_bird_die())
@@ -89,7 +89,7 @@ int pixel_bird(void)
 {
     //init the scene
     srand(time());
-    rigid_bodys[0] = pb_rigid_body_create(0,0,sprite_create(3, 1, BIRD_X, 15, 1, 1, BIRD_PHY_X, 15, bird[0], 0));
+    rigid_bodys[0] = pb_rigid_body_create(0,0,sprite_create(3, 1, BIRD_X, 15, 1, 1, BIRD_PHY_X, 15, bird[0]));
     for (u8 i = 1; i <= 4;i++)
     {
         int l1 = rand() % 14;
