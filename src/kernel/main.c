@@ -25,6 +25,7 @@
 #include "driver/led.h"
 #include "driver/vga.h"
 #include "driver/kbd.h"
+#include "driver/timer.h"
 #include "mm/mm.h"
 
 #include "intr/intr.h"
@@ -41,14 +42,15 @@ int main(void)
     vga_puts(0x02, "forewing@EmmmCS:");
     vga_puts(0x01, "~$ ");
     int i;
-    for (i = 0; i < 10; i++){
-        vga_putc(0x70, getchar());
-    }
+    // for (i = 0; i < 10; i++){
+    //     vga_putc(0x70, getchar());
+    // }
+    vga_puts(0x07, "start? ");
+    getchar();
+    u32 time_last = 0;
     while (1){
-        // vga_puts(0x07, "\nc= ");
-        char str[100];
-        gets(str);
-        vga_puts(0x70, str);
+        getchar();
+        vga_putn(0x70, uptime(), VGA_N_HEX);
     }
     return 0;
 }
@@ -58,6 +60,7 @@ void init(void)
     led_init();
     vga_init();
     kbd_init();
+    timer_init();
     mm_init();
     intr_init();
 }

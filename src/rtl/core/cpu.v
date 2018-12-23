@@ -64,6 +64,7 @@ module cpu(
 wire ps2_ready;
 // wire ps2_ovf;
 wire [7:0] ps2_kbcode;
+reg [7:0] ps2_kbcode_last;
 wire [7:0] scan2ascii_ascii;
 
 // gregs
@@ -156,14 +157,23 @@ kbd_scan2ascii s2a(
 //     .PS2_DAT  (PS2_DAT)
 // );
 // assign ps2_proc = IF;
-ps2 ps2_e(
+// ps2 ps2_e(
+//     .clk(clk_cpu),
+//     .clr_n(clr_n),
+//     .ps2_clk(PS2_CLK),
+//     .ps2_data(PS2_DAT),
+//     .ps2_scan_out(ps2_kbcode),
+//     .ps2_output_en(ps2_ready)
+// );
+keyboard kbd(
     .clk(clk_cpu),
-    .clr_n(clr_n),
+    .clrn(clr_n),
     .ps2_clk(PS2_CLK),
     .ps2_data(PS2_DAT),
-    .ps2_scan_out(ps2_kbcode),
-    .ps2_output_en(ps2_ready)
+    .o_ascii(ps2_kbcode),
+    .hexascii()
 );
+
 
 // gregs
 cpu_gregs gregs(
@@ -341,6 +351,12 @@ clkgen_module #(100) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(
 wire clk_fast;
 clkgen_module #(10000000) cursorclk2(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_fast));
 
+
+reg clk_1s_ed;
+reg [`CPU_XLEN-1 : 0] cnt_1ms;
+wire clk_1ms;
+clkgen_module #(1000) cursorclk3(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1ms));
+
 wire clk_cpu;
 assign clk_cpu = SW[1] ? clk_slow : clk_fast;
 
@@ -354,12 +370,17 @@ always @(posedge clk_cpu) begin
         cpu_clk <= 0;
         is_intring <= 0;
         IF = 0;
+        clk_1s_ed <= 0;
+        cnt_1ms <= 0;
     end else begin
         case(status)
             `STATUS_INIT: begin
             if (SW[0]) begin
                 status <= `STATUS_INIT;
             end else begin
+                if (clk_1ms == 0) begin
+                    clk_1s_ed <= 0;
+                end
                 gregs_restore <= 0;
                 flag_alu   <= 0;
                 flag_reg_write  <= 0;
@@ -367,20 +388,38 @@ always @(posedge clk_cpu) begin
                 flag_mem_write  <= 0;
                 flag_branch     <= 0;
                 cpu_clk <= 0;
-                if (is_intring == 0 && IF == 1 && ps2_ready) begin
-                    gregs_backup <= 1;
-                    pc_back = pc;
-                    status = `STATUS_INTR_HANDEL;
-                    is_intring = 1;
-                    flag_branch <= 1;
-                    pc_nxt = csr_mtvec;
-                    csr_mcause <= 1;
-                    csr_mscratch <= ps2_kbcode;
-                    // TODO: Add data to CSR
+
+                if (is_intring == 0 && IF == 1) begin
+                    if (ps2_kbcode != 0 && ps2_kbcode != ps2_kbcode_last) begin
+                        gregs_backup <= 1;
+                        pc_back = pc;
+                        status = `STATUS_INTR_HANDEL;
+                        is_intring = 1;
+                        flag_branch <= 1;
+                        pc_nxt = csr_mtvec;
+                        csr_mcause <= 1;
+                        csr_mscratch <= {24'h0, ps2_kbcode[7:0]};
+                    end else if (clk_1ms == 1 && clk_1s_ed == 0) begin
+                        gregs_backup <= 1;
+                        pc_back = pc;
+                        status = `STATUS_INTR_HANDEL;
+                        is_intring = 1;
+                        flag_branch <= 1;
+                        pc_nxt = csr_mtvec;
+                        csr_mcause <= 2;
+                        csr_mscratch <= cnt_1ms;
+                        cnt_1ms <= cnt_1ms + 1;
+                        clk_1s_ed <= 1;
+                    end else begin
+                        gregs_backup <= 0;
+                        status <= `STATUS_FETCHING_INSTR;
+                    end
                 end else begin
                     gregs_backup <= 0;
                     status <= `STATUS_FETCHING_INSTR;
                 end
+
+                ps2_kbcode_last <= ps2_kbcode;
             end
             end
             `STATUS_FETCHING_INSTR: begin

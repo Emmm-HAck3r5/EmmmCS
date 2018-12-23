@@ -32,4 +32,5 @@ void timer_handler(void);
 void tick_handler_register(void *handler);
 void tick_handler_unregister(void);
 u32 time(void);
+u32 uptime(void);
 #endif

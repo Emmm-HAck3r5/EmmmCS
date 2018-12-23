@@ -30,7 +30,7 @@ module keyboard(clk,clrn,ps2_clk,ps2_data,o_ascii,hexascii);
 	reg caps;
 	reg alt;
 	reg shift;
-	reg ctrl;s
+	reg ctrl;
 	//for dbg
 	output wire [13:0]hexascii;
 	//
@@ -45,16 +45,16 @@ module keyboard(clk,clrn,ps2_clk,ps2_data,o_ascii,hexascii);
 	wire [7:0]ps2code;
 	wire [7:0]ascii;
 	output wire [7:0] o_ascii;
-	
+
 	ps2_keyboard ps2(.clk(clk),.clrn(clrn),.ps2_clk(ps2_clk),.ps2_data(ps2_data),.data(ps2code),
  .ready(ready),.nextdata_n(nextdata_n),.overflow(overflow));
 	ps2_ascii p2a(.pscode(out_d),.shift(inner_shift),.ctrl(ctrl),.ascii(ascii));
-	
-	d_trigger d(.in_en(~outputen),.in_data(ps2code),.clk(clk),.out(out_d));
-	
-	seg7display_h s2(.en(1'b1),.in(ascii[3:0]),.hex(hexascii[6:0]));
-	seg7display_h s3(.en(1'b1),.in(ascii[7:4]),.hex(hexascii[13:7]));
-	
+
+	d_trigger d(.en(~outputen),.in_data(ps2code),.clk(clk),.out(out_d));
+
+	// seg7display_h s2(.en(1'b1),.in(ascii[3:0]),.hex(hexascii[6:0]));
+	// seg7display_h s3(.en(1'b1),.in(ascii[7:4]),.hex(hexascii[13:7]));
+
 	assign o_ascii = outputen?ascii:0;
 	always @(posedge clk)
 	begin

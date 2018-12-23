@@ -22,10 +22,12 @@
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
+#include "../riscv_asm.h"
 #include "timer.h"
 #include "../intr/intr.h"
 static void (*tick_handler)(void);
 static u32 timer_counter;
+static u32 up_time_reg;
 void timer_init(void)
 {
     intr_handler_register(TIMER_INTR, timer_handler);
@@ -34,6 +36,7 @@ void timer_init(void)
 
 void timer_handler(void)
 {
+    read_csr(mscratch, up_time_reg);
     ++timer_counter;
     if(tick_handler)
         tick_handler();
@@ -52,4 +55,15 @@ void tick_handler_unregister(void)
 u32 time(void)
 {
     return timer_counter;
+}
+
+u32 uptime(void)
+{
+    u32 uptime_last = up_time_reg;
+    intr_on();
+    while(uptime_last == up_time_reg){
+        ;
+    }
+    intr_off();
+    return up_time_reg;
 }
