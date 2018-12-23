@@ -13,39 +13,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   --------------------------
-  File: credits_data.c
+  File: credits_include.h
   Project: EmmmCS
-  File Created: 2018-12-23 12:51:39
+  File Created: 2018-12-23 14:38:49
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 16:20:56
+  Last Modified: 2018-12-23 16:40:35
   Modified By: Chen Haodong (easyai@outlook.com)
  */
-const char *const credits_position[] =
-{
-    "Project Director",
-    "Quality Assurancce"
-    "System Architect",
-    "Technical Director",
-    "Art Director",
-    "Hardware Engineers",
-    "Software Engineers",
-    "UI Designers",
-    "Core Contributers",
-    "Testers"
-    "Simulation Engineers",
-    "Special Thanks"
-    "Copyrights"
-};
 
-const char * const credits_data[] =
-{
-    "EasyAI Chen(easyai@outlook.com)",
-    "Forewing Xie(jujianai@hotmail.com)",
-    "Niffle Wu(1102365274@qq.com)",
-    "Copyright 2018 EmmmHackers. All rights reserved.",
-    "Intel Corporation",
-    "Terasic Inc.",
-    "RISC-V Foundation"
-};
-
+#include "../../typedef.h"
+#include "../../../driver/vga.h"
+#include "../../../klib/string.h"
+#include "../../../driver/timer.h"
