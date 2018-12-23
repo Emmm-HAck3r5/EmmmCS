@@ -346,16 +346,15 @@ reg [9:0] LEDR_reg;
 // assign LEDR[9:7] = LEDR_reg[9:7];
 
 wire clk_slow;
-clkgen_module #(100) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_slow));
+clkgen_module #(10000000) cursorclk(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_slow));
 
 wire clk_fast;
-clkgen_module #(10000000) cursorclk2(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_fast));
-
+clkgen_module #(15000000) cursorclk2(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_fast));
 
 reg clk_1s_ed;
 reg [`CPU_XLEN-1 : 0] cnt_1ms;
 wire clk_1ms;
-clkgen_module #(1000) cursorclk3(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1ms));
+clkgen_module #(100) cursorclk3(.clkin(clk), .rst(~clr_n), .clken(1'b1), .clkout(clk_1ms));
 
 wire clk_cpu;
 assign clk_cpu = SW[1] ? clk_slow : clk_fast;
