@@ -19,7 +19,7 @@
   Author: Chen Haodong (easyai@outlook.com)
           Xie Nairong (jujianai@hotmail.com)
   --------------------------
-  Last Modified: 2018-12-21 16:51:26
+  Last Modified: 2018-12-23 17:59:25
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #ifndef DRIVER_KBD_H
@@ -29,6 +29,7 @@
 void kbd_init(void);
 void kbd_handler(void);
 u8 kbd_getc(void);
+u8 kbd_getc_async(void);
 //#define KBD_BUF_SIZE 256
 
 //void kbd_init();

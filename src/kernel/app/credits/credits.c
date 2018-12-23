@@ -18,7 +18,7 @@
   File Created: 2018-12-23 12:51:46
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 17:43:53
+  Last Modified: 2018-12-23 18:00:05
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 #include "credits_include.h"
@@ -229,7 +229,7 @@ int credits(void)
         }
         if(cur_anime_time == 0)
             update_anime();
-        if(kbd_getc()=='q')
+        if(kbd_getc_async()=='q')
             break;
     }
     credits_exit();
