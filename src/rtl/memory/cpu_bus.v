@@ -36,7 +36,7 @@ module cpu_bus(
 
 `define	CACHE_MAXSIZE	32'h80000
 `define	LED_MAXSIZE		32'h4
-`define VGA_MEMORY_SIZE	32'h12BC
+`define VGA_MEMORY_SIZE	32'h12C0
 `define VGA_CREGS_SIZE  32'h10
 
 `define	CACHE_START		32'h0
@@ -122,7 +122,7 @@ end
 // address offset
 always @ (posedge clk) begin
 	case (bus_state)
-	  `BUS_ST_IDLE: 
+	  `BUS_ST_IDLE:
 	  	if (!EN_N && WLEN == `WLEN_RD32)
 		  addr_offset <= 32'd2;
 		else addr_offset <= 32'd0;
@@ -168,7 +168,7 @@ end
 
 // state transformation
 always @ (posedge clk) begin
-	case (bus_state)	
+	case (bus_state)
 		`BUS_ST_IDLE : begin
 			READY <= 1;
 			if (EN_N) bus_state <= `BUS_ST_IDLE;
@@ -221,7 +221,7 @@ vga_memory2port vm2p(
 );
 
 assign led_rdata = led_memory[0];
-  
+
 always @ (posedge clk) begin
 	if (led_wen && address[1:0] < 2'b10) begin
 		led_memory[led_addr[1]] <= wdata16;
@@ -238,7 +238,7 @@ always @ (posedge clk) begin
 	if (vgac_wen && ~vgac_addr[4]) begin
 		// MAGIC OPERATORS '+:' / '-:'
 		vga_ctrl[{vgac_addr[3:1], 4'hf} -: `WORD_SIZE] <= wdata16;
-	end 
+	end
 end
 
 // DEVICE OUTPUT
