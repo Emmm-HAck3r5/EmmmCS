@@ -18,7 +18,7 @@
   File Created: 2018-12-23 13:24:07
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 13:31:58
+  Last Modified: 2018-12-23 14:00:48
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -121,7 +121,7 @@ module ps2_ascii(pscode,shift,ctrl,ascii);
 		    		8'h2c:ascii=8'h74;
 		    		8'h35:ascii=8'h79;
 		    		8'h3c:ascii=8'h75;
-		    		8'h43:ascii=8'h6c;
+		    		8'h43:ascii=8'h69;
 		    		8'h44:ascii=8'h6f;
 		    		8'h4d:ascii=8'h70;
 		    		8'h54:ascii=8'h5b;

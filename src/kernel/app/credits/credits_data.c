@@ -18,26 +18,33 @@
   File Created: 2018-12-23 12:51:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 13:31:06
+  Last Modified: 2018-12-23 13:48:41
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 const char *const credits_position[] =
 {
-    "Project Manager",
+    "Project Director",
     "Quality Assurancce"
-    "Chief Software/Hardware Architect",
+    "System Architect",
     "Technical Director",
     "Art Director",
-    "Hardware Programmers",
-    "Software Programmers",
+    "Hardware Engineers",
+    "Software Engineers",
     "UI Designers",
     "Core Contributers",
     "Testers"
+    "Simulation Engineer",
+    "Special Thanks"
+    "Copyrights"
 };
 
 const char * const credits_data[] =
 {
     "EasyAI Chen(easyai@outlook.com)",
     "Forewing Xie(jujianai@hotmail.com)",
-    "Niffle Wu(1102365274@qq.com)"
+    "Niffle Wu(1102365274@qq.com)",
+    "Copyright 2018 EmmmHackers. All rights reserved.",
+    "Intel Corporation",
+    "Terasic Inc.",
+    "RISC-V Foundation"
 };
