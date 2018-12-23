@@ -16,7 +16,7 @@ void sh(){
         vga_puts(0x01, "~");
         vga_puts(0x07, "$ ");
         char tmp[101];
-        gets(tmp);
+        gets_drawback(tmp);
         if (strcmp(tmp, "hello") == 0){
             vga_puts(VGA_F_CYAN|VGA_B_BLACK, "Hello, world!\n");
         }else if (strcmp(tmp, "time") == 0){

@@ -37,6 +37,7 @@
 void init(void);
 
 extern u16 emmmcs_logo[];
+extern const char * const credits_data[];
 int main(void)
 {
     init();
@@ -46,7 +47,14 @@ int main(void)
         }
         vga_putc(0x07, '\n');
     }
-    vga_putc(0x07, '\n');
+    vga_puts(0x7, "======================================\n");
+    vga_puts(0x7, credits_data[0]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[1]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, credits_data[2]);
+    vga_puts(0x7, "\n");
+    vga_puts(0x7, "======================================\n\n");
     led_on(0);
     // vga_puts(0x07, "Press ANY Key to Start.\n");
     // getchar();

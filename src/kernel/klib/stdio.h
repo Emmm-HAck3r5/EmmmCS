@@ -6,6 +6,7 @@
 char  getchar();
 char* gets(char* str);
 int getn();
+char* gets_drawback(char* str);
 
 int putchar(char cha);
 int   puts(const char* str);

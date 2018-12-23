@@ -55,6 +55,23 @@ char* gets(char* str){
     return str;
 }
 
+char* gets_drawback(char* str){
+    char* ptr = str;
+    while (1){
+        *ptr = getchar();
+        vga_putc(0x7, *ptr);
+        if (*ptr == '\n')
+            break;
+        if (*ptr == '\b'){
+            *ptr = 0;
+        }else{
+            ptr++;
+        }
+    }
+    *ptr = '\0';
+    return str;
+}
+
 int getn()
 {
     int n = 0;
