@@ -5,7 +5,7 @@
 set_global_assignment -name FAMILY "Cyclone V"
 set_global_assignment -name DEVICE 5CSXFC6D6F31C6
 set_global_assignment -name TOP_LEVEL_ENTITY "emmmcs"
-set_global_assignment -name ORIGINAL_QUARTUS_VERSION "16.0.2"
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 16.0.2
 set_global_assignment -name LAST_QUARTUS_VERSION "18.0.0 Lite Edition"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "10:26:22 DECEMBER 18,2018"
 set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
@@ -282,15 +282,19 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_FILE ../src/rtl/seg7_h.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/util/seg7_h.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/util/reset_module.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/util/d_trigger.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/util/clkgen_module.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/driver/yakbd/yakbd_ps2ascii.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/driver/yakbd/yakbd.v
+set_global_assignment -name VERILOG_FILE ../src/rtl/driver/yakbd/ps2_keyboard.v
+set_global_assignment -name QIP_FILE ../src/rtl/memory/vga_memory2port.qip
 set_global_assignment -name QIP_FILE ../src/rtl/memory/cache.qip
-set_global_assignment -name QIP_FILE ../src/rtl/memory/vga_memory.qip
 set_global_assignment -name QIP_FILE ../src/rtl/memory/vga_font_rom.qip
 set_global_assignment -name VERILOG_FILE ../src/rtl/memory/cpu_bus.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/driver/vga_ctrl.v
-set_global_assignment -name VERILOG_FILE ../src/rtl/driver/ps2_keyboard.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/driver/led_ctrl.v
-set_global_assignment -name VERILOG_FILE ../src/rtl/driver/keyboard_ctrl.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/driver/driver_define.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/driver/display_ctrl.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/core/cpu_instr_decoder.v
@@ -301,8 +305,6 @@ set_global_assignment -name VERILOG_FILE ../src/rtl/core/cpu.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/core/alu_mul.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/core/alu_div.v
 set_global_assignment -name VERILOG_FILE ../src/rtl/core/alu_define.v
-set_global_assignment -name VERILOG_FILE ../src/rtl/reset_module.v
-set_global_assignment -name VERILOG_FILE ../src/rtl/clkgen_module.v
 set_global_assignment -name SDC_FILE emmmcs.SDC
 set_global_assignment -name VERILOG_FILE ../src/rtl/driver/vga_color_decoder.v
 set_global_assignment -name QIP_FILE ../src/rtl/memory/kbd_scan2ascii.qip

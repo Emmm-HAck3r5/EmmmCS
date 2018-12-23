@@ -16,18 +16,18 @@
 % See the License for the specific language governing permissions and
 % limitations under the License.
 % --------------------------
-% File: kernel_lib.tex
+% File: kernel_intr.tex
 % Project: EmmmCS
 % File Created: 2018-12-08 16:58:40
 % Author: Chen Haodong (easyai@outlook.com)
+%         Xie Nairong (jujianai@hotmail.com)
 % --------------------------
 % Last Modified: 2018-12-08 17:15:10
 % Modified By: Chen Haodong (easyai@outlook.com)
 %
 
-\chapter{Kernel Intr}
-中断处理函数。
-
+\chapter{Kernel 中断处理}
+中断规定、中断表见CPU中断部分。\textbf{注意Kernel统一将中断处理函数设置为intr，通过在intr内部读取中断号进行中断分发，不再由CPU进行中断分发}
 \section{intr\_init}
 \texttt{void intr\_init(void)}
 
@@ -52,6 +52,7 @@
 
 简介：中断处理主函数，用于分发中断。
 
-\subsection{函数功能}
+\section{intr\_handler\_register}
+\texttt{void intr\_handler\_register(u8 intrno, void *handler)}
 
-在发生中断时被调用，读取 \texttt{0x7fffc} 开始的 4 子节作为中断参数，根据首字节进行分发；具体定义见 cpu 中断部分。
+简介：对相应中断处理函数进行注册。

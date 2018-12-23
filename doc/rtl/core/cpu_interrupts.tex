@@ -7,37 +7,34 @@
 \section{中断控制}
 
 \subsubsection{初始化}
-通过写入 \texttt{0x40} 号 csr uscratch，设置中断入口。
+通过写入mtvec寄存器，设置中断处理向量表。
 
 \subsubsection{打开中断}
-通过给 \texttt{0x41} 号 csr uepc 赋值为 1，打开中断。
+通过给mie寄存器赋值为 1，打开中断。
 
 \subsubsection{关闭中断}
-通过给 \texttt{0x41} 号 csr uepc 赋值为 0，关闭中断。
+通过给mie寄存器赋值为 0，关闭中断。
 
 \subsubsection{中断返回}
-通过给 \texttt{0x42} 号 csr ucause 赋值，从中断中返回。
+通过MRET指令，从中断中返回。
 
 \section{中断发生}
 
-当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到中断处理函数所指向的地址；
-
-中断参数为一个 4 字节数，每子节含义如下：
-\begin{tabular}{|c|c|}
-    \hline
-    位数 & 含义 \\\hline
-    0     & 中断号 \\\hline
-    1-3     & 终端参数，由中断执行函数确定含义 \\\hline
-\end{tabular}
+当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到mtvec[0]所指向的中断处理函数。其中，mcause寄存器存储中断号，mscratch存储第一个参数，如硬件中断需要更多的参数传递，由mhpmevent3至mhpmevent31寄存器存储。
 
 \section{中断返回}
 
 由于本项目仅支持 M-level，故只支持通过 \texttt{MRET} 指令进行中断返回；执行本指令时，将会将 \texttt{pc}、\texttt{xi} 等通用寄存器恢复为进行中断前的状态。
 
 \section{中断表}
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|}
     \hline
-    中断号 & 含义 & 参数 1 & 参数 2\\\hline
-    0     & 无异常 & &\\\hline
-    1     & 键盘 & 键盘内存地址 &\\\hline
+    中断号 & 含义\\\hline
+    0     & FATAL ERROR\\\hline
+    1     & 键盘\\\hline
+    2     & 计时器\\\hline
 \end{tabular}
+
+\section{硬件中断参数}
+\subsection{键盘}
+\noindent{参数1：键盘扫描码}

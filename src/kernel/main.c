@@ -25,16 +25,52 @@
 #include "driver/led.h"
 #include "driver/vga.h"
 #include "driver/kbd.h"
+#include "driver/timer.h"
 #include "mm/mm.h"
+
 #include "intr/intr.h"
+#include "riscv_asm.h"
+
+#include "klib/stdio.h"
+#include "klib/string.h"
 
 void init(void);
 
 int main(void)
 {
     init();
-    while(1)
-        ;
+
+    int i;
+    // for (i = 0; i < 10; i++){
+    //     vga_putc(0x70, getchar());
+    // }
+    vga_puts(0x07, "Press ANY Key to Start.");
+    getchar();
+    vga_puts(0x07, "Welcome to EmmmCS!\n");
+    while (1){
+        vga_puts(0x02, "forewing@EmmmCS:");
+        vga_puts(0x01, "~$ ");
+        char tmp[101];
+        int i;
+        for (i = 0; i < 100; i++){
+            tmp[i] = getchar();
+            vga_putc(0x7, tmp[i]);
+            if (tmp[i] == '\n'){
+                tmp[i] = '\0';
+                break;
+            }
+        }
+        if (strcmp(tmp, "hello") == 0){
+            vga_puts(0x3, "Hello, world!\n");
+        }else if (strcmp(tmp, "time") == 0){
+            vga_putn(0x07, uptime(), VGA_N_HEX);
+            vga_puts(0x7, "\n");
+        }else if (strcmp(tmp, "fuck") == 0){
+            vga_puts(0x50, "Fuck you\n");
+        }else{
+            vga_puts(0x50, "Invalid command\n");
+        }
+    }
     return 0;
 }
 
@@ -43,6 +79,7 @@ void init(void)
     led_init();
     vga_init();
     kbd_init();
+    timer_init();
     mm_init();
     intr_init();
 }

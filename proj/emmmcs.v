@@ -76,6 +76,9 @@ reset_module reset(
 );
 
 cpu cpu(
+	.SW(SW),
+	.KEY(KEY),
+
 	.clk    (CLOCK_50),
 	.cpu_clk(cpu_clk),
 	.clr_n  (clr_n),
@@ -92,7 +95,14 @@ cpu cpu(
 	.VGA_VS	(VGA_VS),
 
 	.PS2_CLK(PS2_CLK),
-	.PS2_DAT(PS2_DAT)
+	.PS2_DAT(PS2_DAT),
+
+	.HEX0(HEX0),
+	.HEX1(HEX1),
+	.HEX2(HEX2),
+	.HEX3(HEX3),
+	.HEX4(HEX4),
+	.HEX5(HEX5)
 );
 
 
