@@ -29,6 +29,8 @@
 #include "mm/mm.h"
 #include "sh/sh.h"
 
+#include "klib/stdio.h"
+
 #include "intr/intr.h"
 #include "riscv_asm.h"
 
@@ -38,9 +40,10 @@ int main(void)
 {
     init();
     led_on(0);
-    vga_puts(0x07, "Press ANY Key to Start.\n");
-    getchar();
-    vga_puts(0x07, "Welcome to EmmmCS!\n");
+    // vga_puts(0x07, "Press ANY Key to Start.\n");
+    // getchar();
+    // vga_puts(0x07, "Welcome to EmmmCS!\n");
+    sh();
 
     return 0;
 }

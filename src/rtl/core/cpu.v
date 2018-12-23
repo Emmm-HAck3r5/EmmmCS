@@ -545,7 +545,7 @@ always @(posedge clk_cpu) begin
                             //NOT SUPPORT
                         end
                         `CPU_INSTR_GRP_E_CSR:  begin
-                            LEDR_reg[9:7] <= decoder_funct[2:0];
+                            
                             case(decoder_funct[2:0])
                                 3'b000: begin
                                     is_intring <= 0;

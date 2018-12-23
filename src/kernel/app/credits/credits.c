@@ -34,6 +34,13 @@ static int cur_anime_time;
 static int cur_pos_print;
 static int cur_data_print;
 static BOOL is_refresh;
+
+
+void credits_exit()
+{
+    tick_handler_unregister();
+}
+
 static void credits_tick()
 {
     cur_anime_time = (cur_anime_time + 1) & 0x3FF;
@@ -233,9 +240,4 @@ int credits(void)
             break;
     }
     credits_exit();
-}
-
-void credits_exit()
-{
-    tick_handler_unregister();
 }
