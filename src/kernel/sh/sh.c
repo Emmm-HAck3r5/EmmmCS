@@ -61,6 +61,7 @@ void sh(){
             }
         }else if (strcmp(cmd, "bird") == 0){
             pixel_bird();
+            vga_init();
         }else if (strcmp(cmd, "exit") == 0){
             return;
         }else if (strcmp(cmd, "led") == 0){

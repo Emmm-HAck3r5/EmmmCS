@@ -124,8 +124,15 @@ int pixel_bird(void)
             {
                 sprite_draw(&rigid_bodys[i].spr,0x7);
             }
-            if (kbd_getc() == KBD_SPACE)
+            if(rand() & 0x1)
+            {
                 rigid_bodys[0].y_speed += 2;
+            }
+            if (kbd_getc_async() == KBD_SPACE)
+            {
+                rigid_bodys[0].y_speed += 2;
+                kbd_clear_buf();
+            }
             if(is_bird_die())
                 is_gameover = TRUE;
             update_tubes();
