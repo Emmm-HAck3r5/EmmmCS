@@ -18,7 +18,7 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-23 12:49:04
+  Last Modified: 2018-12-23 20:38:13
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -53,7 +53,7 @@ typedef struct sprite_t
     u8 phy_length;
     s8 phy_x;
     s8 phy_y;
-    u8 *pixels;
+    u8 pixels[100];
 } sprite_t;
 
 sprite_t *sprite_create(u8 w, u8 l, s8 x, s8 y, u8 p_w, u8 p_l, s8 p_x, s8 p_y, u8 *pxs);

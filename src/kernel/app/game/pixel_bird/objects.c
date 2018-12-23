@@ -18,7 +18,7 @@
   File Created: 2018-12-21 19:44:05
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 20:53:31
+  Last Modified: 2018-12-23 20:48:40
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -26,13 +26,11 @@
 
 u8 bird[2][3] = {{0x5F, SOLID_SQUARE, UR_TRIANGLE}, {0x60, SOLID_SQUARE, DR_TRIANGLE}};
 
-u8 *tube_pixels_generate(int l, int w);
-void tube_pixels_destroy(u8 *tube);
-u8 *tube_pixels_generate(int l, int w)
+void tube_pixels_generate(u8 *buf, int l, int w)
 {
-      u8 *pixel = (u8 *)malloc(sizeof(u8) * l * w);
-      memset(pixel, SOLID_SQUARE, l * w);
-      return pixel;
+      //u8 *pixel = (u8 *)malloc(sizeof(u8) * l * w);
+      memset(buf, SOLID_SQUARE, l * w);
+      //return pixel;
 }
 void tube_pixels_destroy(u8 *tube)
 {

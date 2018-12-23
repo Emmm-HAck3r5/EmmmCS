@@ -18,7 +18,7 @@
   File Created: 2018-12-22 20:24:39
   Author: Chen Haodong (easyai@outlook.com)
   --------------------------
-  Last Modified: 2018-12-22 21:00:55
+  Last Modified: 2018-12-23 20:48:17
   Modified By: Chen Haodong (easyai@outlook.com)
  */
 
@@ -30,7 +30,7 @@
 #define BIRD_PHY_X 6
 #define BIRD_ACT_UP 0
 #define BIRD_ACT_DOWN 1
-u8 *tube_pixels_generate(int l, int w);
+void tube_pixels_generate(u8 *buf, int l, int w);
 void tube_pixels_destroy(u8 *tube);
 
 extern u8 bird[2][3];
