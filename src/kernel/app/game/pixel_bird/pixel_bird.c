@@ -81,7 +81,7 @@ void update_tubes()
 }
 static void tick(void)
 {
-    cur_time = (cur_time + 1) & 0x3F;
+    cur_time = (cur_time + 1) & 0x7F;
 }
 int pixel_bird(void)
 {
@@ -105,6 +105,8 @@ int pixel_bird(void)
     {
         sprite_draw(&rigid_bodys[i].spr,0x7);
     }
+    // while(1)
+    //     ;
     //scene init finished
     is_gameover = FALSE;
     //register game main logic as the timer handler
@@ -124,8 +126,15 @@ int pixel_bird(void)
             {
                 sprite_draw(&rigid_bodys[i].spr,0x7);
             }
-            if (kbd_getc() == KBD_SPACE)
+            // if(rand() & 0x1)
+            // {
+            //     rigid_bodys[0].y_speed += 2;
+            // }
+            if (kbd_getc_async() == KBD_SPACE)
+            {
                 rigid_bodys[0].y_speed += 2;
+                kbd_clear_buf();
+            }
             if(is_bird_die())
                 is_gameover = TRUE;
             update_tubes();

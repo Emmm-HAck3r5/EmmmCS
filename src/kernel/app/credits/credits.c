@@ -45,7 +45,7 @@ void credits_exit()
 static void credits_tick()
 {
     cur_anime_time = (cur_anime_time + 1) & 0x7;
-    cur_time = (cur_time + 1) & 0x1F;
+    cur_time = (cur_time + 1) & 0xF;
     // vga_putn(0X70, cur_time, VGA_N_U_DEC);
     // vga_puts(0x7, "\n");
 }

@@ -47,6 +47,10 @@ void kbd_init(void)
     intr_handler_register(KBD_INTR, kbd_handler);
 }
 
+void kbd_clear_buf(void){
+    kbd_buf = 0;
+}
+
 void kbd_handler(void)
 {
     // kbd_buf = read_csr(mtval);

@@ -30,6 +30,7 @@ void kbd_init(void);
 void kbd_handler(void);
 u8 kbd_getc(void);
 u8 kbd_getc_async(void);
+void kbd_clear_buf(void);
 //#define KBD_BUF_SIZE 256
 
 //void kbd_init();

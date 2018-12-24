@@ -61,6 +61,7 @@ void sh(){
             }
         }else if (strcmp(cmd, "bird") == 0){
             pixel_bird();
+            vga_init();
         }else if (strcmp(cmd, "exit") == 0){
             return;
         }else if (strcmp(cmd, "led") == 0){
@@ -71,7 +72,16 @@ void sh(){
                 vga_puts(0x7, "Please provide LED id.\n");
             }
         }else if (strcmp(cmd, "help") == 0){
-            vga_puts(0x7, "help page\n");
+            vga_puts(0x7, "help\n\tShow this page\n");
+            vga_puts(0x7, "time\n\tDisplay the time \n\tsince boot (per 10ms)\n");
+            vga_puts(0x7, "credits\n\tDisplay the credits\n");
+            vga_puts(0x7, "hello [name]\n\tSay hello to someone, \n\tdefault to world if no name\n");
+            vga_puts(0x7, "uname\n\tDisplay the version of the system\n");
+            vga_puts(0x7, "clear\n\tClear the screen\n");
+            vga_puts(0x7, "eval\n\tCalculator\n");
+            vga_puts(0x7, "bird\n\tFlappy bird game\n");
+            vga_puts(0x7, "exit\n\tExit the shell\n");
+            vga_puts(0x7, "led [id]\n\tToggle the [id]th led\n");
         }else if (strcmp(cmd, "bc") == 0){
             sh_bc();
         }else if (cmd[0] == '\0'){
