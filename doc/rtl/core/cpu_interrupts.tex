@@ -6,19 +6,19 @@
 
 \section{中断控制}
 
-\subsubsection{初始化}
+\subsection{初始化}
 通过写入mtvec寄存器，设置中断处理向量表。
 
-\subsubsection{打开中断}
+\subsection{打开中断}
 通过给mie寄存器赋值为 1，打开中断。
 
-\subsubsection{关闭中断}
+\subsection{关闭中断}
 通过给mie寄存器赋值为 0，关闭中断。
 
-\subsubsection{中断返回}
+\subsection{中断返回}
 通过MRET指令，从中断中返回。
 
-\section{中断发生}
+\section{中断流程}
 
 当中断发生时，CPU 将会储存 \texttt{x1} 到 \texttt{x31} 寄存器、\texttt{pc} 寄存器的一份拷贝。并跳转到mtvec[0]所指向的中断处理函数。其中，mcause寄存器存储中断号，mscratch存储第一个参数，如硬件中断需要更多的参数传递，由mhpmevent3至mhpmevent31寄存器存储。
 
@@ -38,3 +38,6 @@
 \section{硬件中断参数}
 \subsection{键盘}
 \noindent{参数1：键盘扫描码}
+
+\subsection{计时器}
+\noindent{参数1：开机时间数（每10ms）}

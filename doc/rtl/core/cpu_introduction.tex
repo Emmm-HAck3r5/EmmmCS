@@ -50,8 +50,10 @@
     Ext.N   &   1.1 &   否\\\hline
 \end{tabular}
 \section{常量定义}
-常量均定义在$rtl/core/cpu\_define.v$内，该文件给出CPU各个数据位宽和各个预定义模式。\\
-\begin{center}
+常量均定义在$rtl/core/cpu\_define.v$内，该文件给出CPU各个数据位宽和各个预定义模式。
+
+\begin{table}[H]
+    \centering
 \begin{tabular}{|l|p{3cm}|p{6cm}|}
     \hline
     名称    &   值  &   说明\\\hline
@@ -72,6 +74,13 @@
     CPU\_INSTR\_OPR\_RD & b01000 & 操作数：RD\\\hline
     CPU\_INSTR\_OPR\_RS3 & b10000 & 操作数：R\\\hline
     CPU\_INSTR\_GRP\_INVALID & 0 & 无效指令组\\\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+\begin{tabular}{|l|p{3cm}|p{6cm}|}
+    \hline
     \multicolumn{3}{|c|}{RV32I}\\\hline
     \multicolumn{2}{|c|}{CPU\_INSTR\_INFO\_WIDTH}&\\\hline
     CPU\_INSTR\_GRP\_LUI & 1 & 指令组：LUI\\\hline
@@ -96,4 +105,4 @@
     CPU\_INSTR\_GRP\_F\_FNMADD & 18 & 指令组：FNMADD\\\hline
     CPU\_INSTR\_GRP\_F\_FOPR & 19 & 指令组：FOPR\\\hline
 \end{tabular}
-\end{center}
+\end{table}

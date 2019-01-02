@@ -1,15 +1,15 @@
 %
 % Copyright 2018 EmmmHackers
-% 
-% 
+%
+%
 % Licensed under the Apache License, Version 2.0 (the "License");
 % you may not use this file except in compliance with the License.
 % You may obtain a copy of the License at
-% 
-% 
+%
+%
 %       http://www.apache.org/licenses/LICENSE-2.0
-% 
-% 
+%
+%
 % Unless required by applicable law or agreed to in writing, software
 % distributed under the License is distributed on an "AS IS" BASIS,
 % WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,3 +55,32 @@
 \end{tabular}
 \subsection{说明}
 本模块可产生50MHz的可分时钟信号。\\
+
+\section{d\_trigger}
+\subsection{基本信息}
+模块名：d\_trigger
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽 &   名称    &   说明\\\hline
+    input   &   8   &   in\_data &   输入数据\\\hline
+    input   &   1   &   en  &   使能信号\\\hline
+    input   &   1   &   clk  &   时钟信号\\\hline
+    output  &   8   &   out  &   输出数据\\\hline
+\end{tabular}
+\subsection{说明}
+本模块维护一个 D-锁存器。\\
+
+\section{seg7\_h}
+\subsection{基本信息}
+模块名：seg7\_h
+\subsection{接口}
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    类型    &   位宽    &   名称    &   说明\\\hline
+    input   &   1   &   en &   使能信号\\\hline
+    input   &   4   &   in  &   输入数据\\\hline
+    output   &   7   &   hex  &   数码管信号\\\hline
+\end{tabular}
+\subsection{说明}
+本模块用于将输入数据对应的 16 进制表示写到七段数码管上。\\

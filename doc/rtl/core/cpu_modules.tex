@@ -219,10 +219,86 @@ SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
     \hline
     类型    & 位宽 &   名称    &   说明\\\hline
     input   &  1  &   clk     &   硬件时钟信号\\\hline
-    input   &  1  &   clr\_n   &   清零信号（低电平有效）\\\hline
+    input   &  1  &   clr\_n   &   复位信号（低电平有效）\\\hline
     output  &  1  &   cpu\_clk &   CPU时钟\\\hline
+    \multicolumn{4}{|c|}{硬件接口}\\\hline
+    \multicolumn{4}{|c|}{...}\\\hline
 \end{tabular}
-\subsection{时序}
-    $$T(\textit{cpu\_clk})=10T(\textit{clk})+\text{max}(T(\textit{cpu\_bus})+T(\textit{cpu\_alu}))$$
+
 \subsection{说明}
 本模块定义 CPU 顶层模块，用于综合各 CPU 组件并完成指令执行。clk 与 clr\_n 信号含义如说明；cpu\_clk 为 CPU 时钟信号，每一个周期表明一个 CPU 时钟周期。
+
+\subsection{使用模块}
+\begin{enumerate}
+    \item cpu\_gregs
+    \item cpu\_bus
+    \item cpu\_instr\_decoder
+    \item cpu\_alu
+    \item keyboard
+    \item clkgen\_module
+\end{enumerate}
+
+\subsection{状态图}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,semithick]
+
+    \tikzstyle{every state}=[fill=black,draw=none,text=white]
+
+    \node[initial,state] (INIT)             {INIT};
+
+
+    \node[state] (FETCH)    [below of=INIT]     {FETCH};
+    \node[state] (DECODE)   [right of=FETCH]    {DECODE};
+    \node[state] (SET)      [right of=DECODE]   {SET};
+    \node[state] (IOFF)     [below of=FETCH]      {IOFF};
+    \node[state] (MEMW)     [right of=IOFF]     {MEMW};
+    \node[state] (MEMR)     [right of=MEMW]     {MEMR};
+    \node[state] (ALU)      [right of=MEMR]     {ALU};
+    \node[state] (BRANCH)   [below of=IOFF]      {BRANCH};
+    \node[state] (REGW)     [right of=BRANCH]   {REGW};
+    \node[state] (INTR) [above of=INIT]  {INTR};
+
+    \path (INIT)
+        edge [loop right] node {SW[0]} (INIT)
+        edge [pos=0.25]node {!IF or !signal} (FETCH)
+        edge [bend right] node [right]{IF and signal} (INTR);
+
+    \path (INTR)
+        edge [bend right] (BRANCH);
+
+    \path (FETCH)
+        edge (DECODE);
+
+    \path (DECODE)
+        edge [loop above] node [right] {!decode\_ready} (DECODE)
+        edge [bend left] node {decode\_ready} (SET);
+
+    \path (SET)
+        edge node [left] {mret} (IOFF)
+        edge node [left] {store} (MEMW)
+        edge node [right] {load} (MEMR)
+        edge node [right] {alu[i] or muldiv} (ALU)
+        edge node [right, pos=0.8] {lui auipc jal jalr csrr} (REGW)
+        edge [bend left] node [left,pos=0.7] {bcc csrw} (BRANCH);
+
+    \path (IOFF)
+        edge (BRANCH);
+
+    \path (MEMW)
+        edge [loop left] node [pos=0.5,below]{!bus\_ready} (MEMW)
+        edge node [left,pos=0.25]{bus\_ready} (BRANCH);
+
+    \path (MEMR)
+        edge [loop right] node [pos=0,right]{!bus\_ready} (MEMR)
+        edge [bend left]node [right,pos=0.75]{bus\_ready} (REGW);
+
+    \path (ALU)
+        edge [loop right] node [pos=0.5,right]{!alu\_ready} (ALU)
+        edge [bend left]node [right,pos=0.5]{alu\_ready} (REGW);
+
+    \path (REGW)
+        edge [bend left] (BRANCH);
+
+    \path (BRANCH)
+        edge [bend left] (INIT);
+
+\end{tikzpicture}
