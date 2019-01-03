@@ -26,3 +26,92 @@
 %
 
 \chapter{Kernel shell}
+
+shell 提供了开机后的默认交互环境。\\
+
+\section{使用说明}
+
+进入 shell 后，可以看到“ {\color{green}EmmmCS>}{\color{red}<mode>} \$” 字样，表明 shell 加载完成，此时输入命令即可执行相应的内容。
+
+命令支持情况如下：\\
+
+\begin{tabular}{|l|c|}
+    \hline
+    命令    & 描述  \\\hline
+    bird    & “下坠的小鸟”游戏  \\\hline
+    clear   & 清屏  \\\hline
+    credits & 致谢信息  \\\hline
+    eval    & 计算器  \\\hline
+    exit    & 退出  \\\hline
+    hello   & 问好  \\\hline
+    help    & 帮助  \\\hline
+    led     & LED 灯控制  \\\hline
+    time    & 开机时间  \\\hline
+    uname   & 版本信息  \\\hline
+    其他    & 不支持的命令  \\\hline
+\end{tabular}
+
+\section{bird}
+\subsection{描述}
+进入“下坠的小鸟”游戏，游戏相关内容见 app/pixel\_bird。
+\subsection{参数}
+无
+
+\section{clear}
+\subsection{描述}
+清空屏幕
+\subsection{参数}
+无
+
+\section{credits}
+\subsection{描述}
+展示致谢信息，相关内容见 app/credits。
+\subsection{参数}
+无
+
+\section{eval}
+\subsection{描述}
+循环获取一行表达式，以回车结尾；获取后调用 app/eval 进行计算，并打印计算结果。
+
+在表达式框输入 quit 退回到 shell。
+\subsection{参数}
+无
+
+\section{exit}
+\subsection{描述}
+退出 shell。
+\subsection{参数}
+无
+
+\section{hello}
+\subsection{描述}
+打印欢迎信息。
+\subsection{参数}
+当提供参数时，将对参数进行问好；否则直接打印 "Hello World!"。
+
+\section{help}
+\subsection{描述}
+打印使用说明。
+\subsection{参数}
+无
+
+\section{led}
+\subsection{描述}
+切换指定编号 LED 灯的状态。
+\subsection{参数}
+指定 LED 编号。
+
+\section{time}
+\subsection{描述}
+打印开机时间（每 10 ms）。
+\subsection{参数}
+无
+
+\section{uname}
+\subsection{描述}
+打印版本信息。
+\subsection{参数}
+无
+
+\section{其他}
+报错
