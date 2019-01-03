@@ -141,28 +141,14 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     \hline
     类型        &   位宽    &   名称    &   说明\\\hline
     input       &   1      &    clk     &   时钟信号\\\hline
+    input       &   1      &    reset\_n  &   复位端\\\hline
     input       &   32     &    address &   地址端\\\hline
     input       &   32      &   wdata   &   写入数据\\\hline
-    input       &   2       &   WLEN    &   SDRAM读写控制\\\hline
     input       &   1       &   EN\_N   &   使能信号(低有效)\\\hline
+    input       &   2       &   WLEN   &   读写控制端\\\hline
     output      &   1       &   READY   &   预备信号\\\hline
     output      &   32      &   rdata   &   读取数据\\\hline
 \end{tabular}
-%\subsection{SDRAM接口}
-%\label{SDRAM-ports}
-%\begin{tabular}{|c|c|c|c|}
-%    \hline
-%    类型        &   位宽    &   名称    &   说明\\\hline
-%    output      &   13     &    ADDR   &    DRAM\_ADDR[12..0]\\\hline
-%    output      &   2       &   BA      &   DRAM\_BA[1..0]\\\hline
-%    output      &   16      &   DQ      &   DRAM\_DQ[15..0]\\\hline
-%    output      &   1       &   CKE     &   DRAM\_CKE\\\hline
-%    output      &   1       &   CS\_N     &   DRAM\_CS\_N\\\hline
-%    output      &   1       &   RAS\_N     &   DRAM\_RAS\_N\\\hline
-%    output      &   1       &   CAS\_N     &   DRAM\_CAS\_N\\\hline
-%    output      &   1       &   WE\_N     &   DRAM\_WE\_N\\\hline
-%    output      &   2       &   DMASK     &  \{DRAM\_UDQM, DRAM\_LDQM\}\\\hline
-%\end{tabular}
 \subsection{WLEN控制信号真值表}
 \begin{tabular}{|c|c|c|}
     \hline
@@ -173,9 +159,8 @@ RST 复位端高电平有效，乘法、除法、取余操作必须透过 RST �
     1       &   1       &       32位写入操作\\\hline
 \end{tabular}
 \subsection{说明}
-SDRAM接口部份，请参考DE10-Standard User Manual 第39页 Table3-23。\\
 将复位端 RST 置零后，总线开始进行读写操作。当READY恢复高电平时，表示读写操作已完成。因为没有输入数据缓存，操作完成之前更改输入可能发生无法预料的结果。\\
-地址端输入映射存储位置详细请见第四章硬件驱动说明。除了 SDRAM 外，其余位于片内存储器的读写所需周期皆为 1 个周期，READY 直接置高电平。\\
+地址端输入映射存储位置详细请见第四章硬件驱动说明。\\
 \textbf{SDRAM IS DEPRECATED}
 
 \section{cpu\_instr\_decoder}
